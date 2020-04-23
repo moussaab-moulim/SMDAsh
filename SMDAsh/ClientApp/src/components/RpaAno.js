@@ -1,11 +1,11 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState,useEffect, useRef} from 'react';
 import '../App.css';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from "react-redux";
-import { getData } from "../actions/chartAnoActions";
+import { getData } from "../actions/rpaAnoActions";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -24,10 +24,9 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-export default function ChartAno() {
+export default function RpaAno() {
   const dispatch = useDispatch();
-  const state = useSelector(state => state.chartAno)
-
+  const state = useSelector(state => state.rpaAno)
   const classes = useStyles();
  
   useEffect(() => dispatch(getData()), []);
@@ -37,86 +36,63 @@ export default function ChartAno() {
 
 
 <Grid container className={classes.root} >
-      <Grid item xs={6}>
-        <h2>Tableau Anomalie</h2>
+      <Grid item xs={5} >
+            <h2>Tableau Répartition Par Application</h2>
+            
             <TableContainer className="" >
                         <Table  aria-label="simple table">
                             <TableHead>
                             <TableRow>
-                                <TableCell>Year / Week</TableCell>
-                                <TableCell align="right">Year</TableCell>
-                                <TableCell align="right">Week</TableCell>
-                                <TableCell align="right">In</TableCell>
-                                <TableCell align="right">Out</TableCell>
-                                <TableCell align="right">Backlog</TableCell>
-                                <TableCell align="right">TealBacklog</TableCell>
-                                <TableCell align="right">OCPBacklog</TableCell>
+                                <TableCell>Lignes</TableCell>
+                                <TableCell align="center">Count</TableCell>
+                               
                             </TableRow>
                             </TableHead>
                             <TableBody>
-                                
                             {state.dataTable.map((data,i) => (
                                 <TableRow key={i}>
                                 <TableCell component="th" scope="row">
-                                    {data.YearWeek}
+                                {data.project}
                                 </TableCell>
-                                <TableCell align="right"> {data.Year}</TableCell>
-                                <TableCell align="right"> {data.Week}</TableCell>
-                                <TableCell align="right"> {data.In}</TableCell>
-                                <TableCell align="right"> {data.Out}</TableCell>
-                                <TableCell align="right"> {data.Backlog}</TableCell>
-                                <TableCell align="right"> 0</TableCell>
-                                <TableCell align="right"> 0</TableCell>
+                                <TableCell align="center"> {data.count}</TableCell>
+                                
                                 </TableRow>
                             ))}
+                            <TableRow >
+                                <TableCell component="th" scope="row" backgroundColor="red">
+                                    <b>Total</b>
+                                    </TableCell>
+                                    <TableCell align="center"> <b>{state.total}</b></TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                         </TableContainer>
-     
       </Grid>
-      <Grid item xs={6} > 
-        <h2>Anomalie : Input / Output / Week</h2>
-      <Bar
-                    data={state.data}
+      <Grid item xs={7}>
+      <div style={{padding:"5px"}} >
+      <h2>Pie Répartition Par Application</h2>
+        <Pie data={state.data} options={{
+            plugins: {
+                labels: {
                    
-                    width= "670vw"  height="400vh"
-                    options={{
-                        plugins: {
-                            labels: {
-                               
-                                render: 'value',
-                                fontSize: 12,
-                               
-                                fontColor: '#000',
-                                fontFamily: '"Lucida Console", Monaco, monospace'
-                              },
-                        },
-                        responsive: true,
-                        
-                        scales: {
-                            yAxes: [
-                                {
-                                gridLines: {
-                                display: false
-                                },
-                                ticks: {
-                                    beginAtZero: true,
-                                    
-                                }
-                            }]
-                        }
-                        
-                    }} 
-                 />
+                    render: 'value',
+                    fontSize: 12,
+                    
+                    fontColor: '#000',
+                    fontFamily: '"Lucida Console", Monaco, monospace'
+                  },
+            },
+                responsive: true,
+        }} /> 
+      </div>
+     
        </Grid>
 </Grid> 
 
 
-              
 
-            
 
-               
+        
 
     </div>
    

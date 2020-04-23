@@ -1,5 +1,5 @@
 {
-  "name": "demochartmantis",
+  "name": "smdash",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,6 +9,11 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
+    "chart.piecelabel.js": "^0.15.0",
+    "chartjs-plugin-datalabels": "^0.7.0",
+    "chartjs-plugin-labels": "^1.1.0",
+    "file-saver": "^2.0.2",
+    "html2canvas": "^1.0.0-rc.5",
     "moment": "^2.24.0",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.9.0",
@@ -20,9 +25,9 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "set PORT=5000 && react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "cross-env CI=true react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -41,3 +46,5 @@
     ]
   }
 }
+
+

@@ -23,29 +23,7 @@ namespace SMDAsh.Controllers
         {
             _context = context;
         }
-        [ODataRoute("GetBacklogByYearWeek(Category={Category},YearWeek={YearWeek})")]
-        public ActionResult<List<BacklogInOut>> GetBacklogByYearWeek([FromODataUri] string Category, [FromODataUri] IEnumerable<string> YearWeek)
-        {
-            /*var cmdText = "GetBacklogByYearWeek @Cat = @c, @YearWeek = @yw";
-            var @params = new[]{
-            new SqlParameter("c", Category),
-            new SqlParameter("yw", YearWeek)};*/
-
-
-            //var backl = _context.Backlogs.FromSqlRaw(cmdText, @params).AsQueryable();
-            List<BacklogInOut> result = new List<BacklogInOut>();
-            foreach (string y in YearWeek)
-            {
-                var cmdText = "GetBacklogByYearWeek @Cat = @c, @YearWeek = @yw";
-                var @params = new[]{
-            new SqlParameter("c", Category),
-            new SqlParameter("yw", y)};
-                var queryResIn = _context.BacklogInOuts.FromSqlRaw(cmdText, @params).AsEnumerable<BacklogInOut>().First();
-                result.Add(queryResIn);
-            }
-
-            return result;
-        }
+       
         /*
         [HttpGet]
         public virtual ActionResult<IQueryable<Backlog>> GetBacklogByYearWeek(string Cat, string YearWeek)

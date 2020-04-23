@@ -7,16 +7,12 @@ export const getData = () => async (dispatch) => {
       type: 'AWAITING_CHARTANO',
     });
 
-    const website = `http://localhost:44381`;
-    const route = `/api/Tickets/sm.BacklogInOut(Category='Anomalie',YearWeek=['2017W20','2017W21','2017W22'])`;
+  
     const response = await axios.get(
-      `http://tealtest1.azurewebsites.net/api/Tickets/sm.BacklogInOut(Category='Anomalie',YearWeek=['2017W20','2017W21','2017W22'])`
+      `api/Tickets/GetBacklogByYearWeek(Category='Anomalie',YearWeek=['2017W20','2017W21','2017W22','2017W23'])`
     );
-    //http://tealtest1.azurewebsites.net
+    const data = response.data.value;
 
-    const data = JSON.parse(response.data.value);
-
-    //console.log("api",data.length);
 
     const dataTable = [];
     const labels = [];

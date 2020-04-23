@@ -15,6 +15,11 @@
 .tableWidth{
   width: 50% !important;
 }
+/* Table Padding */
+.MuiTableCell-root{
+  padding: 2px !important;
+  text-align: center !important;
+}
 
 
 
