@@ -38,9 +38,9 @@ namespace SMDAsh.Controllers
             if (excelFile.Length <= 0)
                 return BadRequest("FileNotFound");
             string fileExtension = Path.GetExtension(excelFile.FileName);
-               List<string> list = new List<string>();
-           
-            string test1 = fileExtension;
+               
+
+            int count  = 0;
 
             if (fileExtension == ".xls" || fileExtension == ".xlsx")
             {
@@ -64,16 +64,15 @@ namespace SMDAsh.Controllers
 
 
                             List<string> keys = new List<string>();
-                            int i = 0;
-                            foreach (var row in sheetData.ChildElements)
+                            for (int i = 0;i< sheetData.ChildElements.Count;i++)
                             {
-
+                                var row = sheetData.ChildElements[i];
                                 Dictionary<string, string> ligne = new Dictionary<string, string>();
 
-                                int j = 0;
-                                foreach (var cell in (row as Row).ChildElements)
+                                
+                                for(int j = 0; j< (row as Row).ChildElements.Count;j++)
                                 {
-                                    var cellValue = (cell as Cell).CellValue;
+                                    var cell = (row as Row).ChildElements[j];
                                     Cell thecurrentcell = cell as Cell;
                                     /*
                                     if (cellValue != null)
@@ -113,17 +112,24 @@ namespace SMDAsh.Controllers
                                     }
                                     else
                                     {
-                                        ligne.Add(keys[j++], currentcellvalue);
+                                        
+                                            ligne.Add(keys[j], currentcellvalue);
+
+
                                     }
 
                                 }
-                                list = ligne.Keys.ToList<string>();
-                                if (sf.SourceTool.Equals("MANTIS")) { }
-                                //_context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = "MANTIS", AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
-                                else if (sf.SourceTool.Equals("SM9")) { }
-                                // _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = "SM9", AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
-                               
-                                i++;
+                                
+                                if (i != 0) { 
+                                if (sf.SourceTool.Equals("MANTIS")) { 
+                                _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = "MANTIS", AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
+                                        count++;
+                                    }
+                                    else if (sf.SourceTool.Equals("SM9")) { 
+                                 _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = "SM9", AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
+                                        count++;
+                                    }
+                                }
 
                             }
                         }
@@ -142,10 +148,11 @@ namespace SMDAsh.Controllers
             }
 
 
-            return Ok(new{
-                    Status = list[0].ToString(), 
-                    count = list
-                });
+            return Ok(new
+            {
+                Status = "sucess",
+                count = count +" row inserted",
+            }); ;
 
         }
     }
