@@ -41,9 +41,6 @@ namespace SMDAsh.Controllers
               List<List<string>> list = new List<List<string>>();
            
             string test1 = fileExtension;
-            string test2 = "";
-            string test3 = "";
-            string test4 = "";
 
             if (fileExtension == ".xls" || fileExtension == ".xlsx")
             {
@@ -52,21 +49,18 @@ namespace SMDAsh.Controllers
           
                 using (var fileStream = new FileStream(filename, FileMode.Create))
                 {
-                    test2 = "da5el using lowl";
                     await excelFile.CopyToAsync(fileStream);
 
                     try
                     {
-                        test3 = "da5el try";
+
                         //Lets open the existing excel file and read through its content . Open the excel using openxml sdk
                         using (SpreadsheetDocument doc = SpreadsheetDocument.Open(fileStream, false))
                         {
-                            test4 = "da5el using tanya";
                             WorkbookPart wbPart = doc.WorkbookPart;
-                            Sheet mysheet = (Sheet)doc.WorkbookPart.Workbook.Sheets.ChildElements.FirstOrDefault();
+                            Sheet mysheet = (Sheet)doc.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
                             Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
-                            SheetData sheetData = (SheetData)worksheet.ChildElements.FirstOrDefault();
-
+                            SheetData sheetData = (SheetData)worksheet.GetFirstChild<SheetData>();
                             foreach (var row in sheetData.ChildElements)
                             {
                                 List<string> str = new List<string>();
@@ -75,7 +69,7 @@ namespace SMDAsh.Controllers
                                     var cellValue = (cell as Cell).CellValue;
                                     if (cellValue != null)
                                     {
-                                        Console.WriteLine(cellValue.Text);
+                                        //Console.WriteLine(cellValue.Text);
                                         str.Add(cellValue.Text);
                                     }
                                 }
@@ -141,9 +135,9 @@ namespace SMDAsh.Controllers
                     //            }
                     //        }
 
-                    catch (Exception)
+                    catch (Exception e)
                     {
-
+                        throw e;
                     }
                 }
 
@@ -155,8 +149,8 @@ namespace SMDAsh.Controllers
 
 
             return Ok(new{
-                    Status = test1 + test2 + test3 + test4,    
-                    Message = list[0][0]
+                    Status = list[0].ToString(), 
+                    count = list
                 });
 
         }
