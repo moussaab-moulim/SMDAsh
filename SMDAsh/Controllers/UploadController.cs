@@ -67,11 +67,39 @@ namespace SMDAsh.Controllers
                                 foreach (var cell in (row as Row).ChildElements)
                                 {
                                     var cellValue = (cell as Cell).CellValue;
+                                    Cell thecurrentcell = cell as Cell;
+                                    /*
                                     if (cellValue != null)
                                     {
                                         //Console.WriteLine(cellValue.Text);
                                         str.Add(cellValue.Text);
-                                    }
+                                    }*/
+                                    string currentcellvalue = string.Empty;
+                                          if (thecurrentcell.DataType != null)
+                                          {
+                                              if (thecurrentcell.DataType == CellValues.SharedString)
+                                              {
+                                                  int id;
+                                                  if (Int32.TryParse(thecurrentcell.InnerText, out id))
+                                                  {
+                                                      SharedStringItem item = wbPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
+                                                      if (item.Text != null)
+                                                      {
+                                                    //code to take the string value  
+                                                    currentcellvalue = item.Text.Text;
+                                                      }
+                                                      else if (item.InnerText != null)
+                                                      {
+                                                          currentcellvalue = item.InnerText;
+                                                      }
+                                                      else if (item.InnerXml != null)
+                                                      {
+                                                          currentcellvalue = item.InnerXml;
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                    str.Add(currentcellvalue);
                                 }
                                 list.Add(str);
                             }
