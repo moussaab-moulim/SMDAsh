@@ -38,7 +38,7 @@ namespace SMDAsh.Controllers
             if (excelFile.Length <= 0)
                 return BadRequest("FileNotFound");
             string fileExtension = Path.GetExtension(excelFile.FileName);
-              List<List<string>> list = new List<List<string>>();
+               List<string> list = new List<string>();
            
             string test1 = fileExtension;
 
@@ -61,9 +61,16 @@ namespace SMDAsh.Controllers
                             Sheet mysheet = (Sheet)doc.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
                             Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
                             SheetData sheetData = (SheetData)worksheet.GetFirstChild<SheetData>();
+
+
+                            List<string> keys = new List<string>();
+                            int i = 0;
                             foreach (var row in sheetData.ChildElements)
                             {
-                                List<string> str = new List<string>();
+
+                                Dictionary<string, string> ligne = new Dictionary<string, string>();
+
+                                int j = 0;
                                 foreach (var cell in (row as Row).ChildElements)
                                 {
                                     var cellValue = (cell as Cell).CellValue;
@@ -75,93 +82,52 @@ namespace SMDAsh.Controllers
                                         str.Add(cellValue.Text);
                                     }*/
                                     string currentcellvalue = string.Empty;
-                                          if (thecurrentcell.DataType != null)
-                                          {
-                                              if (thecurrentcell.DataType == CellValues.SharedString)
-                                              {
-                                                  int id;
-                                                  if (Int32.TryParse(thecurrentcell.InnerText, out id))
-                                                  {
-                                                      SharedStringItem item = wbPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
-                                                      if (item.Text != null)
-                                                      {
+                                    if (thecurrentcell.DataType != null)
+                                    {
+                                        if (thecurrentcell.DataType == CellValues.SharedString)
+                                        {
+                                            int id;
+                                            if (Int32.TryParse(thecurrentcell.InnerText, out id))
+                                            {
+                                                SharedStringItem item = wbPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
+                                                if (item.Text != null)
+                                                {
                                                     //code to take the string value  
                                                     currentcellvalue = item.Text.Text;
-                                                      }
-                                                      else if (item.InnerText != null)
-                                                      {
-                                                          currentcellvalue = item.InnerText;
-                                                      }
-                                                      else if (item.InnerXml != null)
-                                                      {
-                                                          currentcellvalue = item.InnerXml;
-                                                      }
-                                                  }
-                                              }
-                                          }
-                                    str.Add(currentcellvalue);
+                                                }
+                                                else if (item.InnerText != null)
+                                                {
+                                                    currentcellvalue = item.InnerText;
+                                                }
+                                                else if (item.InnerXml != null)
+                                                {
+                                                    currentcellvalue = item.InnerXml;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (i == 0)
+                                    {
+                                        keys.Add(currentcellvalue);
+                                    }
+                                    else
+                                    {
+                                        ligne.Add(keys[j++], currentcellvalue);
+                                    }
+
                                 }
-                                list.Add(str);
+                                list = ligne.Keys.ToList<string>();
+                                if (sf.SourceTool.Equals("MANTIS")) { }
+                                //_context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = "MANTIS", AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
+                                else if (sf.SourceTool.Equals("SM9")) { }
+                                // _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = "SM9", AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
+                               
+                                i++;
+
                             }
                         }
                     }
-
-                    //            //create the object for workbook part  
-                    //            WorkbookPart workbookPart = doc.WorkbookPart;
-                    //            Sheets thesheetcollection = workbookPart.Workbook.GetFirstChild<Sheets>();
-                    //            StringBuilder excelResult = new StringBuilder();
-
-                    //            //using for each loop to get the sheet from the sheetcollection  
-                    //            foreach (Sheet thesheet in thesheetcollection)
-                    //            {
-                    //                excelResult.AppendLine("Excel Sheet Name : " + thesheet.Name);
-                    //                excelResult.AppendLine("----------------------------------------------- ");
-                    //                //statement to get the worksheet object by using the sheet id  
-                    //                Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(thesheet.Id)).Worksheet;
-
-                    //                SheetData thesheetdata = (SheetData)theWorksheet.GetFirstChild<SheetData>();
-                    //                foreach (Row thecurrentrow in thesheetdata)
-                    //                {
-                    //                    foreach (Cell thecurrentcell in thecurrentrow)
-                    //                    {
-                    //                        //statement to take the integer value  
-                    //                        string currentcellvalue = string.Empty;
-                    //                        if (thecurrentcell.DataType != null)
-                    //                        {
-                    //                            if (thecurrentcell.DataType == CellValues.SharedString)
-                    //                            {
-                    //                                int id;
-                    //                                if (Int32.TryParse(thecurrentcell.InnerText, out id))
-                    //                                {
-                    //                                    SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
-                    //                                    if (item.Text != null)
-                    //                                    {
-                    //                                        //code to take the string value  
-                    //                                        excelResult.Append(item.Text.Text + " ");
-                    //                                    }
-                    //                                    else if (item.InnerText != null)
-                    //                                    {
-                    //                                        currentcellvalue = item.InnerText;
-                    //                                    }
-                    //                                    else if (item.InnerXml != null)
-                    //                                    {
-                    //                                        currentcellvalue = item.InnerXml;
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            excelResult.Append(Convert.ToInt16(thecurrentcell.InnerText) + " ");
-                    //                        }
-                    //                    }
-                    //                    excelResult.AppendLine();
-                    //                }
-                    //                excelResult.Append("");
-                    //                Console.WriteLine(excelResult.ToString());
-                    //                Console.ReadLine();
-                    //            }
-                    //        }
 
                     catch (Exception e)
                     {
@@ -171,8 +137,8 @@ namespace SMDAsh.Controllers
 
 
                 // IMPORT TO DATABASE
-            //    _context.Tickets.Add(new Ticket());
-
+                
+               _context.SaveChanges();
             }
 
 
