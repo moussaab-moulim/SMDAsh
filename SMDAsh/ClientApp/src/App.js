@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import ChartAno from "./components/ChartAno";
 import RpaAno from './components/RpaAno';
+import Fileupload from './components/Fileupload';
 //import 'chartjs-plugin-datalabels';
 import 'chartjs-plugin-labels';
 import html2canvas from 'html2canvas';
@@ -13,6 +14,7 @@ function App() {
         <div className="App">
             <ChartAno />
             <RpaAno />
+            <Fileupload/>
             
         </div>
     );}

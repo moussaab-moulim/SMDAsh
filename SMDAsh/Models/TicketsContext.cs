@@ -16,7 +16,7 @@ namespace SMDAsh.Models
 
         public DbSet<Ticket> Tickets { get; set; }
 
-        public DbSet<BacklogInOut> BacklogInOuts { get; set; }
+        public DbSet<Backlog> Backlog { get; set; }
         
     }
 }

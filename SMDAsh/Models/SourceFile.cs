@@ -9,6 +9,6 @@ namespace SMDAsh.Models
     public class SourceFile
     {
         public string SourceTool { get; set; }
-        public IFormFile file  { get; set; }
+        public IFormFile DataFile  { get; set; }
     }
 }

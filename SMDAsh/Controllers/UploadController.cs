@@ -6,23 +6,26 @@ using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNet.OData.Routing;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using SMDAsh.Models;
 
 namespace SMDAsh.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UploadController : ControllerBase
     {
 
         private readonly TicketsContext _context;
+      
 
         public UploadController(TicketsContext context)
         {
             _context = context;
+     
         }
 
         [HttpPost("")]
@@ -31,7 +34,7 @@ namespace SMDAsh.Controllers
             // Getting source tool
             string sourcetool = sf.SourceTool;
             // Getting file
-            var excelFile = sf.file;
+            var excelFile = sf.DataFile;
 
             if (excelFile == null || excelFile.Length == 0)
                 return NoContent();
@@ -44,9 +47,10 @@ namespace SMDAsh.Controllers
 
             if (fileExtension == ".xls" || fileExtension == ".xlsx")
             {
-                
-                string filename = Guid.NewGuid() + fileExtension;
-          
+
+                string filename = Path.Combine("Data", sourcetool + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + fileExtension)  ;
+
+
                 using (var fileStream = new FileStream(filename, FileMode.Create))
                 {
                     await excelFile.CopyToAsync(fileStream);
@@ -58,9 +62,9 @@ namespace SMDAsh.Controllers
                         using (SpreadsheetDocument doc = SpreadsheetDocument.Open(fileStream, false))
                         {
                             WorkbookPart wbPart = doc.WorkbookPart;
-                            Sheet mysheet = (Sheet)doc.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
+                            Sheet mysheet = doc.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
                             Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
-                            SheetData sheetData = (SheetData)worksheet.GetFirstChild<SheetData>();
+                            SheetData sheetData = worksheet.GetFirstChild<SheetData>();
 
 
                             List<string> keys = new List<string>();
@@ -121,38 +125,40 @@ namespace SMDAsh.Controllers
                                 }
                                 
                                 if (i != 0) { 
-                                if (sf.SourceTool.Equals("MANTIS")) { 
-                                _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = "MANTIS", AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
+                                if (sf.SourceTool.ToLower().Equals("mantis")) { 
+                                _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = sourcetool, AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
                                         count++;
                                     }
-                                    else if (sf.SourceTool.Equals("SM9")) { 
-                                 _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = "SM9", AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
+                                    else if (sf.SourceTool.ToLower().Equals("sm9")) { 
+                                 _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
                                         count++;
                                     }
                                 }
 
                             }
+                            // IMPORT TO DATABASE
+
+                            int created = _context.SaveChanges();
+                            return Created("File imported successfully", new { name = filename, keys= keys, rows = sheetData.ChildElements.Count });
                         }
+
+                        
                     }
 
                     catch (Exception e)
                     {
-                        throw e;
+                        //throw e;
+                        return StatusCode(StatusCodes.Status500InternalServerError,e.Message);
                     }
                 }
 
 
-                // IMPORT TO DATABASE
                 
-               _context.SaveChanges();
+            }else
+            {
+                return BadRequest("File type Not Supported: " +fileExtension);
             }
 
-
-            return Ok(new
-            {
-                Status = "sucess",
-                count = count +" row inserted",
-            }); ;
 
         }
     }

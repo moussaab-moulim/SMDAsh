@@ -1,5 +1,3 @@
-using Microsoft.AspNet.OData.Builder;
-using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -7,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OData.Edm;
 using SMDAsh.Models;
 
 namespace SMDAsh
@@ -24,10 +21,11 @@ namespace SMDAsh
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContextPool<TicketsContext>(opt =>
-               opt.UseSqlServer(Configuration.GetConnectionString("TicketCon")));
-            services.AddControllersWithViews(mvcOptions => mvcOptions.EnableEndpointRouting = false);
-            services.AddOData();
+            // adding entity freameworke context 
+            services.AddDbContext<TicketsContext>(opt =>
+                opt.UseSqlServer(Configuration.GetConnectionString("TicketCon")));
+
+            services.AddControllersWithViews();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -54,25 +52,12 @@ namespace SMDAsh
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-            /*
-            app.UseMvc(routeBuilder =>
-            {
-                routeBuilder.EnableDependencyInjection();
-                routeBuilder.Select().OrderBy().Filter().SkipToken().MaxTop(100);
-                
-            });
-            /*
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
-            */
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.Select().Filter().OrderBy().Expand().Count().MaxTop(50);
-                endpoints.MapODataRoute("api", "api", GetEdmModel());
             });
             app.UseSpa(spa =>
             {
@@ -81,21 +66,9 @@ namespace SMDAsh
                 if (env.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer(npmScript: "start");
-                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:3001/%22");
                 }
             });
         }
-        private IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Ticket>("Tickets");
-            var getBacklogByYearWeek = builder.EntityType<Ticket>().Collection
-                .Function("GetBacklogByYearWeek")
-                .ReturnsCollectionFromEntitySet<BacklogInOut>("Backlog");
-            getBacklogByYearWeek.Parameter<string>("Category");
-            getBacklogByYearWeek.CollectionParameter<string>("YearWeek");
-
-            return builder.GetEdmModel();
-        }
+        
     }
 }

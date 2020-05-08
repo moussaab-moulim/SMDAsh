@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 
 namespace SMDAsh.Models
 {
-    public class BacklogInOut
+    public class Backlog
     {
-        [Key]
-        public int backlogID { get; set; }
         public string SourceTool { get; set; }
+        [Key]
         public string YearWeek { get; set; }
-
-        public string Year { get; set; }
-        public string Week { get; set; }
         public int In { get; set; }
         public int Out { get; set; }
-       
-        public int Backlog { get; set; }
+
+        public int? backlog { get; set; }
+
+
     }
 }
