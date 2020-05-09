@@ -9,9 +9,9 @@ export const getData = () => async (dispatch) => {
 
   
     const response = await axios.get(
-      `api/Tickets/GetBacklogByYearWeek(Category='Anomalie',YearWeek=['2017W20','2017W21','2017W22','2017W23'])`
+      `api/GetBacklog/mantis/anomalie`
     );
-    const data = response.data.value;
+      const data = response.data;
 
 
     const dataTable = [];
@@ -20,19 +20,18 @@ export const getData = () => async (dispatch) => {
     const dataOut = [];
     const dataLineBacklog = [];
     const dataTealBacklog = [];
-    const dataOCPBacklog = [];
-
+      const dataOCPBacklog = [];
    
     for (let i = 0; i < data.length; i++) {
       dataTable.push(data[i]);
-      dataIn.push(data[i].In);
-      dataOut.push(data[i].Out);
-      dataLineBacklog.push(data[i].Backlog);
+      dataIn.push(data[i].in);
+      dataOut.push(data[i].out);
+      dataLineBacklog.push(data[i].backlog);
       //response.data[i].TealBacklog
       dataTealBacklog.push(0);
       //response.data[i].OCPBacklog
       dataOCPBacklog.push(0);
-      labels.push(data[i].Week);
+      labels.push(data[i].yearWeek.substring(0,-2));
     }
 
    

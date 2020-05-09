@@ -7,7 +7,7 @@ export const getData = () => async dispatch => {
       type: "AWAITING_RPAANO"
     })
     //const response = await axios.get(`http://localhost:3010/rpa`);
-    const response = await axios.get(`https://localhost:44334/weatherforecast`);
+    const response = await axios.get(`weatherforecast`);
     const data = response.data;
    
 

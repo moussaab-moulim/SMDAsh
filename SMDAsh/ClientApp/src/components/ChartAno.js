@@ -44,8 +44,7 @@ export default function ChartAno() {
                             <TableHead>
                             <TableRow>
                                 <TableCell>Year / Week</TableCell>
-                                <TableCell align="right">Year</TableCell>
-                                <TableCell align="right">Week</TableCell>
+                                
                                 <TableCell align="right">In</TableCell>
                                 <TableCell align="right">Out</TableCell>
                                 <TableCell align="right">Backlog</TableCell>
@@ -58,13 +57,11 @@ export default function ChartAno() {
                             {state.dataTable.map((data,i) => (
                                 <TableRow key={i}>
                                 <TableCell component="th" scope="row">
-                                    {data.YearWeek}
+                                    {data.yearWeek}
                                 </TableCell>
-                                <TableCell align="right"> {data.Year}</TableCell>
-                                <TableCell align="right"> {data.Week}</TableCell>
-                                <TableCell align="right"> {data.In}</TableCell>
-                                <TableCell align="right"> {data.Out}</TableCell>
-                                <TableCell align="right"> {data.Backlog}</TableCell>
+                                <TableCell align="right"> {data.in}</TableCell>
+                                <TableCell align="right"> {data.out}</TableCell>
+                                <TableCell align="right"> {data.backlog}</TableCell>
                                 <TableCell align="right"> 0</TableCell>
                                 <TableCell align="right"> 0</TableCell>
                                 </TableRow>

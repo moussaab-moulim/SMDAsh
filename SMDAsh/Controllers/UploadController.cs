@@ -139,7 +139,7 @@ namespace SMDAsh.Controllers
                             // IMPORT TO DATABASE
 
                             int created = _context.SaveChanges();
-                            return Created("File imported successfully", new { name = filename, keys= keys, rows = sheetData.ChildElements.Count });
+                            return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
 
                         
