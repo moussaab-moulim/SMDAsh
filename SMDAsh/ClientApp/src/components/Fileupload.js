@@ -4,22 +4,25 @@ import { post } from 'axios';
 
 class Fileupload extends React.Component {
   constructor(props) {
-    super(props);
+      super(props);
+      this.submit = this.submit.bind(this);
 
     this.state = {
-      file: '',
-      SourceTool:'',
+      DataFile: '',
+        SourceTool: '',
+        test:'home'
     };
   }
 
   async submit(e) {
-    e.preventDefault();
+      e.preventDefault();
+      this.setState({test:'submited'})
 
     const url = `api/Upload`;
 
     const formData = new FormData();
 
-    formData.append('body', this.state.file);
+      formData.append('body', this.state.DataFile);
     formData.append('body', this.state.SourceTool);
 
     const config = {
@@ -47,8 +50,8 @@ class Fileupload extends React.Component {
           <h1>File Upload</h1>
 
           <input type='file' onChange={(e) => this.setFile(e)} />
-          <input type = 'text' onChange={(e) => this.setSourceTool(e)}/>
-
+                <input type='text' onChange={(e) => this.setSourceTool(e)} />
+                <div>{this.state.test}</div>
           <button className='btn btn-primary' type='submit'>
             Upload
           </button>

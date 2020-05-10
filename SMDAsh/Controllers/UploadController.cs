@@ -126,12 +126,14 @@ namespace SMDAsh.Controllers
                                 
                                 if (i != 0) { 
                                 if (sf.SourceTool.ToLower().Equals("mantis")) { 
-                                _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = sourcetool, AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"] });
+                                   var entity= _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = sourcetool, AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"], Application=ligne["Projet Court"] });
                                         count++;
+                                        //System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
-                                    else if (sf.SourceTool.ToLower().Equals("sm9")) { 
-                                 _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = "Date/Heure d'ouverture", DateResolved = "Date/Heure de résolution", DateClosed = "Date/Heure de clôture", Priority = "Priorité", P = "P", Status = "État", Description = "Titre", Category = "New Cat", WeekIn = "week in", WeekOut = "week out", YearIn = "year in", YearOut = "year out", YearWeekIn = "Year / Week in", YearWeekOut = "Year / Week Out", SLO = "Slo", ResolutionDuration = "Realisation time", SLA = "SLA", SR = "SR", Affectation = "Best effort", MD = "M/D" }));
+                                    else if (sf.SourceTool.ToLower().Equals("sm9")) {
+                                        var entity = _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = ligne["Date/Heure d'ouverture"], DateResolved = ligne["Date/Heure de résolution"], DateClosed = ligne["Date/Heure de clôture"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["État"], Description = ligne["Titre"], Category = ligne["New Cat"], WeekIn = ligne["week in"], WeekOut = ligne["week out"], YearIn = ligne["year in"], YearOut = ligne["year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["Slo"], ResolutionDuration = ligne["Realisation time"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Best effort"], MD = ligne["M/D"], Application = ligne["Application"] }));
                                         count++;
+                                        //System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
                                 }
 
@@ -148,7 +150,7 @@ namespace SMDAsh.Controllers
                     catch (Exception e)
                     {
                         //throw e;
-                        return StatusCode(StatusCodes.Status500InternalServerError,e.Message);
+                        return StatusCode(StatusCodes.Status500InternalServerError,new { errorMessage = e.Message, exception = e.ToString() , innerException=e.InnerException.ToString()});
                     }
                 }
 

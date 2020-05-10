@@ -56,5 +56,6 @@ namespace SMDAsh.Models
         public string Affectation { get; set; }
 
         public string MD { get; set; }
+        public string Application { get; set; }
     }
 }
