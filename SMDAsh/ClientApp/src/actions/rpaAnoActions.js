@@ -8,7 +8,6 @@ export const getData = () => async dispatch => {
     })
     const response = await axios.get(`http://localhost:3010/rpa`);
     const responsee = await axios.get(`https://localhost:44334/weatherforecast`);
-    console.log(responsee.data);
     const respData = response.data;
    
 

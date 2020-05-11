@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData } from '../actions/chartAnoActions';
+import { getData, getDataThunk } from '../actions/chartAnoActions';
 
 // core components
 import GridItem from 'components/Grid/GridItem.js';
@@ -79,14 +79,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialChartState2 = {
-  yearWeek: [],
-  in: [],
-  out: [],
-  backlog: [],
-  tealBacklog: [],
-  ocpBacklog: [],
-};
+
 const initialChartState = {
   datasets: [],
   labels: [],
@@ -106,11 +99,14 @@ export default function ChartAno() {
   const [chartData, setChartData] = useState(initialChartState);
 
   const dispatch = useDispatch();
-  const chartState = useSelector((state) => state.chartAno);
+  const chartState = useSelector((state) => state.chartAno,[])||[];
+  
 
   useEffect(() => {
-    dispatch(getData());
-  }, [chartData]);
+    if(chartState.loading)dispatch(getDataThunk());
+    if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable)}
+    console.log(chartState);
+  }, [chartState.loading]);
 
   //const [dataTableFiltred, setdataTableFiltred] = React.useState([]);
   const [alignment, setAlignment] = useState('1 Months');
@@ -274,8 +270,7 @@ export default function ChartAno() {
                 Chart PNG
               </Button>
             </Grid>
-
-            <Bar
+            {!chartState.loading && <Bar
               data={chartData}
               width='670vw'
               height='400vh'
@@ -309,7 +304,8 @@ export default function ChartAno() {
                   ],
                 },
               }}
-            />
+            />}
+            
           </CardBody>
         </Card>
       </GridContainer>
