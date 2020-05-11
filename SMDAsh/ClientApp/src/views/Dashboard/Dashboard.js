@@ -8,6 +8,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import Upload from "components/UploadZone/Upload";
 
 const styles = {
   cardCategoryWhite: {
@@ -48,6 +49,8 @@ export default function Dashboard() {
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardBody>
+            <Upload/>
+            {/*
             <Table
               tableHeaderColor="primary"
               tableHead={["Name", "Country", "City", "Salary"]}
@@ -59,7 +62,7 @@ export default function Dashboard() {
                 ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
                 ["Mason Porter", "Chile", "Gloucester", "$78,615"]
               ]}
-            />
+            />*/}
           </CardBody>
         </Card>
       </GridItem>
