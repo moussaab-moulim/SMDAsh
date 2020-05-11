@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 export default function RpaAno() {
   const dispatch = useDispatch();
   const state = useSelector(state => state.rpaAno)
+    //console.log(state);
   const classes = useStyles();
  
   useEffect(() => dispatch(getData()), []);
@@ -52,9 +53,9 @@ export default function RpaAno() {
                             {state.dataTable.map((data,i) => (
                                 <TableRow key={i}>
                                 <TableCell component="th" scope="row">
-                                {data.project}
+                                {data.Project}
                                 </TableCell>
-                                <TableCell align="center"> {data.count}</TableCell>
+                                <TableCell align="center"> {data.Count}</TableCell>
                                 
                                 </TableRow>
                             ))}

@@ -6,11 +6,11 @@ export const getData = () => async dispatch => {
     dispatch({
       type: "AWAITING_RPAANO"
     })
-    //const response = await axios.get(`http://localhost:3010/rpa`);
-    const response = await axios.get(`weatherforecast`);
-    const data = response.data;
+    const response = await axios.get(`http://localhost:3010/rpa`);
+    const responsee = await axios.get(`https://localhost:44334/weatherforecast`);
+    console.log(responsee.data);
+    const respData = response.data;
    
-
 
     const dataTable = [];
     let total = 0;
@@ -31,15 +31,15 @@ export const getData = () => async dispatch => {
     };
 
     
-    for (let i = 0; i < data.length; i++) {
-      labels.push(data[i].project);
-      dataTable.push(data[i]);
-      counts.push(data[i].count);
+    for (let i = 0; i < respData[0].data.length; i++) {
+      labels.push(respData[0].data[i].Project)
+      dataTable.push(respData[0].data[i])
+      counts.push(respData[0].data[i].Count)
       backgroundColor.push(dynamicColors());
       hoverBackgroundColor.push(dynamicColors());
-      total += data[i].count;
+      total += respData[0].data[i].Count;
     }
-  
+   
 
     
     
