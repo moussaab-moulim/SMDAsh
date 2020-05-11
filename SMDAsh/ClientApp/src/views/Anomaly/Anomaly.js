@@ -1,7 +1,8 @@
 import React from 'react';
-
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
+// core components
+import ChartAno from "components/ChartAno";
 
 
 
@@ -41,11 +42,10 @@ const useStyles = makeStyles((theme) => ({
 export default function Anomaly() {
 
 
-
   const classes = useStyles();
   return (
     <div>
-     
+      <ChartAno></ChartAno>
     </div>
   );
 }
