@@ -88,39 +88,66 @@ const initialChartState = {
 export default function ChartAno() {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
-      { title: 'Year/Week', field: 'YearWeek' },
-      { title: 'In', field: 'In', type: 'numeric' },
-      { title: 'Out', field: 'Out', type: 'numeric' },
-      { title: 'Backlog', field: 'Backlog', type: 'numeric' },
-      { title: 'Teal Backlog', field: 'TealBacklog', type: 'numeric' },
-      { title: 'OCP Backlog', field: 'OCPBacklog', type: 'numeric' },
+      { title: 'Year/Week', field: 'yearWeek' },
+      { title: 'In', field: 'in', type: 'numeric' },
+      { title: 'Out', field: 'out', type: 'numeric' },
+      { title: 'Backlog', field: 'backlog', type: 'numeric' },
+      { title: 'Teal Backlog', field: 'tealBacklog', type: 'numeric' },
+      { title: 'OCP Backlog', field: 'ocpBacklog', type: 'numeric' },
     ],
   });
   const [chartData, setChartData] = useState(initialChartState);
 
   const dispatch = useDispatch();
   const chartState = useSelector((state) => state.chartAno,[])||[];
-  
+  const [chartTable, setChartTable] = useState(chartState.dataTable);
+  const [filter, setFilter] = useState('1 Months');
+  const classes = useStyles();
 
   useEffect(() => {
     if(chartState.loading)dispatch(getDataThunk());
-    if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable)}
-    console.log(chartState);
+    if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable,filter)}
+    console.log(chartState,chartTable);
   }, [chartState.loading]);
 
   //const [dataTableFiltred, setdataTableFiltred] = React.useState([]);
-  const [alignment, setAlignment] = useState('1 Months');
-  const classes = useStyles();
+  
 
-  const handleAlignment = (event, newAlignment) => {
-    if (newAlignment !== null) {
-      setAlignment(newAlignment);
-      orginizeData(chartState.dataTable);
+  const handleFilter = (event, newFilter) => {
+    if (newFilter !== null) {
+      setFilter(newFilter);
+      console.log(event,newFilter);
+      orginizeData(chartState.dataTable,newFilter);
     }
   };
 
-  const orginizeData = (dt) => {
-    const datatable = dt;
+  const orginizeData = (dt, filter) => {
+    console.log(filter)
+    let datatable = dt;
+    switch (filter) {
+      case '1 Months':
+        datatable = datatable.filter((item,i) => {
+          return i>= datatable.length-4;
+        });
+        break;
+      case '3 Months':
+        datatable = datatable.filter((item,i) => {
+          return i>= datatable.length-13;
+        });
+        break;
+      case '6 Months':
+        datatable = datatable.filter((item,i) => {
+          return i>= datatable.length-26;
+        });
+        break;
+      case 'Year' : 
+      datatable = datatable.filter((item,i) => {
+        return i>= datatable.length-52;
+      });
+        break;
+      default:
+        break;
+    }
     const newChartArrays = {
       yearWeek: [],
       in: [],
@@ -182,6 +209,7 @@ export default function ChartAno() {
     };
 
     setChartData(newChartData);
+    setChartTable(datatable);
   };
 
   return (
@@ -207,10 +235,10 @@ export default function ChartAno() {
                 All PNG
               </Button>
               <ToggleButtonGroup
-                value={alignment}
+                value={filter}
                 className={classes.btn}
                 exclusive
-                onChange={handleAlignment}
+                onChange={handleFilter}
                 aria-label='text alignment'
                 size='small'
               >
@@ -247,7 +275,7 @@ export default function ChartAno() {
             <MaterialTable
               title='Anomaly'
               columns={statecolumns.columns}
-              data={chartState.dataTable}
+              data={chartTable}
             />
           </CardBody>
         </Card>
