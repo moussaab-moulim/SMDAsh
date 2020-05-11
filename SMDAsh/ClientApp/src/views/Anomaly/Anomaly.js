@@ -3,8 +3,7 @@ import React from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartAno from "components/ChartAno";
-
-
+import 'chartjs-plugin-labels';
 
 
 const useStyles = makeStyles((theme) => ({
