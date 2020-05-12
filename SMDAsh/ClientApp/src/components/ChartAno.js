@@ -21,6 +21,7 @@ import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 
+
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
     marginRight: theme.spacing(1),
@@ -210,6 +211,8 @@ export default function ChartAno() {
     setChartTable(datatable);
   };
 
+  
+
   return (
     <div>
       <GridContainer>
@@ -274,6 +277,9 @@ export default function ChartAno() {
               title='Anomaly'
               columns={statecolumns.columns}
               data={chartTable}
+              options={{
+                search: false
+              }}
             />
           </CardBody>
         </Card>
