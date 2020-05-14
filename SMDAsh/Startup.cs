@@ -1,3 +1,5 @@
+using Microsoft.AspNet.OData.Builder;
+using Microsoft.AspNet.OData.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -5,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OData.Edm;
 using SMDAsh.Models;
+using System;
 
 namespace SMDAsh
 {
@@ -25,7 +29,10 @@ namespace SMDAsh
             services.AddDbContext<TicketsContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("TicketCon")));
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson();
+            
+
+            services.AddOData();
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -52,13 +59,26 @@ namespace SMDAsh
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-            
+
             app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                  name: "default",
+                  pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                //Sendpoints.EnableDependencyInjection();
+                endpoints.Select().Filter().OrderBy().Count().MaxTop(null);
+                endpoints.MapODataRoute("odata", "api", GetEdmModel());
+            });
+
+            /*
+             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
+             */
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
@@ -69,6 +89,13 @@ namespace SMDAsh
                 }
             });
         }
-        
+
+        private IEdmModel GetEdmModel()
+        {
+            var odataBuilder = new ODataConventionModelBuilder();
+            odataBuilder.EntitySet<Backlog>("Backlog");
+
+            return odataBuilder.GetEdmModel();
+        }
     }
 }

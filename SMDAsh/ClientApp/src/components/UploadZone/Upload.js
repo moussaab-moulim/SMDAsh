@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Dropzone from "./dropzone/Dropzone";
-import "./Upload.css";
 import Progress from "./progress/Progress";
 import checkedIcon from "assets/img/baseline-check_circle_outline-24px.svg";
 import InputLabel from '@material-ui/core/InputLabel';
@@ -9,7 +8,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import constants from '../../constants';
-
 class Upload extends Component {
   constructor(props) {
     super(props);
