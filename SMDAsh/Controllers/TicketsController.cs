@@ -6,9 +6,10 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SMDAsh.Models;
 
+
 namespace SMDAsh.Controllers
 {
-
+   
     [Route("api")]
     [ApiController]
     public class TicketsController : ControllerBase
