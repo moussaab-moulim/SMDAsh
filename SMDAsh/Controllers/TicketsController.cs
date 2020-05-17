@@ -22,14 +22,13 @@ namespace SMDAsh.Controllers
         }
 
         //[Route("[action]/{SourceTool}/{Category}")]
-        [HttpGet("[action]/{SourceTool}/{Category}")]
-        public async Task<ActionResult<List<Backlog>>> GetBacklog(string SourceTool, string Category)
+        [HttpGet("[action]/{Category}")]
+        public async Task<ActionResult<List<Backlog>>> GetBacklog(string Category)
         {
             //System.Diagnostics.Debug.WriteLine();
-            var cmdText = "GetBacklogByCat @Cat = @c, @SourceTool = @st";
+            var cmdText = "GetBacklogByCat @Cat = @c";
             var @params = new[]{
-            new SqlParameter("c", Category),
-            new SqlParameter("st", SourceTool)};
+            new SqlParameter("c", Category)};
             List<Backlog> queryResIn = await _context.Backlog.FromSqlRaw(cmdText, @params).ToListAsync<Backlog>();
 
             return queryResIn;
