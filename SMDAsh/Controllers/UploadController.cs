@@ -115,23 +115,68 @@ namespace SMDAsh.Controllers
                                         keys.Add(currentcellvalue);
                                     }
                                     else
-                                    {
-                                        
+                                    {                                        
                                             ligne.Add(keys[j], currentcellvalue);
-
-
                                     }
 
                                 }
                                 
                                 if (i != 0) { 
                                 if (sf.SourceTool.ToLower().Equals("mantis")) { 
-                                   var entity= _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = sourcetool, AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"], Application=ligne["Projet Court"] });
+                                   var entity= _context.Tickets.Add(new Ticket() { 
+                                       ID = ligne["Identifiant"], 
+                                       SourceTool = sourcetool.ToUpper(), 
+                                       AssignedTo = ligne["Assigné à"], 
+                                       DateSent = ligne["Date de soumission"], 
+                                       DateResolved = ligne["Date résolution"], 
+                                       DateClosed = ligne["Clos"], 
+                                       Priority = ligne["Priorité"], 
+                                       P = ligne["P"], 
+                                       Status = ligne["Statut"], 
+                                       Description = ligne["Résumé"], 
+                                       Category = ligne["Catégorie"], 
+                                       WeekIn = ligne["Week in"], 
+                                       WeekOut = ligne["Week out"], 
+                                       YearIn = ligne["Year in"], 
+                                       YearOut = ligne["Year out"], 
+                                       YearWeekIn = ligne["Year / Week in"], 
+                                       YearWeekOut = ligne["Year / Week Out"], 
+                                       SLO = ligne["SLO"], 
+                                       ResolutionDuration = ligne["TimeResol"], 
+                                       SLA = ligne["SLA"], 
+                                       SR = ligne["SR"], 
+                                       Affectation = ligne["Affectation"], 
+                                       MD = ligne["M/D"], 
+                                       Application=ligne["Projet Court"] });
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
-                                        var entity = _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = ligne["Date/Heure d'ouverture"], DateResolved = ligne["Date/Heure de résolution"], DateClosed = ligne["Date/Heure de clôture"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["État"], Description = ligne["Titre"], Category = ligne["New Cat"], WeekIn = ligne["week in"], WeekOut = ligne["week out"], YearIn = ligne["year in"], YearOut = ligne["year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["Slo"], ResolutionDuration = ligne["Realisation time"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Best effort"], MD = ligne["M/D"], Application = ligne["Application"] }));
+                                        var entity = _context.Tickets.Add((new Ticket() { 
+                                            ID = ligne["ID Incident"], 
+                                            SourceTool = sourcetool.ToUpper(), 
+                                            AssignedTo = ligne["Responsable"], 
+                                            DateSent = ligne["Date/Heure d'ouverture"], 
+                                            DateResolved = ligne["Date/Heure de résolution"], 
+                                            DateClosed = ligne["Date/Heure de clôture"], 
+                                            Priority = ligne["Priorité"], 
+                                            P = ligne["P"], 
+                                            Status = ligne["État"],
+                                            Description = ligne["Titre"], 
+                                            Category = ligne["New Cat"], 
+                                            WeekIn = ligne["week in"], 
+                                            WeekOut = ligne["week out"], 
+                                            YearIn = ligne["year in"], 
+                                            YearOut = ligne["year out"], 
+                                            YearWeekIn = ligne["Year / Week in"], 
+                                            YearWeekOut = ligne["Year / Week Out"], 
+                                            SLO = ligne["Slo"], 
+                                            ResolutionDuration = ligne["Realisation time"], 
+                                            SLA = ligne["SLA"], 
+                                            SR = ligne["SR"], 
+                                            Affectation = ligne["Best effort"], 
+                                            MD = ligne["M/D"], 
+                                            Application = ligne["Application"] }));
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
@@ -144,17 +189,16 @@ namespace SMDAsh.Controllers
                             return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
 
-                        
                     }
 
                     catch (Exception e)
                     {
                         //throw e;
-                        return StatusCode(StatusCodes.Status500InternalServerError,new { errorMessage = e.Message, exception = e.ToString() , innerException=e.InnerException.ToString()});
+                        return StatusCode(StatusCodes.Status500InternalServerError,new { 
+                            errorMessage = e.Message, exception = e.ToString() ,
+                            innerException=e.InnerException.ToString()});
                     }
                 }
-
-
                 
             }else
             {
