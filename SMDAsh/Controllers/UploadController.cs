@@ -19,10 +19,10 @@ namespace SMDAsh.Controllers
     public class UploadController : ControllerBase
     {
 
-        private readonly TicketsContext _context;
+        private readonly DBContext _context;
       
 
-        public UploadController(TicketsContext context)
+        public UploadController(DBContext context)
         {
             _context = context;
      
@@ -126,7 +126,10 @@ namespace SMDAsh.Controllers
                                 
                                 if (i != 0) { 
                                 if (sf.SourceTool.ToLower().Equals("mantis")) { 
-                                   var entity= _context.Tickets.Add(new Ticket() { ID = ligne["Identifiant"], SourceTool = sourcetool, AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"], Application=ligne["Projet Court"] });
+                                   var entity= _context.Tickets.Add(new Ticket() { 
+                                       ID = ligne["Identifiant"],
+                                       SourceTool = sourcetool,
+                                       AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"], Application=ligne["Projet Court"] });
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }

@@ -57,5 +57,6 @@ namespace SMDAsh.Models
 
         public string MD { get; set; }
         public string Application { get; set; }
+        public string AssignedToService { get; set; }
     }
 }

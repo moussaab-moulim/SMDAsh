@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace SMDAsh.Models
 {
-    public class TicketsContext : DbContext
+    public class DBContext : DbContext
     {
-        public TicketsContext(DbContextOptions<TicketsContext> options)
+        public DBContext(DbContextOptions<DBContext> options)
             : base(options)
         {
         }
@@ -17,6 +17,8 @@ namespace SMDAsh.Models
         public DbSet<Ticket> Tickets { get; set; }
 
         public DbSet<Backlog> Backlog { get; set; }
+
         
+
     }
 }
