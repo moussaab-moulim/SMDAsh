@@ -27,8 +27,8 @@ namespace SMDAsh
         public void ConfigureServices(IServiceCollection services)
         {
             // adding entity freameworke context 
-            services.AddDbContext<DBContext>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("TicketCon")));
+            services.AddDbContext<SmDashboardContext>(opt =>
+                opt.UseSqlServer(Configuration.GetConnectionString("TicketConLocal")));
 
             services.AddControllersWithViews().AddNewtonsoftJson();
 
@@ -97,18 +97,19 @@ namespace SMDAsh
                 }
             });
         }
-
+        /*
         private IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
             builder.Namespace = "sm";
-            builder.EntitySet<Ticket>("Tickets");
+            builder.EntitySet<Tickets>("Tickets");
 
-            var function = builder.EntityType<Ticket>().Collection.Function("BacklogInOut").Returns<Backlog>();
+            var function = builder.EntityType<Tickets>().Collection.Function("BacklogInOut").Returns<Backlogs>();
             function.Parameter<string>("Category");
             //function.Parameter<string>("SourceTool");
 
             return builder.GetEdmModel();
         }
+        */
     }
 }

@@ -19,10 +19,10 @@ namespace SMDAsh.Controllers
     public class UploadController : ControllerBase
     {
 
-        private readonly DBContext _context;
+        private readonly SmDashboardContext _context;
       
 
-        public UploadController(DBContext context)
+        public UploadController(SmDashboardContext context)
         {
             _context = context;
      
@@ -66,29 +66,43 @@ namespace SMDAsh.Controllers
                             Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
                             SheetData sheetData = worksheet.GetFirstChild<SheetData>();
 
-
+                            
                             List<string> keys = new List<string>();
+                            /*
+                            string text;
+                            List<List<string>> secondApproach = new List<List<string>>();
+
+                            foreach (Row r in sheetData.Elements<Row>())
+                            {
+                                secondApproach.Add(new List<string>());
+                                foreach (Cell c in r.Elements<Cell>())
+                                {
+                                    text = c.CellValue.Text;
+                                    secondApproach[secondApproach.Count - 1].Add(text);
+                                }
+                            }   */
                             for (int i = 0;i< sheetData.ChildElements.Count;i++)
                             {
-                                var row = sheetData.ChildElements[i];
+                                Row row = sheetData.ChildElements[i] as Row;
                                 Dictionary<string, string> ligne = new Dictionary<string, string>();
 
                                 
-                                for(int j = 0; j< (row as Row).ChildElements.Count;j++)
+                                for(int j = 0; j< row.ChildElements.Count;j++)
                                 {
-                                    var cell = (row as Row).ChildElements[j];
-                                    Cell thecurrentcell = cell as Cell;
+                                    Cell thecurrentcell = row.ChildElements[j] as Cell ;
                                     /*
                                     if (cellValue != null)
                                     {
                                         //Console.WriteLine(cellValue.Text);
                                         str.Add(cellValue.Text);
                                     }*/
+                                    
+                                    if(i>3 && j == 21) {
+                                        var here = false;
+                                    }
                                     string currentcellvalue = string.Empty;
-                                    if (thecurrentcell.DataType != null)
+                                    if (thecurrentcell.DataType != null && thecurrentcell.DataType == CellValues.SharedString)
                                     {
-                                        if (thecurrentcell.DataType == CellValues.SharedString)
-                                        {
                                             int id;
                                             if (Int32.TryParse(thecurrentcell.InnerText, out id))
                                             {
@@ -107,7 +121,10 @@ namespace SMDAsh.Controllers
                                                     currentcellvalue = item.InnerXml;
                                                 }
                                             }
-                                        }
+                                    }
+                                    else
+                                    {
+                                        System.Diagnostics.Debug.WriteLine(thecurrentcell.CellValue.Text);
                                     }
 
                                     if (i == 0)
@@ -126,15 +143,15 @@ namespace SMDAsh.Controllers
                                 
                                 if (i != 0) { 
                                 if (sf.SourceTool.ToLower().Equals("mantis")) { 
-                                   var entity= _context.Tickets.Add(new Ticket() { 
-                                       ID = ligne["Identifiant"],
+                                   var entity= _context.Tickets.Add(new Tickets() { 
+                                       TicketID = ligne["Identifiant"],
                                        SourceTool = sourcetool,
                                        AssignedTo = ligne["Assigné à"], DateSent = ligne["Date de soumission"], DateResolved = ligne["Date résolution"], DateClosed = ligne["Clos"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["Statut"], Description = ligne["Résumé"], Category = ligne["Catégorie"], WeekIn = ligne["Week in"], WeekOut = ligne["Week out"], YearIn = ligne["Year in"], YearOut = ligne["Year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["SLO"], ResolutionDuration = ligne["TimeResol"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Affectation"], MD = ligne["M/D"], Application=ligne["Projet Court"] });
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
-                                        var entity = _context.Tickets.Add((new Ticket() { ID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = ligne["Date/Heure d'ouverture"], DateResolved = ligne["Date/Heure de résolution"], DateClosed = ligne["Date/Heure de clôture"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["État"], Description = ligne["Titre"], Category = ligne["New Cat"], WeekIn = ligne["week in"], WeekOut = ligne["week out"], YearIn = ligne["year in"], YearOut = ligne["year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["Slo"], ResolutionDuration = ligne["Realisation time"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Best effort"], MD = ligne["M/D"], Application = ligne["Application"] }));
+                                        var entity = _context.Tickets.Add((new Tickets() { TicketID = ligne["ID Incident"], SourceTool = sourcetool, AssignedTo = ligne["Responsable"], DateSent = ligne["Date/Heure d'ouverture"], DateResolved = ligne["Date/Heure de résolution"], DateClosed = ligne["Date/Heure de clôture"], Priority = ligne["Priorité"], P = ligne["P"], Status = ligne["État"], Description = ligne["Titre"], Category = ligne["New Cat"], WeekIn = ligne["week in"], WeekOut = ligne["week out"], YearIn = ligne["year in"], YearOut = ligne["year out"], YearWeekIn = ligne["Year / Week in"], YearWeekOut = ligne["Year / Week Out"], SLO = ligne["Slo"], ResolutionDuration = ligne["Realisation time"], SLA = ligne["SLA"], SR = ligne["SR"], Affectation = ligne["Best effort"], MD = ligne["M/D"], Application = ligne["Application"] }));
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
@@ -144,7 +161,8 @@ namespace SMDAsh.Controllers
                             // IMPORT TO DATABASE
 
                             int created = _context.SaveChanges();
-                            return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
+                            return Created("File imported successfully",
+                                new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
 
                         
@@ -163,8 +181,6 @@ namespace SMDAsh.Controllers
             {
                 return BadRequest("File type Not Supported: " +fileExtension);
             }
-
-
         }
     }
 }

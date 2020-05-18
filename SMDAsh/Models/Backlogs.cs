@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SMDAsh.Models
 {
-    public class Backlog
+    public class Backlogs
     {
         public string SourceTool { get; set; }
         [Key]

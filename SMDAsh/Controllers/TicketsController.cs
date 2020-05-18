@@ -19,9 +19,9 @@ namespace SMDAsh.Controllers
     public class TicketsController : ControllerBase
     {
         // GET: api/Tickets
-        private readonly DBContext _context;
+        private readonly SmDashboardContext _context;
 
-        public TicketsController(DBContext context)
+        public TicketsController(SmDashboardContext context)
         {
             _context = context;
         }
@@ -31,14 +31,14 @@ namespace SMDAsh.Controllers
         //[HttpGet]
         //[ODataRoute("Tickets/BacklogInOut/{Category)")]
         [HttpGet("[action]/{Category}"), AutoQueryable]
-        public IQueryable<Backlog> GetBacklog(string Category)
+        public IQueryable<Backlogs> GetBacklog(string Category)
         {
 
             //System.Diagnostics.Debug.WriteLine();
             var cmdText = "GetBacklogByCat @Cat";
             var param = new SqlParameter("@Cat", Category);
 
-            IQueryable<Backlog> back = _context.Backlog.FromSqlRaw(cmdText, param).ToList<Backlog>().AsQueryable();
+            IQueryable<Backlogs> back = _context.Backlogs.FromSqlRaw(cmdText, param).ToList<Backlogs>().AsQueryable();
             return back;
 
         }
