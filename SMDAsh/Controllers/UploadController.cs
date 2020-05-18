@@ -132,11 +132,8 @@ namespace SMDAsh.Controllers
                                         keys.Add(currentcellvalue);
                                     }
                                     else
-                                    {
-                                        
+                                    {                                        
                                             ligne.Add(keys[j], currentcellvalue);
-
-
                                     }
 
                                 }
@@ -165,17 +162,16 @@ namespace SMDAsh.Controllers
                                 new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
 
-                        
                     }
 
                     catch (Exception e)
                     {
                         //throw e;
-                        return StatusCode(StatusCodes.Status500InternalServerError,new { errorMessage = e.Message, exception = e.ToString() , innerException=e.InnerException.ToString()});
+                        return StatusCode(StatusCodes.Status500InternalServerError,new { 
+                            errorMessage = e.Message, exception = e.ToString() ,
+                            innerException=e.InnerException.ToString()});
                     }
                 }
-
-
                 
             }else
             {

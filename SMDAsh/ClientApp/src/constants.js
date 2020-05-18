@@ -1,5 +1,5 @@
 const APIS = {
-    getBacklog: '/api/GetBacklog/mantis/anomalie',
+    getBacklog: '/api/GetBacklog/anomalie',
     upload:'/api/upload'
 };
   export default {
