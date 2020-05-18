@@ -26,9 +26,6 @@ namespace SMDAsh.Controllers
             _context = context;
         }
 
-        //[Route("[action]/{SourceTool}/{Category}")]
-        //[HttpGet]
-        //[ODataRoute("Tickets/BacklogInOut/{Category)")]
         [HttpGet("[action]/{Category}"), AutoQueryable]
         public IQueryable<Backlogs> GetBacklog(string Category)
 

@@ -22,8 +22,6 @@ namespace SMDAsh.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tickets>().ToTable("Tickets");
-            modelBuilder.Ignore<Backlogs>();
-
         }
     }
 }
