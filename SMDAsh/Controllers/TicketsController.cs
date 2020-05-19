@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoQueryable.AspNetCore.Filter.FilterAttributes;
+using Microsoft.AspNet.OData;
+using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SMDAsh.Models;
 
 namespace SMDAsh.Controllers
@@ -14,27 +19,24 @@ namespace SMDAsh.Controllers
     public class TicketsController : ControllerBase
     {
         // GET: api/Tickets
-        private readonly TicketsContext _context;
+        private readonly SmDashboardContext _context;
 
-        public TicketsController(TicketsContext context)
+        public TicketsController(SmDashboardContext context)
         {
             _context = context;
         }
 
-        //[Route("[action]/{SourceTool}/{Category}")]
-        [HttpGet("[action]/{Category}")]
-        public async Task<ActionResult<List<Backlog>>> GetBacklog(string Category)
-        {
-            //System.Diagnostics.Debug.WriteLine();
-            var cmdText = "GetBacklogByCat @Cat = @c";
-            var @params = new[]{
-            new SqlParameter("c", Category)};
-            List<Backlog> queryResIn = await _context.Backlog.FromSqlRaw(cmdText, @params).ToListAsync<Backlog>();
+        [HttpGet("[action]/{Category}"), AutoQueryable]
+        public IQueryable<Backlogs> GetBacklog(string Category)
 
-            return queryResIn;
+        {
+
+            //System.Diagnostics.Debug.WriteLine();
+            var cmdText = "GetBacklogByCat @Cat";
+            var param = new SqlParameter("@Cat", Category);
+            IQueryable<Backlogs> back = _context.Backlogs.FromSqlRaw(cmdText, param).ToList<Backlogs>().AsQueryable();
+            return back;
 
         }
-
-
     }
 }
