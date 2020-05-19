@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using SMDAsh.Models;
 
+
 namespace SMDAsh.Controllers
 {
-
+   
     [Route("api")]
     [ApiController]
     public class TicketsController : ControllerBase
