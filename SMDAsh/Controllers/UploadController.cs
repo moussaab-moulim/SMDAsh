@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using SMDAsh.Helpers;
 using SMDAsh.Models;
 
 namespace SMDAsh.Controllers
@@ -78,6 +79,10 @@ namespace SMDAsh.Controllers
                                 {
                                     var cell = (row as Row).ChildElements[j];
                                     Cell thecurrentcell = cell as Cell;
+                                    //if (i> 2 && j == 21)
+                                    //{
+                                    //    var hna = true;
+                                    //}
                                     /*
                                     if (cellValue != null)
                                     {
@@ -106,8 +111,14 @@ namespace SMDAsh.Controllers
                                                 {
                                                     currentcellvalue = item.InnerXml;
                                                 }
+                                               // System.Diagnostics.Debug.WriteLineIf(j == 21, "cell" + j + thecurrentcell.DataType + currentcellvalue);
                                             }
                                         }
+                                    }
+                                    else
+                                    {
+                                         currentcellvalue = thecurrentcell.CellValue.ToString();
+                                       
                                     }
 
                                     if (i == 0)
@@ -117,13 +128,43 @@ namespace SMDAsh.Controllers
                                     else
                                     {                                        
                                             ligne.Add(keys[j], currentcellvalue);
+
                                     }
 
                                 }
                                 
-                                if (i != 0) { 
-                                if (sf.SourceTool.ToLower().Equals("mantis")) { 
-                                   var entity= _context.Tickets.Add(new Ticket() { 
+                                if (i != 0) {
+
+                                    if (sf.SourceTool.ToLower().Equals("mantis")) {
+
+                                        var Msta = ligne["Statut"].In("Fermée", "Abandonnée", "closed", "Clôturé") ? "Abandonné"
+                                                : ligne["Statut"].In("Nouvelle", "Accepté") ? "Nouvelle"
+                                                : ligne["Statut"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
+                                                : ligne["Statut"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
+                                                : ligne["Statut"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
+                                                : ligne["Statut"].In("A fermer", "Résolu") ? "Resolved"
+                                                : ligne["Statut"].In("") ? ""
+                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
+
+                                          var Mp = ligne["P"].In("P1", "1") ? "P1"
+                                                : ligne["P"].In("P2", "2") ? "P2"
+                                                : ligne["P"].In("P3", "3") ? "P3"
+                                                : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Mp);
+
+                                       var Mprio = ligne["Priorité"].In("basse", "Faible") ? "Faible"
+                                                : ligne["Priorité"].In("normale", "Moyenne") ? "Moyenne"
+                                                : ligne["Priorité"].In("élevée") ? "Elevée"
+                                                : ligne["Priorité"].In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
+
+                                        var Mcat = ligne["Catégorie"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
+                                                : ligne["Catégorie"].In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? "SR"
+                                                : ligne["Catégorie"].In("Evolution") ? "Evolution" : "Category not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
+
+                                        var entity= _context.Tickets.Add(new Ticket() { 
                                        ID = ligne["Identifiant"], 
                                        SourceTool = sourcetool.ToUpper(), 
                                        AssignedTo = ligne["Assigné à"], 
@@ -148,10 +189,42 @@ namespace SMDAsh.Controllers
                                        Affectation = ligne["Affectation"], 
                                        MD = ligne["M/D"], 
                                        Application=ligne["Projet Court"] });
+
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
+
+                                        var Ssta = ligne["État"].In("Fermée", "Abandonnée", "closed", "Clôturé") ? "Abandonné"
+                                                : ligne["État"].In("Nouvelle", "Accepté") ? "Nouvelle"
+                                                : ligne["État"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
+                                                : ligne["État"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
+                                                : ligne["État"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
+                                                : ligne["État"].In("A fermer", "Résolu") ? "Resolved"
+                                                : ligne["État"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Ssta);
+
+                                          var Sp = ligne["P"].In("P1", "1") ? "P1"
+                                                : ligne["P"].In("P2", "2") ? "P2"
+                                                : ligne["P"].In("P3", "3") ? "P3"
+                                                : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Sp);
+
+                                       var Sprio = ligne["Priorité"].In("basse", "3 - Faible", "4 - Faible") ? "Faible"
+                                                : ligne["Priorité"].In("normale", "2 - Moyenne") ? "Moyenne"
+                                                : ligne["Priorité"].In("1 - Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Sprio);
+
+                                        var Scat = ligne["New Cat"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
+                                                : ligne["New Cat"].In("Demande d'extraction", "Demande d'information", "Demande d'accès", "service request") ? "SR"
+                                                : ligne["New Cat"].In("") ? ""
+                                                : ligne["New Cat"].In("Evolution") ? "Evolution"
+                                                : ligne["New Cat"].In("Monitoring") ? "Monitoring"
+                                                : ligne["New Cat"].In("EFC") ? "EFC"
+                                                : ligne["New Cat"].In("RFC") ? "RFC" : "Category not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["New Cat"] + " to " + Scat);
+
+
                                         var entity = _context.Tickets.Add((new Ticket() { 
                                             ID = ligne["ID Incident"], 
                                             SourceTool = sourcetool.ToUpper(), 
