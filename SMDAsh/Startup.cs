@@ -1,7 +1,6 @@
 using AutoQueryable.Extensions.DependencyInjection;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,14 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SMDAsh.Models;
-using System;
 using SMDAsh.Helpers;
 using SMDAsh.Services;
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
+using System;
 
 namespace SMDAsh
 {
@@ -131,21 +129,12 @@ namespace SMDAsh
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-                endpoints.MapControllerRoute(
-                  name: "default",
-                  pattern: "{controller}/{action}/{id?}");
-                endpoints.MapControllers();
-                //Sendpoints.EnableDependencyInjection();
-                endpoints.Select().Filter().OrderBy().Count().MaxTop(null);
-                endpoints.MapODataRoute("odata", "api", GetEdmModel());
+               
             app.UseAuthentication();
             app.UseAuthorization();
          /* Authentication End */
 
-            
-
-            });
-            */
+        
 
 
             
@@ -154,7 +143,8 @@ namespace SMDAsh
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
+                endpoints.MapControllers();
+                    });
              
             app.UseSpa(spa =>
             {
@@ -171,19 +161,6 @@ namespace SMDAsh
            
 
         }
-        /*
-        private IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.Namespace = "sm";
-            builder.EntitySet<Tickets>("Tickets");
-
-            var function = builder.EntityType<Tickets>().Collection.Function("BacklogInOut").Returns<Backlogs>();
-            function.Parameter<string>("Category");
-            //function.Parameter<string>("SourceTool");
-
-            return builder.GetEdmModel();
-        }
-        */
+        
     }
 }

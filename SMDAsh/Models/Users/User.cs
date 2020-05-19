@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SMDAsh.Entities
+namespace SMDAsh.Models.Users
 {
     public class User
     {

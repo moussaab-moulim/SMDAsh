@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SMDAsh.Entities;
+using SMDAsh.Models.Users;
 using SMDAsh.Helpers;
 using SMDAsh.Models;
 
@@ -21,9 +21,9 @@ namespace SMDAsh.Services
 
     public class UserService : IUserService
     {
-        private TicketsContext _context;
+        private SmDashboardContext _context;
 
-        public UserService(TicketsContext context)
+        public UserService(SmDashboardContext context)
         {
             _context = context;
         }

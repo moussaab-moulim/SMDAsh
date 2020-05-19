@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using SMDAsh.Entities;
 using SMDAsh.Models.Users;
 
 namespace SMDAsh.Helpers
