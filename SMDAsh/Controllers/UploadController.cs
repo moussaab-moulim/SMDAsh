@@ -20,10 +20,10 @@ namespace SMDAsh.Controllers
     public class UploadController : ControllerBase
     {
 
-        private readonly TicketsContext _context;
+        private readonly SmDashboardContext _context;
       
 
-        public UploadController(TicketsContext context)
+        public UploadController(SmDashboardContext context)
         {
             _context = context;
      
@@ -137,7 +137,7 @@ namespace SMDAsh.Controllers
 
                                     if (sf.SourceTool.ToLower().Equals("mantis")) {
 
-                                        var Msta = ligne["Statut"].In("Fermée", "Abandonnée", "closed", "Clôturé") ? "Abandonné"
+                                        var Msta = ligne["Statut"].In("Fermée", "Abondonnée", "closed", "Clôturé") ? "Abandonnée"
                                                 : ligne["Statut"].In("Nouvelle", "Accepté") ? "Nouvelle"
                                                 : ligne["Statut"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
                                                 : ligne["Statut"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
@@ -147,7 +147,14 @@ namespace SMDAsh.Controllers
                                                 : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
 
-                                          var Mp = ligne["P"].In("P1", "1") ? "P1"
+                                        var Mats = ligne["Statut"].In("A appliquer en PROD", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                                                    "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
+                                                 : ligne["Statut"].In("SR Oracle en cours") ? "Editeur"
+                                                 : ligne["Statut"].In("En cours chez le prestataire") ? "Presta"
+                                                 : ligne["Statut"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Mats);
+
+                                        var Mp = ligne["P"].In("P1", "1") ? "P1"
                                                 : ligne["P"].In("P2", "2") ? "P2"
                                                 : ligne["P"].In("P3", "3") ? "P3"
                                                 : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
@@ -157,25 +164,25 @@ namespace SMDAsh.Controllers
                                                 : ligne["Priorité"].In("normale", "Moyenne") ? "Moyenne"
                                                 : ligne["Priorité"].In("élevée") ? "Elevée"
                                                 : ligne["Priorité"].In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
+                                       System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
 
                                         var Mcat = ligne["Catégorie"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
                                                 : ligne["Catégorie"].In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? "SR"
                                                 : ligne["Catégorie"].In("Evolution") ? "Evolution" : "Category not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
+                                       System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
 
-                                        var entity= _context.Tickets.Add(new Ticket() { 
-                                       ID = ligne["Identifiant"], 
+                                        var entity= _context.Tickets.Add(new Tickets() {
+                                        TicketID = ligne["Identifiant"], 
                                        SourceTool = sourcetool.ToUpper(), 
                                        AssignedTo = ligne["Assigné à"], 
                                        DateSent = ligne["Date de soumission"], 
                                        DateResolved = ligne["Date résolution"], 
                                        DateClosed = ligne["Clos"], 
-                                       Priority = ligne["Priorité"], 
-                                       P = ligne["P"], 
-                                       Status = ligne["Statut"], 
+                                       Priority = Mprio, 
+                                       P = Mp, 
+                                       Status = Msta, 
                                        Description = ligne["Résumé"], 
-                                       Category = ligne["Catégorie"], 
+                                       Category = Mcat, 
                                        WeekIn = ligne["Week in"], 
                                        WeekOut = ligne["Week out"], 
                                        YearIn = ligne["Year in"], 
@@ -188,14 +195,15 @@ namespace SMDAsh.Controllers
                                        SR = ligne["SR"], 
                                        Affectation = ligne["Affectation"], 
                                        MD = ligne["M/D"], 
-                                       Application=ligne["Projet Court"] });
+                                       Application=ligne["Projet Court"],
+                                       AssignedToService = Mats });
 
-                                        count++;
+                            count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
 
-                                        var Ssta = ligne["État"].In("Fermée", "Abandonnée", "closed", "Clôturé") ? "Abandonné"
+                                        var Ssta = ligne["État"].In("Fermée", "Abondonnée", "closed", "Clôturé", "A fermer") ? "Abandonnée"
                                                 : ligne["État"].In("Nouvelle", "Accepté") ? "Nouvelle"
                                                 : ligne["État"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
                                                 : ligne["État"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
@@ -203,8 +211,15 @@ namespace SMDAsh.Controllers
                                                 : ligne["État"].In("A fermer", "Résolu") ? "Resolved"
                                                 : ligne["État"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Ssta);
+                                        
+                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                                                    "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
+                                                 : ligne["État"].In("SR Oracle en cours") ? "Editeur"
+                                                 : ligne["État"].In("En cours chez le prestataire") ? "Presta"
+                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
 
-                                          var Sp = ligne["P"].In("P1", "1") ? "P1"
+                                        var Sp = ligne["P"].In("P1", "1") ? "P1"
                                                 : ligne["P"].In("P2", "2") ? "P2"
                                                 : ligne["P"].In("P3", "3") ? "P3"
                                                 : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
@@ -225,18 +240,18 @@ namespace SMDAsh.Controllers
                                         System.Diagnostics.Debug.WriteLine(ligne["New Cat"] + " to " + Scat);
 
 
-                                        var entity = _context.Tickets.Add((new Ticket() { 
-                                            ID = ligne["ID Incident"], 
+                                        var entity = _context.Tickets.Add(new Tickets() {
+                                            TicketID = ligne["ID Incident"], 
                                             SourceTool = sourcetool.ToUpper(), 
                                             AssignedTo = ligne["Responsable"], 
                                             DateSent = ligne["Date/Heure d'ouverture"], 
                                             DateResolved = ligne["Date/Heure de résolution"], 
                                             DateClosed = ligne["Date/Heure de clôture"], 
-                                            Priority = ligne["Priorité"], 
-                                            P = ligne["P"], 
-                                            Status = ligne["État"],
+                                            Priority = Sprio, 
+                                            P = Sp, 
+                                            Status = Ssta,
                                             Description = ligne["Titre"], 
-                                            Category = ligne["New Cat"], 
+                                            Category = Scat, 
                                             WeekIn = ligne["week in"], 
                                             WeekOut = ligne["week out"], 
                                             YearIn = ligne["year in"], 
@@ -249,7 +264,8 @@ namespace SMDAsh.Controllers
                                             SR = ligne["SR"], 
                                             Affectation = ligne["Best effort"], 
                                             MD = ligne["M/D"], 
-                                            Application = ligne["Application"] }));
+                                            Application = ligne["Application"],
+                                            AssignedToService = Sats});
                                         count++;
                                         System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
