@@ -1,6 +1,4 @@
 using AutoQueryable.Extensions.DependencyInjection;
-using Microsoft.AspNet.OData.Builder;
-using Microsoft.AspNet.OData.Extensions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System;
+using Microsoft.OpenApi.Models;
 
 namespace SMDAsh
 {
@@ -35,6 +34,13 @@ namespace SMDAsh
             // adding entity freameworke context 
             services.AddDbContext<SmDashboardContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("TicketConLocal")));
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            
+            services.AddSwaggerGen(c =>
+            {
+                c.OperationFilter<CommonSwaggerParams>();
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
 
             services.AddControllersWithViews().AddNewtonsoftJson();
 
@@ -117,6 +123,17 @@ namespace SMDAsh
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SmDashboard api V1");
+            });
 
             app.UseRouting();
             /* odata 
