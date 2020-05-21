@@ -144,13 +144,16 @@ namespace SMDAsh.Controllers
                                                 : ligne["Statut"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
                                                 : ligne["Statut"].In("A fermer", "Résolu") ? "Resolved"
                                                 : ligne["Statut"].In("") ? ""
-                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
+                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
 
-                                        var Mats = ligne["Statut"].In("A appliquer en PROD", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                        var Mats = ligne["Statut"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
                                                                     "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
                                                  : ligne["Statut"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["Statut"].In("En cours chez le prestataire") ? "Presta"
+                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
+                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
+                                                                     "Nouvelle") ? "Run serivce"
+                                                 : ligne["Statut"].In("En cours chez le prestataire__") ? "Presta"
                                                  : ligne["Statut"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Mats);
 
@@ -212,10 +215,13 @@ namespace SMDAsh.Controllers
                                                 : ligne["État"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Ssta);
                                         
-                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
                                                                     "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
                                                  : ligne["État"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["État"].In("En cours chez le prestataire") ? "Presta"
+                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
+                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
+                                                                     "Nouvelle") ? "Run serivce"
+                                                 : ligne["État"].In("En cours chez le prestataire__") ? "Presta"
                                                  : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
 
