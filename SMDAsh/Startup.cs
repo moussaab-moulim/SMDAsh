@@ -39,7 +39,7 @@ namespace SMDAsh
             services.AddSwaggerGen(c =>
             {
                 c.OperationFilter<CommonSwaggerParams>();
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SM Dashboard API", Version = "v1" });
             });
 
             services.AddControllersWithViews().AddNewtonsoftJson();

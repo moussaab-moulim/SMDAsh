@@ -9,8 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using SMDAsh.Helpers.Params;
 using SMDAsh.Models;
-
+using SMDAsh.Models.Charts;
 
 namespace SMDAsh.Controllers
 {
@@ -37,6 +38,40 @@ namespace SMDAsh.Controllers
             var param = new SqlParameter("@Cat", Category);
             IQueryable<Backlogs> back = _context.Backlogs.FromSqlRaw(cmdText, param).ToList<Backlogs>().AsQueryable();
             return back;
+
+        }
+
+        [HttpGet("[action]/{Category}/{Service}"), AutoQueryable]
+        public IQueryable TicketsAssigned(string Category,string Service)
+
+        {
+            List<string> allStatus = StatusParams.GetForTicketsAssigned();
+            System.Diagnostics.Debug.WriteLine(allStatus.Contains("Abondonnée"));
+            allStatus.ForEach(i => System.Diagnostics.Debug.WriteLine(i));
+            var query = Category.ToLower().Equals("all") ?
+                (from t in _context.Tickets
+                 where  allStatus.Contains(t.Status)
+                 select t) :
+                 (from t in _context.Tickets
+                  where t.Category == Category && allStatus.Contains(t.Status)
+                  select t);
+            var results = query.ToList().GroupBy(t => t.Application)
+                                   .Select(t => new TicketsAssigned()
+                                   {
+                                       category = Category,
+                                       assignedToService = Service,
+                                       application = t.Key,
+                                       count = t.Count()
+                                   })
+                                   .AsQueryable<TicketsAssigned>();
+            
+
+            return results;
+
+
+
+
+
 
         }
     }

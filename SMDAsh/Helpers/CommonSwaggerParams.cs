@@ -16,7 +16,7 @@ namespace SMDAsh.Helpers
 
             var descriptor = context.ApiDescription.ActionDescriptor as ControllerActionDescriptor;
 
-            if (descriptor != null && !descriptor.ControllerName.StartsWith("Weather"))
+            if (descriptor != null && !descriptor.ControllerName.In("Upload"))
             {
                 operation.Parameters.Add(CreateParameter(context,"select","select columns"));
                 operation.Parameters.Add(CreateParameter(context, "take", "only show specific number","int"));
