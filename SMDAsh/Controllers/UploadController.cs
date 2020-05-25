@@ -222,7 +222,7 @@ namespace SMDAsh.Controllers
                                                                      "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
                                                                      "Nouvelle") ? "Run serivce"
                                                  : ligne["État"].In("En cours chez le prestataire__") ? "Presta"
-                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
+                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "-" : "AssignedToService not configured";
                                         System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
 
                                         var Sp = ligne["P"].In("P1", "1") ? "P1"
