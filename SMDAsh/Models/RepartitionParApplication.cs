@@ -8,7 +8,6 @@ namespace SMDAsh.Models
 {
     public class RepartitionParApplication
     {
-        [Key]
         public int RPAID { get; set; }
         public string Project { get; set; }
 
