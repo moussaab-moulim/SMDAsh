@@ -67,19 +67,28 @@ namespace SMDAsh.Controllers
                             Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
                             SheetData sheetData = worksheet.GetFirstChild<SheetData>();
 
-                            List<Tickets> tickets = new List<Tickets>();
+
                             List<string> keys = new List<string>();
-                            int rowCount = sheetData.ChildElements.Count;
-                            for (int i = 0;i< rowCount;i++)
+                            for (int i = 0;i< sheetData.ChildElements.Count;i++)
                             {
                                 var row = sheetData.ChildElements[i];
                                 Dictionary<string, string> ligne = new Dictionary<string, string>();
 
-                                int cellCount = (row as Row).ChildElements.Count;
-                                for (int j = 0; j< cellCount;j++)
+                                
+                                for(int j = 0; j< (row as Row).ChildElements.Count;j++)
                                 {
                                     var cell = (row as Row).ChildElements[j];
                                     Cell thecurrentcell = cell as Cell;
+                                    //if (i> 2 && j == 21)
+                                    //{
+                                    //    var hna = true;
+                                    //}
+                                    /*
+                                    if (cellValue != null)
+                                    {
+                                        //Console.WriteLine(cellValue.Text);
+                                        str.Add(cellValue.Text);
+                                    }*/
                                     string currentcellvalue = string.Empty;
                                     if (thecurrentcell.DataType != null)
                                     {
@@ -134,36 +143,38 @@ namespace SMDAsh.Controllers
                                                 : ligne["Statut"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
                                                 : ligne["Statut"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
                                                 : ligne["Statut"].In("A fermer", "Résolu") ? "Resolved"
-                                                : ligne["Statut"].In("") ? "-"
-                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
+                                                : ligne["Statut"].In("") ? ""
+                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
 
-                                        var Mats = ligne["Statut"].In("A appliquer en PROD", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                        var Mats = ligne["Statut"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
                                                                     "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
                                                  : ligne["Statut"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["Statut"].In("En cours chez le prestataire") ? "Prestataire"
-                                                 : ligne["Statut"].In("A fermer", "Fermée", "Abondonnée") ? "-" : "AssignedToService not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Mats);
+                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
+                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
+                                                                     "Nouvelle") ? "Run serivce"
+                                                 : ligne["Statut"].In("En cours chez le prestataire__") ? "Presta"
+                                                 : ligne["Statut"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Mats);
 
                                         var Mp = ligne["P"].In("P1", "1") ? "P1"
                                                 : ligne["P"].In("P2", "2") ? "P2"
                                                 : ligne["P"].In("P3", "3") ? "P3"
                                                 : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Mp);
+                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Mp);
 
                                        var Mprio = ligne["Priorité"].In("basse", "Faible") ? "Faible"
                                                 : ligne["Priorité"].In("normale", "Moyenne") ? "Moyenne"
                                                 : ligne["Priorité"].In("élevée") ? "Elevée"
                                                 : ligne["Priorité"].In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
-                                       //System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
+                                       System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
 
                                         var Mcat = ligne["Catégorie"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
                                                 : ligne["Catégorie"].In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? "SR"
                                                 : ligne["Catégorie"].In("Evolution") ? "Evolution" : "Category not configured";
-                                       //System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
+                                       System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
 
-                                        
-                                        tickets.Add(new Tickets() {
+                                        var entity= _context.Tickets.Add(new Tickets() {
                                         TicketID = ligne["Identifiant"], 
                                        SourceTool = sourcetool.ToUpper(), 
                                        AssignedTo = ligne["Assigné à"], 
@@ -191,6 +202,7 @@ namespace SMDAsh.Controllers
                                        AssignedToService = Mats });
 
                             count++;
+                                        System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
 
@@ -201,24 +213,28 @@ namespace SMDAsh.Controllers
                                                 : ligne["État"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
                                                 : ligne["État"].In("A fermer", "Résolu") ? "Resolved"
                                                 : ligne["État"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Ssta);
                                         
-                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette", "A tester", "Demande de clarification métier",
+                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
                                                                     "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
                                                  : ligne["État"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["État"].In("En cours chez le prestataire") ? "Presta"
-                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
+                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
+                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
+                                                                     "Nouvelle") ? "Run serivce"
+                                                 : ligne["État"].In("En cours chez le prestataire__") ? "Presta"
+                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "-" : "AssignedToService not configured";
+                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
 
                                         var Sp = ligne["P"].In("P1", "1") ? "P1"
                                                 : ligne["P"].In("P2", "2") ? "P2"
                                                 : ligne["P"].In("P3", "3") ? "P3"
                                                 : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Sp);
+                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Sp);
 
                                        var Sprio = ligne["Priorité"].In("basse", "3 - Faible", "4 - Faible") ? "Faible"
                                                 : ligne["Priorité"].In("normale", "2 - Moyenne") ? "Moyenne"
                                                 : ligne["Priorité"].In("1 - Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Sprio);
+                                        System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Sprio);
 
                                         var Scat = ligne["New Cat"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
                                                 : ligne["New Cat"].In("Demande d'extraction", "Demande d'information", "Demande d'accès", "service request") ? "SR"
@@ -227,10 +243,10 @@ namespace SMDAsh.Controllers
                                                 : ligne["New Cat"].In("Monitoring") ? "Monitoring"
                                                 : ligne["New Cat"].In("EFC") ? "EFC"
                                                 : ligne["New Cat"].In("RFC") ? "RFC" : "Category not configured";
-                                        //System.Diagnostics.Debug.WriteLine(ligne["New Cat"] + " to " + Scat);
+                                        System.Diagnostics.Debug.WriteLine(ligne["New Cat"] + " to " + Scat);
 
 
-                                        tickets.Add(new Tickets() {
+                                        var entity = _context.Tickets.Add(new Tickets() {
                                             TicketID = ligne["ID Incident"], 
                                             SourceTool = sourcetool.ToUpper(), 
                                             AssignedTo = ligne["Responsable"], 
@@ -257,12 +273,13 @@ namespace SMDAsh.Controllers
                                             Application = ligne["Application"],
                                             AssignedToService = Sats});
                                         count++;
+                                        System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
                                 }
 
                             }
                             // IMPORT TO DATABASE
-                            _context.AddRange(tickets);
+
                             int created = _context.SaveChanges();
                             return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
