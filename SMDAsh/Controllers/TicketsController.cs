@@ -12,6 +12,9 @@ using Newtonsoft.Json;
 using SMDAsh.Helpers.Params;
 using SMDAsh.Models;
 using SMDAsh.Models.Charts;
+using AutoQueryable;
+using SMDAsh.Helpers.Exceptions;
+using SMDAsh.Models.Errors;
 
 namespace SMDAsh.Controllers
 {
@@ -41,19 +44,34 @@ namespace SMDAsh.Controllers
 
         }
 
-        [HttpGet("[action]/{Category}/{Service}"), AutoQueryable]
-        public IQueryable TicketsAssigned(string Category,string Service)
-
+        [HttpGet("[action]/{Category}/{Service}")]
+        [AutoQueryable]
+        public  ActionResult<IQueryable> TicketsAssigned(string Category,string Service)
         {
             List<string> allStatus = StatusParams.GetForTicketsAssigned();
-            System.Diagnostics.Debug.WriteLine(allStatus.Contains("Abondonnée"));
-            allStatus.ForEach(i => System.Diagnostics.Debug.WriteLine(i));
-            var query = Category.ToLower().Equals("all") ?
-                (from t in _context.Tickets
-                 where  allStatus.Contains(t.Status)
-                 select t) :
+            List<string> allCategory = CategoryParams.GetAll();
+
+            //bad request error;
+            List<BadUrl> lit = new List<BadUrl>();
+
+            if (!allCategory.Contains(Category, StringComparer.OrdinalIgnoreCase) && !Category.Equals("all"))
+            {
+
+                BadUrl obj = new BadUrl(Category);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            } else if (!AssignedToService.GetAll().Contains(Service, StringComparer.OrdinalIgnoreCase) && !Service.Equals("all"))
+            {
+                BadUrl obj = new BadUrl(Service);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+            
+            var query =
                  (from t in _context.Tickets
-                  where t.Category == Category && allStatus.Contains(t.Status)
+                  where t.Category.Contains((Category.Equals("all")?"":Category))
+                  && allStatus.Contains(t.Status)
+                  && t.AssignedToService.Contains((Service.Equals("all") ? "" : Service))
                   select t);
             var results = query.ToList().GroupBy(t => t.Application)
                                    .Select(t => new TicketsAssigned()
@@ -65,8 +83,9 @@ namespace SMDAsh.Controllers
                                    })
                                    .AsQueryable<TicketsAssigned>();
             
+            
 
-            return results;
+            return Ok(results);
 
 
 

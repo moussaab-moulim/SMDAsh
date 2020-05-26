@@ -13,17 +13,18 @@ namespace SMDAsh.Helpers.Params
         public const string QUEUED = "Queued";
         public const string QUEUED_TEAL = "Queued TEAL";
         public const string RESOLVED = "Resolved";
-        public const string EMPTY_STATUS = "-";
+        public const string EMPTY = "-";
         public const string IN_PROCRESS = "En Cours";
         public const string NOT_CONFIGURED = "status not parametered";
             
-        public static String[] GetAll() {
+        public static List<string> GetAll() {
             var fields = typeof(StatusParams).GetFields();
             int paramsCount = fields.Length;
-            string[] allStatus =new string[paramsCount];
+            List<string> allStatus =new List<string>();
             for (int i = 0; i<paramsCount;i++)
             {
-                allStatus[i] = fields[i].GetValue(null).ToString();
+                string status = fields[i].GetValue(null).ToString();
+                allStatus.Add(status);
             }
 
             return allStatus;
@@ -36,7 +37,7 @@ namespace SMDAsh.Helpers.Params
             for (int i = 0; i < paramsCount; i++)
             {
                 string status = fields[i].GetValue(null).ToString();
-                if (status.In(EMPTY_STATUS, NOT_CONFIGURED, ABANDONED,RESOLVED)) continue;
+                if (status.In(EMPTY, NOT_CONFIGURED, ABANDONED,RESOLVED)) continue;
                 allStatus.Add(status);
             }
 

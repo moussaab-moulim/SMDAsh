@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMDAsh.Helpers;
+using SMDAsh.Helpers.Exceptions;
+using SMDAsh.Helpers.Params;
 using SMDAsh.Models;
 
 namespace SMDAsh.Controllers
@@ -68,6 +70,9 @@ namespace SMDAsh.Controllers
                             SheetData sheetData = worksheet.GetFirstChild<SheetData>();
 
 
+                            // list to save the data of excel as tickets
+                            List < Tickets > tickets= new List<Tickets>();
+                            //list to save the first row of data sheet as keys
                             List<string> keys = new List<string>();
                             for (int i = 0;i< sheetData.ChildElements.Count;i++)
                             {
@@ -79,16 +84,6 @@ namespace SMDAsh.Controllers
                                 {
                                     var cell = (row as Row).ChildElements[j];
                                     Cell thecurrentcell = cell as Cell;
-                                    //if (i> 2 && j == 21)
-                                    //{
-                                    //    var hna = true;
-                                    //}
-                                    /*
-                                    if (cellValue != null)
-                                    {
-                                        //Console.WriteLine(cellValue.Text);
-                                        str.Add(cellValue.Text);
-                                    }*/
                                     string currentcellvalue = string.Empty;
                                     if (thecurrentcell.DataType != null)
                                     {
@@ -137,55 +132,18 @@ namespace SMDAsh.Controllers
 
                                     if (sf.SourceTool.ToLower().Equals("mantis")) {
 
-                                        var Msta = ligne["Statut"].In("Fermée", "Abondonnée", "closed", "Clôturé") ? "Abandonnée"
-                                                : ligne["Statut"].In("Nouvelle", "Accepté") ? "Nouvelle"
-                                                : ligne["Statut"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
-                                                : ligne["Statut"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
-                                                : ligne["Statut"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
-                                                : ligne["Statut"].In("A fermer", "Résolu") ? "Resolved"
-                                                : ligne["Statut"].In("") ? ""
-                                                : ligne["Statut"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Msta);
-
-                                        var Mats = ligne["Statut"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
-                                                                    "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
-                                                 : ligne["Statut"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
-                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
-                                                                     "Nouvelle") ? "Run serivce"
-                                                 : ligne["Statut"].In("En cours chez le prestataire__") ? "Presta"
-                                                 : ligne["Statut"].In("A fermer", "Fermée", "Abondonnée") ? "" : "AssignedToService not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["Statut"] + " to " + Mats);
-
-                                        var Mp = ligne["P"].In("P1", "1") ? "P1"
-                                                : ligne["P"].In("P2", "2") ? "P2"
-                                                : ligne["P"].In("P3", "3") ? "P3"
-                                                : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Mp);
-
-                                       var Mprio = ligne["Priorité"].In("basse", "Faible") ? "Faible"
-                                                : ligne["Priorité"].In("normale", "Moyenne") ? "Moyenne"
-                                                : ligne["Priorité"].In("élevée") ? "Elevée"
-                                                : ligne["Priorité"].In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
-                                       System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Mprio);
-
-                                        var Mcat = ligne["Catégorie"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
-                                                : ligne["Catégorie"].In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? "SR"
-                                                : ligne["Catégorie"].In("Evolution") ? "Evolution" : "Category not configured";
-                                       System.Diagnostics.Debug.WriteLine(ligne["Catégorie"] + " to " + Mcat);
-
-                                        var entity= _context.Tickets.Add(new Tickets() {
+                                        tickets.Add(new Tickets() {
                                         TicketID = ligne["Identifiant"], 
-                                       SourceTool = sourcetool.ToUpper(), 
+                                       SourceTool = sourcetool, 
                                        AssignedTo = ligne["Assigné à"], 
                                        DateSent = ligne["Date de soumission"], 
                                        DateResolved = ligne["Date résolution"], 
                                        DateClosed = ligne["Clos"], 
-                                       Priority = Mprio, 
-                                       P = Mp, 
-                                       Status = Msta, 
+                                       Priority = integrateColumn(ligne["Priorité"], "Priority"), 
+                                       P = integrateColumn(ligne["P"], "P"), 
+                                       Status = integrateColumn(ligne["Statut"], "Status"), 
                                        Description = ligne["Résumé"], 
-                                       Category = Mcat, 
+                                       Category = integrateColumn(ligne["Catégorie"], "Category"), 
                                        WeekIn = ligne["Week in"], 
                                        WeekOut = ligne["Week out"], 
                                        YearIn = ligne["Year in"], 
@@ -199,65 +157,24 @@ namespace SMDAsh.Controllers
                                        Affectation = ligne["Affectation"], 
                                        MD = ligne["M/D"], 
                                        Application=ligne["Projet Court"],
-                                       AssignedToService = Mats });
+                                       AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService")
+                                        });
 
                             count++;
-                                        System.Diagnostics.Debug.WriteLine(entity.State.ToString()+" "+ count);
                                     }
                                     else if (sf.SourceTool.ToLower().Equals("sm9")) {
-
-                                        var Ssta = ligne["État"].In("Fermée", "Abondonnée", "closed", "Clôturé", "A fermer") ? "Abandonnée"
-                                                : ligne["État"].In("Nouvelle", "Accepté") ? "Nouvelle"
-                                                : ligne["État"].In("Prise en charge retours tests", "A tester", "En attente du client") ? "A tester"
-                                                : ligne["État"].In("ETUDE_A_VALIDER", "Queued") ? "Queued"
-                                                : ligne["État"].In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? "Queued TEAL"
-                                                : ligne["État"].In("A fermer", "Résolu") ? "Resolved"
-                                                : ligne["État"].In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En cours chez le prestataire") ? "En Cours" : "status not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Ssta);
-                                        
-                                        var Sats = ligne["État"].In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
-                                                                    "En cours chez le métier", "ETUDE_A_VALIDER") ? "OCP"
-                                                 : ligne["État"].In("SR Oracle en cours") ? "Editeur"
-                                                 : ligne["Statut"].In("A appliquer en recette", "En cours chez le prestataire", "A appliquer en PROD",
-                                                                     "En Cours DEV SI", "En cours DEV SI", "Prise en charge/Etude de faisabilité SI",
-                                                                     "Nouvelle") ? "Run serivce"
-                                                 : ligne["État"].In("En cours chez le prestataire__") ? "Presta"
-                                                 : ligne["État"].In("A fermer", "Fermée", "Abondonnée") ? "-" : "AssignedToService not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["État"] + " to " + Sats);
-
-                                        var Sp = ligne["P"].In("P1", "1") ? "P1"
-                                                : ligne["P"].In("P2", "2") ? "P2"
-                                                : ligne["P"].In("P3", "3") ? "P3"
-                                                : ligne["P"].In("P4", "4") ? "P4" : "P not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["P"] + " to " + Sp);
-
-                                       var Sprio = ligne["Priorité"].In("basse", "3 - Faible", "4 - Faible") ? "Faible"
-                                                : ligne["Priorité"].In("normale", "2 - Moyenne") ? "Moyenne"
-                                                : ligne["Priorité"].In("1 - Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["Priorité"] + " to " + Sprio);
-
-                                        var Scat = ligne["New Cat"].In("incident", "réclamation", "Anomalie") ? "Anomalie"
-                                                : ligne["New Cat"].In("Demande d'extraction", "Demande d'information", "Demande d'accès", "service request") ? "SR"
-                                                : ligne["New Cat"].In("") ? ""
-                                                : ligne["New Cat"].In("Evolution") ? "Evolution"
-                                                : ligne["New Cat"].In("Monitoring") ? "Monitoring"
-                                                : ligne["New Cat"].In("EFC") ? "EFC"
-                                                : ligne["New Cat"].In("RFC") ? "RFC" : "Category not configured";
-                                        System.Diagnostics.Debug.WriteLine(ligne["New Cat"] + " to " + Scat);
-
-
-                                        var entity = _context.Tickets.Add(new Tickets() {
+                                        tickets.Add(new Tickets() {
                                             TicketID = ligne["ID Incident"], 
-                                            SourceTool = sourcetool.ToUpper(), 
+                                            SourceTool = sourcetool, 
                                             AssignedTo = ligne["Responsable"], 
                                             DateSent = ligne["Date/Heure d'ouverture"], 
                                             DateResolved = ligne["Date/Heure de résolution"], 
                                             DateClosed = ligne["Date/Heure de clôture"], 
-                                            Priority = Sprio, 
-                                            P = Sp, 
-                                            Status = Ssta,
+                                            Priority = integrateColumn(ligne["Priorité"], "Priority"), 
+                                            P = integrateColumn(ligne["P"], "P"), 
+                                            Status = integrateColumn(ligne["État"], "Status"),
                                             Description = ligne["Titre"], 
-                                            Category = Scat, 
+                                            Category = integrateColumn(ligne["New Cat"], "Category"), 
                                             WeekIn = ligne["week in"], 
                                             WeekOut = ligne["week out"], 
                                             YearIn = ligne["year in"], 
@@ -271,15 +188,15 @@ namespace SMDAsh.Controllers
                                             Affectation = ligne["Best effort"], 
                                             MD = ligne["M/D"], 
                                             Application = ligne["Application"],
-                                            AssignedToService = Sats});
+                                            AssignedToService = integrateColumn(ligne["État"], "AssignedToService")
+                                        });
                                         count++;
-                                        System.Diagnostics.Debug.WriteLine(entity.State.ToString() +" "+count);
                                     }
                                 }
 
                             }
                             // IMPORT TO DATABASE
-
+                            _context.AddRange(tickets);
                             int created = _context.SaveChanges();
                             return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
                         }
@@ -301,6 +218,62 @@ namespace SMDAsh.Controllers
             }
 
 
+        }
+
+        private string integrateColumn(string valueToCompare,string destination)
+        {
+            string finalVal = String.Empty;
+            string ligneVal = valueToCompare;
+
+            switch (destination)
+            {
+                case "Status":
+                    finalVal = ligneVal.In("Fermée", "Abondonnée", "closed", "Clôturé") ? StatusParams.ABANDONED
+                                                : ligneVal.In("Nouvelle", "Accepté") ? StatusParams.NEW
+                                                : ligneVal.In("Prise en charge retours tests", "A tester", "En attente du client") ? StatusParams.TO_BE_TESTED
+                                                : ligneVal.In("ETUDE_A_VALIDER", "Queued") ? StatusParams.QUEUED
+                                                : ligneVal.In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? StatusParams.QUEUED_TEAL
+                                                : ligneVal.In("A fermer", "Résolu") ? StatusParams.RESOLVED
+                                                : ligneVal.In("") ? StatusParams.EMPTY
+                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire") ? StatusParams.IN_PROCRESS : StatusParams.NOT_CONFIGURED;
+                    break;
+                case "Category":
+                    finalVal = ligneVal.In("incident", "réclamation", "Anomalie") ? CategoryParams.INCIDENT
+                    : ligneVal.In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? CategoryParams.SR
+                    : ligneVal.In("Evolution") ? CategoryParams.EVOLUTION : CategoryParams.NOT_CONFIGURED;
+                    break;
+                case "Priority":
+                    finalVal = ligneVal.In("basse", "Faible") ? "Faible"
+                     : ligneVal.In("normale", "Moyenne") ? "Moyenne"
+                     : ligneVal.In("élevée") ? "Elevée"
+                     : ligneVal.In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
+                    break;
+                case "P":
+                    finalVal = ligneVal.In("P1", "1") ? "P1"
+                    : ligneVal.In("P2", "2") ? "P2"
+                    : ligneVal.In("P3", "3") ? "P3"
+                    : ligneVal.In("P4", "4") ? "P4" : "P not configured";
+                    break;
+                case "AssignedToService":
+                    finalVal = ligneVal.In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
+                                        "En cours chez le métier", "ETUDE_A_VALIDER") ? AssignedToService.OCP
+                     : ligneVal.In("SR Oracle en cours") ? AssignedToService.EDITOR
+                     : ligneVal.In("A appliquer en RECETTE", "En cours chez le prestataire", "A appliquer en PROD",
+                                         "En cours DEV SI", "Prise en charge retours tests", "Prise en charge/Etude de faisabilité SI",
+                                         "Nouvelle") ? AssignedToService.TEAL
+                     : ligneVal.In("En cours chez le prestataire__") ? AssignedToService.OWNER
+                     : ligneVal.In("A fermer", "Fermée", "Abondonnée") ? AssignedToService.EMPTY : AssignedToService.NOT_CONFIGURED;
+                    break;
+
+
+                default:
+                    throw new DataIntegrationException(destination,new Exception());
+            }
+
+      
+            //System.Diagnostics.Debug.WriteLine(ligneVal + " to " + finalVal);
+
+            return finalVal;
         }
     }
 }
