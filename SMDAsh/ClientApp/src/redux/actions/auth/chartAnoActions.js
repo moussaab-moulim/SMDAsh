@@ -1,6 +1,5 @@
 import axios from 'axios';
-import moment from 'moment';
-import constants from '../constants';
+import * as constants from '../../constants';
 
 //Action to get all Repos
 export function getData(response) {
@@ -17,6 +16,7 @@ export function getDataThunk() {
     });
     axios.get(constants.APIS.getBacklog)
       .then(function(response){
+        console.log(response);
         var arr = response.data;
         dispatch({
           type: 'SUCCESS_CHARTANO',
@@ -24,6 +24,7 @@ export function getDataThunk() {
         })
       })
       .catch((error) => {
+        console.error(error,"ERRRRRORRR");
         dispatch({
           type: 'REJECTED_CHARTANO',
           payload: error.message || 'Unexpected Error!!!'
