@@ -7,11 +7,14 @@ import { ToastContainer, Slide } from 'react-toastify';
 import AuthPage from './views/Auth/authpage.component';
 
 import Spinner from './components/spinner/spinner.component';
-import { logoutUser } from './redux/actions/authActionCreators';
+import { logoutUser } from './redux/actions/auth/authActionCreators';
 import Admin from "layouts/Admin.js";
 import RTL from "layouts/RTL.js";
 
-const App = ({ user, dispatchLogoutAction }) => {
+const App = ( store ) => {
+  
+console.log(store.user);
+var user = store.user;
   return (
     <React.Fragment>
       <ToastContainer position="top-right" autoClose={2000}

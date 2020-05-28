@@ -1,14 +1,13 @@
 import { combineReducers } from 'redux';
-import chartAnoReducer from "./auth/chartAnoReducer";
-import user from './userReducer';
+import chartAnoReducer from "./chartAnoReducer";
+import user from './auth/userReducer';
 import loading from './loadingReducer';
-import notes from './notesReducer';
+
 
 const rootReducer = combineReducers({ 
     user, 
     loading,
-    notes,
-    chartAnoReducer
+    chartAno:chartAnoReducer
 });
 
 export default rootReducer;

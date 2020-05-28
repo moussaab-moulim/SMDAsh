@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { loginUser } from './../redux/actions/authActionCreators';
+import { loginUser } from './../redux/actions/auth/authActionCreators';
 
 const LoginForm = ({ dispatchLoginAction }) => {
 

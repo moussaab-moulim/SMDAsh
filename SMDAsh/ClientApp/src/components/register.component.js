@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { registerUser } from './../redux/actions/authActionCreators';
+import { registerUser } from './../redux/actions/auth/authActionCreators';
 
 const RegisterForm = ({ dispatchRegisterAction }) => {
 

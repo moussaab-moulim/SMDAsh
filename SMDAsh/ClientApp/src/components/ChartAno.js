@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../redux/actions/auth/chartAnoActions';
+import { getData, getDataThunk } from '../redux/actions/chartAnoActions';
 
 // core components
 import GridItem from 'components/Grid/GridItem.js';
@@ -107,10 +107,10 @@ export default function ChartAno() {
 
   useEffect(() => {
     if(chartState.loading)dispatch(getDataThunk());
-    /*
+    
     if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable,filter)}
     console.log(chartState,chartTable);
-    */
+    
   }, [chartState.loading]);
 
 
