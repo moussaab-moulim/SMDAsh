@@ -1,3 +1,5 @@
+import * as constants from '../../constants';
+
 const initalState = {
   loading: true,
   dataTable:[]
@@ -7,17 +9,17 @@ const chartSrReducer = (state = initalState, action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case "AWAITING_CHARTSR":
+    case constants.AWAITING_CHARTSR:
       return {
         ...state,
         loading: true
       }
-    case "REJECTED_CHARTSR":
+    case constants.REJECTED_CHARTSR:
       return {
         ...state,
         loading: false,
       }
-    case "SUCCESS_CHARTSR":
+    case constants.SUCCESS_CHARTSR:
       return {
         ...state,
         loading: false,

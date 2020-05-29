@@ -4,7 +4,7 @@ import * as constants from '../../constants';
 //Action to get all Repos
 export function getData(response) {
   return{
-    type: 'SUCCESS_CHARTSR',
+    type: constants.SUCCESS_CHARTSR,
     payload: response
   }
 }
@@ -12,19 +12,19 @@ export function getData(response) {
 export function getDataThunk() {
   return function(dispatch, getState) {
     dispatch({
-      type: 'AWAITING_CHARTSR',
+      type: constants.AWAITING_CHARTSR,
     });
     axios.get(constants.APIS.getBacklogSr)
       .then(function(response){
         var arr = response.data;
         dispatch({
-          type: 'SUCCESS_CHARTSR',
+          type: constants.SUCCESS_CHARTSR,
           payload: arr
         })
       })
       .catch((error) => {
         dispatch({
-          type: 'REJECTED_CHARTSR',
+          type: constants.REJECTED_CHARTSR,
           payload: error.message || 'Unexpected Error!!!'
         })
       });
