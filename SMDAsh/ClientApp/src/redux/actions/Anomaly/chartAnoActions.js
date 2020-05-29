@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as constants from './../constants';
+import * as constants from '../../constants';
 
 //Action to get all Repos
 export function getData(response) {
@@ -14,7 +14,7 @@ export function getDataThunk() {
     dispatch({
       type: 'AWAITING_CHARTANO',
     });
-    axios.get(constants.APIS.getBacklog)
+    axios.get(constants.APIS.getBacklogAnomaly)
       .then(function(response){
         console.log(response);
         var arr = response.data;

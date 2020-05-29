@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../redux/actions/chartAnoActions';
+import { getData, getDataThunk } from '../../redux/actions/Anomaly/chartAnoActions';
 
 // core components
 import GridItem from 'components/Grid/GridItem.js';
@@ -73,6 +73,7 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     flexGrow: 1,
+    
   },
   paper: {
     height: 300,
