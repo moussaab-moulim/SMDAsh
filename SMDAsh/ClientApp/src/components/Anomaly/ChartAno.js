@@ -111,7 +111,7 @@ export default function ChartAno() {
     if (chartState.loading) dispatch(getDataThunk());
 
     if (!chartState.loading && chartState.dataTable.length > 0) { orginizeData(chartState.dataTable, filter) }
-    console.log(chartState, chartTable);
+  
 
   }, [chartState.loading]);
 

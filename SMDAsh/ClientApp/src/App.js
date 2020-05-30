@@ -15,7 +15,7 @@ const App = ( store ) => {
 var user = store.user;
   return (
     <React.Fragment>
-      <ToastContainer position="top-right" autoClose={2000}
+      <ToastContainer closeButton={false} position="top-right" autoClose={2000}
         hideProgressBar transition={Slide} />
       <Spinner />
 
