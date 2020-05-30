@@ -38,11 +38,6 @@ export const getData = () => async dispatch => {
       hoverBackgroundColor.push(dynamicColors());
       total += respData[0].data[i].Count;
     }
-   
-
-    
-    
-
 
     dispatch({
       type: "SUCCESS_RPAANO",

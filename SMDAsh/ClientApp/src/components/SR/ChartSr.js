@@ -17,7 +17,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
-
+import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
@@ -216,6 +216,7 @@ export default function ChartSr() {
     <div>
       <GridContainer>
         <Card xs={12} sm={12} md={12} className={classes.card}>
+          {chartState.loading ? <SpinnerChart />: null}
           <CardBody>
             <Grid
               xs={12}
@@ -283,6 +284,7 @@ export default function ChartSr() {
           </CardBody>
         </Card>
         <Card xs={12} sm={12} md={12} className={classes.card}>
+          {chartState.loading ? <SpinnerChart />: null}
           <CardBody>
             <Grid
               xs={12}
@@ -301,7 +303,7 @@ export default function ChartSr() {
                 Chart PNG
               </Button>
             </Grid>
-            {!chartState.loading && <Bar
+            <Bar
               data={chartData}
               width='670vw'
               height='400vh'
@@ -335,7 +337,7 @@ export default function ChartSr() {
                   ],
                 },
               }}
-            />}
+            />
             
           </CardBody>
         </Card>

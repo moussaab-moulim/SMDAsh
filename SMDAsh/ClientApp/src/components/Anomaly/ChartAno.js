@@ -21,6 +21,7 @@ import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 
+import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
@@ -73,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     flexGrow: 1,
-    
+
   },
   paper: {
     height: 300,
@@ -101,25 +102,25 @@ export default function ChartAno() {
   const [chartData, setChartData] = useState(initialChartState);
 
   const dispatch = useDispatch();
-  const chartState = useSelector((state) => state.chartAno,[])||[];
+  const chartState = useSelector((state) => state.chartAno, []) || [];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
 
   useEffect(() => {
-    if(chartState.loading)dispatch(getDataThunk());
-    
-    if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable,filter)}
-    console.log(chartState,chartTable);
-    
+    if (chartState.loading) dispatch(getDataThunk());
+
+    if (!chartState.loading && chartState.dataTable.length > 0) { orginizeData(chartState.dataTable, filter) }
+    console.log(chartState, chartTable);
+
   }, [chartState.loading]);
 
 
   const handleFilter = (event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event,newFilter);
-      orginizeData(chartState.dataTable,newFilter);
+      console.log(event, newFilter);
+      orginizeData(chartState.dataTable, newFilter);
     }
   };
 
@@ -128,24 +129,24 @@ export default function ChartAno() {
     let datatable = dt;
     switch (filter) {
       case '1 Months':
-        datatable = datatable.filter((item,i) => {
-          return i>= datatable.length-4;
+        datatable = datatable.filter((item, i) => {
+          return i >= datatable.length - 4;
         });
         break;
       case '3 Months':
-        datatable = datatable.filter((item,i) => {
-          return i>= datatable.length-13;
+        datatable = datatable.filter((item, i) => {
+          return i >= datatable.length - 13;
         });
         break;
       case '6 Months':
-        datatable = datatable.filter((item,i) => {
-          return i>= datatable.length-26;
+        datatable = datatable.filter((item, i) => {
+          return i >= datatable.length - 26;
         });
         break;
-      case 'Year' : 
-      datatable = datatable.filter((item,i) => {
-        return i>= datatable.length-52;
-      });
+      case 'Year':
+        datatable = datatable.filter((item, i) => {
+          return i >= datatable.length - 52;
+        });
         break;
       default:
         break;
@@ -214,134 +215,143 @@ export default function ChartAno() {
     setChartTable(datatable);
   };
 
-  
+
 
   return (
     <div>
       <GridContainer>
+
         <Card xs={12} sm={12} md={12} className={classes.card}>
-          <CardBody>
-            <Grid
-              xs={12}
-              sm={12}
-              md={12}
-              container
-              direction='row'
-              justify='space-between'
-              alignItems='center'
-            >
-              <Button
-                variant='contained'
-                color='secondary'
-                className={classes.btn}
+        {chartState.loading ? <SpinnerChart />: null}
+            <CardBody>
+              <Grid
+                xs={12}
+                sm={12}
+                md={12}
+                container
+                direction='row'
+                justify='space-between'
+                alignItems='center'
               >
-                <GetAppIcon className={classes.buttonicon} />
-                All PNG
-              </Button>
-              <ToggleButtonGroup
-                value={filter}
-                className={classes.btn}
-                exclusive
-                onChange={handleFilter}
-                aria-label='text alignment'
-                size='small'
-              >
-                <ToggleButton
-                  className={classes.togglbtn}
-                  value='1 Months'
-                  aligned
+                <Button
+                  variant='contained'
+                  color='secondary'
+                  className={classes.btn}
                 >
-                  1 Months
-                </ToggleButton>
-                <ToggleButton className={classes.togglbtn} value='3 Months'>
-                  3 Months
-                </ToggleButton>
-                <ToggleButton className={classes.togglbtn} value='6 Months'>
-                  6 Months
-                </ToggleButton>
-                <ToggleButton className={classes.togglbtn} value='Year'>
-                  Year
-                </ToggleButton>
-                <ToggleButton className={classes.togglbtn} value='All'>
-                  All
-                </ToggleButton>
-              </ToggleButtonGroup>
+                  <GetAppIcon className={classes.buttonicon} />
+              All PNG
+            </Button>
+                <ToggleButtonGroup
+                  value={filter}
+                  className={classes.btn}
+                  exclusive
+                  onChange={handleFilter}
+                  aria-label='text alignment'
+                  size='small'
+                >
+                  <ToggleButton
+                    className={classes.togglbtn}
+                    value='1 Months'
+                    aligned
+                  >
+                    1 Months
+              </ToggleButton>
+                  <ToggleButton className={classes.togglbtn} value='3 Months'>
+                    3 Months
+              </ToggleButton>
+                  <ToggleButton className={classes.togglbtn} value='6 Months'>
+                    6 Months
+              </ToggleButton>
+                  <ToggleButton className={classes.togglbtn} value='Year'>
+                    Year
+              </ToggleButton>
+                  <ToggleButton className={classes.togglbtn} value='All'>
+                    All
+              </ToggleButton>
+                </ToggleButtonGroup>
 
-              <Button
-                variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
-              >
-                <TableChartIcon className={classes.buttonicon} />
-                Table PNG
-              </Button>
-            </Grid>
+                <Button
+                  variant='contained'
+                  className={classes.buttonGreen + ' ' + classes.btn}
+                >
+                  <TableChartIcon className={classes.buttonicon} />
+              Table PNG
+            </Button>
+              </Grid>
 
-            <MaterialTable
-              title='Anomaly'
-              columns={statecolumns.columns}
-              data={chartTable}
-              options={{
-                search: false
-              }}
-            />
-          </CardBody>
+              <MaterialTable
+                title='Anomaly'
+                columns={statecolumns.columns}
+                data={chartTable}
+                options={{
+                  search: false
+                }}
+              />
+            </CardBody>
+
+          
         </Card>
+
         <Card xs={12} sm={12} md={12} className={classes.card}>
-          <CardBody>
-            <Grid
-              xs={12}
-              sm={12}
-              md={12}
-              container
-              direction='row'
-              justify='flex-end'
-              alignItems='center'
-            >
-              <Button
-                variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
+          {chartState.loading ? <SpinnerChart />: null}
+            <CardBody>
+              <Grid
+                xs={12}
+                sm={12}
+                md={12}
+                container
+                direction='row'
+                justify='flex-end'
+                alignItems='center'
               >
-                <GetAppIcon className={classes.buttonicon} />
+                <Button
+                  variant='contained'
+                  className={classes.buttonGreen + ' ' + classes.btn}
+                >
+                  <GetAppIcon className={classes.buttonicon} />
                 Chart PNG
               </Button>
-            </Grid>
-            {!chartState.loading && <Bar
-              data={chartData}
-              width='670vw'
-              height='400vh'
-              options={{
-                title: {
-                  display: true,
-                  text: 'Anomaly : Input / Output / Week',
-                  fontSize: 20,
-                },
-                plugins: {
-                  labels: {
-                    render: 'value',
-                    fontSize: 12,
+              </Grid>
 
-                    fontColor: '#000',
-                    fontFamily: '"Lucida Console", Monaco, monospace',
+              <Bar
+                data={chartData}
+                width='670vw'
+                height='400vh'
+                options={{
+                  title: {
+                    display: true,
+                    text: 'Anomaly : Input / Output / Week',
+                    fontSize: 20,
                   },
-                },
-                responsive: true,
+                  plugins: {
+                    labels: {
+                      render: 'value',
+                      fontSize: 12,
 
-                scales: {
-                  yAxes: [
-                    {
-                      gridLines: {
-                        display: false,
-                      },
-                      ticks: {
-                        beginAtZero: true,
-                      },
+                      fontColor: '#000',
+                      fontFamily: '"Lucida Console", Monaco, monospace',
                     },
-                  ],
-                },
-              }}
-            />}
-            
-          </CardBody>
+                  },
+                  responsive: true,
+
+                  scales: {
+                    yAxes: [
+                      {
+                        gridLines: {
+                          display: false,
+                        },
+                        ticks: {
+                          beginAtZero: true,
+                        },
+                      },
+                    ],
+                  },
+                }}
+              />
+
+
+            </CardBody>
+          
         </Card>
       </GridContainer>
     </div>
