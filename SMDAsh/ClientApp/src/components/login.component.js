@@ -77,7 +77,7 @@ const LoginForm = ({ dispatchLoginAction }) => {
                     <p className="invalid-feedback">Required</p>
                 </div>
 
-                <button type="submit" className="btn btn-primary mr-2">
+                <button type="submit" className="btn btn-primary mr-2" style={{backgroundColor: "#008080"}}>
                     Login | <i className="fas fa-sign-in-alt"></i>
                 </button>
                 <button onClick={handleCancelForm} className="btn btn-outline-secondary">

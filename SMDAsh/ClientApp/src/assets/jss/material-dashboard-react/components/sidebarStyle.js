@@ -217,25 +217,25 @@ const sidebarStyle = theme => ({
         ",.2)"
     }
   },
-  green: {
-    backgroundColor: successColor[0],
+  teal: {
+    backgroundColor: "#008055",
     boxShadow:
       "0 12px 20px -10px rgba(" +
-      hexToRgb(successColor[0]) +
+      hexToRgb("#008055") +
       ",.28), 0 4px 20px 0 rgba(" +
       hexToRgb(blackColor) +
       ",.12), 0 7px 8px -5px rgba(" +
-      hexToRgb(successColor[0]) +
+      hexToRgb("#008055") +
       ",.2)",
     "&:hover,&:focus": {
-      backgroundColor: successColor[0],
+      backgroundColor: "#008055",
       boxShadow:
         "0 12px 20px -10px rgba(" +
-        hexToRgb(successColor[0]) +
+        hexToRgb("#008055") +
         ",.28), 0 4px 20px 0 rgba(" +
         hexToRgb(blackColor) +
         ",.12), 0 7px 8px -5px rgba(" +
-        hexToRgb(successColor[0]) +
+        hexToRgb("#008055") +
         ",.2)"
     }
   },

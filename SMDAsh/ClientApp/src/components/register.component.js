@@ -101,7 +101,7 @@ const RegisterForm = ({ dispatchRegisterAction }) => {
                     <p className="invalid-feedback">Required</p>
                 </div>
 
-                <button type="submit" className="btn btn-primary mr-2">
+                <button type="submit" className="btn btn-primary mr-2" style={{backgroundColor: "#008080"}}>
                     Register | <i className="fas fa-user-plus"></i>
                 </button>
                 <button onClick={handleCancelForm} className="btn btn-outline-secondary">

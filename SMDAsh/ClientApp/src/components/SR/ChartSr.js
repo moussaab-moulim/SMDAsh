@@ -32,11 +32,19 @@ const useStyles = makeStyles((theme) => ({
   togglbtn: {
     color: 'black !important',
   },
-  buttonGreen: {
-    backgroundColor: '#4caf50',
+  buttonTealColor: {
+    backgroundColor: '#008080',
     color: '#FFF',
     '&:hover': {
-      backgroundColor: 'green',
+      backgroundColor: '#008055',
+      color: '#FFF',
+    },
+  },
+  buttonRedColor: {
+    backgroundColor: '#d44320',
+    color: '#FFF',
+    '&:hover': {
+      backgroundColor: '#e6765b ',
       color: '#FFF',
     },
   },
@@ -168,39 +176,39 @@ export default function ChartSr() {
         {
           label: 'In',
           data: newChartArrays.in,
-          backgroundColor: '#0066cc',
+          backgroundColor: '#008080',
         },
         {
           label: 'Out',
           data: newChartArrays.out,
-          backgroundColor: '#ff4500',
+          backgroundColor: '#e6765b',
         },
         {
-          label: 'line Backlog',
+          label: 'Backlog',
           data: newChartArrays.backlog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#0066cc',
-          borderColor: '#0066cc',
+          backgroundColor: '#007fc9',
+          borderColor: '#007fc9',
         },
         {
-          label: 'Line Teal Backlog',
+          label: 'Teal Backlog',
           data: newChartArrays.tealBacklog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#ffbf00',
-          borderColor: '#ffbf00',
+          backgroundColor: '#f0d461',
+          borderColor: '#f0d461',
         },
         {
-          label: 'Line OCP Backlog',
+          label: 'OCP Backlog',
           data: newChartArrays.ocpBacklog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#cc0000',
-          borderColor: '#cc0000',
+          backgroundColor: '#d44320',
+          borderColor: '#d44320',
         },
       ],
       labels: newChartArrays.yearWeek,
@@ -230,7 +238,7 @@ export default function ChartSr() {
               <Button
                 variant='contained'
                 color='secondary'
-                className={classes.btn}
+                className={classes.btn + " " + classes.buttonRedColor}
               >
                 <GetAppIcon className={classes.buttonicon} />
                 All PNG
@@ -266,7 +274,7 @@ export default function ChartSr() {
 
               <Button
                 variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
+                className={classes.buttonTealColor + ' ' + classes.btn}
               >
                 <TableChartIcon className={classes.buttonicon} />
                 Table PNG
@@ -297,7 +305,7 @@ export default function ChartSr() {
             >
               <Button
                 variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
+                className={classes.buttonTealColor + ' ' + classes.btn}
               >
                 <GetAppIcon className={classes.buttonicon} />
                 Chart PNG
