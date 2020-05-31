@@ -144,11 +144,71 @@ namespace SMDAsh.Controllers
 
         }
 
-        public ActionResult<IQueryable> BacklogByOwner(string Category, int year)
+        [HttpGet("[action]/{Category}/{Year}")]
+        [AutoQueryable]
+        public ActionResult<IQueryable> BacklogByOwner(string Category, string Year, string exclude)
         {
 
+            List<string> allCategory = CategoryParams.GetAll();
+            //bad request error;
+            List<BadUrl> lit = new List<BadUrl>();
 
-            return null;
+            if (!allCategory.Contains(Category, StringComparer.OrdinalIgnoreCase) && !Category.Equals("all"))
+            {
+
+                BadUrl obj = new BadUrl(Category);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+
+            List<string> excludeApp = new List<string>();
+            if(exclude!=null && !exclude.Equals(String.Empty))
+            foreach(var item in exclude.Split(","))
+            {
+                excludeApp.Add(item.Trim());
+            }
+            
+
+            var back = new List<BacklogByOwner>();
+            var query = (from t in _context.Tickets
+                         where t.YearWeekIn.Contains((Year.Equals("all") ? "" : Year))
+                         && t.Category.Contains((Category.Equals("all") ? "" : Category)) 
+                         && t.AssignedToService != "-"
+                         && !excludeApp.Contains(t.Application)
+                         select t)
+                         .OrderByDescending(t => t.YearWeekIn)
+                         .Select(t => new {
+                             category = t.Category,
+                             assignedToService = t.AssignedToService,
+                             status = t.Status,
+                             application = t.Application,
+                             year = t.YearIn,
+                             yearWeek = t.YearWeekIn
+                         }).ToList();
+            var services = query.GroupBy(t => t.assignedToService);
+            foreach ( var item in services)
+            {
+                var service = item.GroupBy(g => g.status);
+                
+                foreach (var srv in service)
+                {
+                    BacklogByOwner b = new BacklogByOwner()
+                    {
+                        category = item.First().category,
+                        assignedToService = item.Key,
+                        status = srv.Key,
+                        countStatus = srv.Count()
+                    };
+                    back.Add(b);
+                }
+                
+                
+                
+            }
+
+
+
+            return Ok(back.AsQueryable());
         }
     }
 }
