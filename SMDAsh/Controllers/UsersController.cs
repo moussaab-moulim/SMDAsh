@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using SMDAsh.Services;
 using SMDAsh.Helpers;
 using SMDAsh.Models.Users;
+using SMDAsh.Models;
 using AutoMapper;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;

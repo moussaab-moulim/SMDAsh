@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-
-import { registerUser } from './../redux/actions/authActionCreators';
+import Alert from '@material-ui/lab/Alert';
+import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
+import { registerUser } from './../redux/actions/auth/authActionCreators';
 
 const RegisterForm = ({ dispatchRegisterAction }) => {
 
@@ -16,8 +17,16 @@ const RegisterForm = ({ dispatchRegisterAction }) => {
         event.preventDefault();
         if (isFormInvalid()) updateErrorFlags();
         else dispatchRegisterAction(firstName, lastName, username, password,
-            () => toast.success('Account Created Successfully!'),
-            (message) => toast.error(`Error: ${message}`));
+            () => {
+                toast(<Alert severity="success">Registered and Logged In Successfully!</Alert>)
+                const userName = JSON.parse(localStorage.getItem('USER_INFO')) || '';
+                
+                toast(<Alert icon={false} severity="success"> <SentimentVerySatisfiedIcon /> Welcome <b>{userName.fullName} !</b></Alert>, { delay: 500 })
+            },
+            (message) =>{
+            toast(<Alert severity="error">{message}</Alert>) 
+            
+            });
     };
 
     const handleCancelForm = (event) => {
@@ -92,7 +101,7 @@ const RegisterForm = ({ dispatchRegisterAction }) => {
                     <p className="invalid-feedback">Required</p>
                 </div>
 
-                <button type="submit" className="btn btn-primary mr-2">
+                <button type="submit" className="btn btn-primary mr-2" style={{backgroundColor: "#008080"}}>
                     Register | <i className="fas fa-user-plus"></i>
                 </button>
                 <button onClick={handleCancelForm} className="btn btn-outline-secondary">

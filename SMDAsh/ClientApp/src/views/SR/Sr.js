@@ -2,7 +2,7 @@ import React from 'react';
 // @material-ui/core
 import { makeStyles } from "@material-ui/core/styles";
 // core components
-import ChartAno from "components/Anomaly/ChartAno";
+import ChartSr from "components/SR/ChartSr";
 import 'chartjs-plugin-labels';
 
 
@@ -38,13 +38,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function Anomaly() {
+export default function Sr() {
 
 
   const classes = useStyles();
   return (
     <div>
-      <ChartAno></ChartAno>
+      <ChartSr></ChartSr>
     </div>
   );
 }

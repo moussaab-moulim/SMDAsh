@@ -3,18 +3,19 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, Slide } from 'react-toastify';
-
 import AuthPage from './views/Auth/authpage.component';
-
 import Spinner from './components/spinner/spinner.component';
-import { logoutUser } from './redux/actions/authActionCreators';
+
+import { logoutUser } from './redux/actions/auth/authActionCreators';
 import Admin from "layouts/Admin.js";
 import RTL from "layouts/RTL.js";
 
-const App = ({ user, dispatchLogoutAction }) => {
+const App = ( store ) => {
+  
+var user = store.user;
   return (
     <React.Fragment>
-      <ToastContainer position="top-right" autoClose={2000}
+      <ToastContainer closeButton={false} position="top-right" autoClose={2000}
         hideProgressBar transition={Slide} />
       <Spinner />
 

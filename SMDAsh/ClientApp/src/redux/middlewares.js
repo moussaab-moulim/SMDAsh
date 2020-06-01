@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import * as constants from './constants';
-import { logoutUser } from './actions/authActionCreators';
+import { logoutUser } from './actions/auth/authActionCreators';
 
 
 export const apiMiddleware = ({ dispatch, getState }) => next => action => {

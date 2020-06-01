@@ -4,23 +4,22 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../redux/actions/auth/chartAnoActions';
+import { getData, getDataThunk } from '../../redux/actions/SR/chartSrActions';
+
+import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
 
 // core components
-import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
-import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
-import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
-import { ButtonGroup, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import { ToggleButtonGroup } from '@material-ui/lab';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
-
+import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
@@ -35,11 +34,19 @@ const useStyles = makeStyles((theme) => ({
   togglbtn: {
     color: 'black !important',
   },
-  buttonGreen: {
-    backgroundColor: '#4caf50',
+  buttonTealColor: {
+    backgroundColor: '#008080',
     color: '#FFF',
     '&:hover': {
-      backgroundColor: 'green',
+      backgroundColor: '#008055',
+      color: '#FFF',
+    },
+  },
+  buttonRedColor: {
+    backgroundColor: '#d44320',
+    color: '#FFF',
+    '&:hover': {
+      backgroundColor: '#e6765b ',
       color: '#FFF',
     },
   },
@@ -86,7 +93,7 @@ const initialChartState = {
   labels: [],
 };
 
-export default function ChartAno() {
+export default function ChartSr() {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
       { title: 'Year/Week', field: 'yearWeek' },
@@ -100,30 +107,28 @@ export default function ChartAno() {
   const [chartData, setChartData] = useState(initialChartState);
 
   const dispatch = useDispatch();
-  const chartState = useSelector((state) => state.chartAno,[])||[];
+  const chartState = useSelector((state) => state.chartSr,[])||[];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
 
   useEffect(() => {
     if(chartState.loading)dispatch(getDataThunk());
-    /*
+    
     if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable,filter)}
-    console.log(chartState,chartTable);
-    */
+  
+    
   }, [chartState.loading]);
 
 
   const handleFilter = (event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event,newFilter);
       orginizeData(chartState.dataTable,newFilter);
     }
   };
 
   const orginizeData = (dt, filter) => {
-    console.log(filter)
     let datatable = dt;
     switch (filter) {
       case '1 Months':
@@ -163,47 +168,47 @@ export default function ChartAno() {
       newChartArrays.in.push(datatable[i].in);
       newChartArrays.out.push(datatable[i].out);
       newChartArrays.backlog.push(datatable[i].backlog);
-      newChartArrays.tealBacklog.push(0);
-      newChartArrays.ocpBacklog.push(0);
+      newChartArrays.tealBacklog.push(Math.floor(Math.random() * 101)+150);
+      newChartArrays.ocpBacklog.push(Math.floor(Math.random() * 101)+150);
     }
     const newChartData = {
       datasets: [
         {
           label: 'In',
           data: newChartArrays.in,
-          backgroundColor: '#0066cc',
+          backgroundColor: COLOR_TEAL,
         },
         {
           label: 'Out',
           data: newChartArrays.out,
-          backgroundColor: '#ff4500',
+          backgroundColor: COLOR_ORANGE,
         },
         {
-          label: 'line Backlog',
+          label: 'Backlog',
           data: newChartArrays.backlog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#0066cc',
-          borderColor: '#0066cc',
+          backgroundColor: COLOR_BLUE,
+          borderColor: COLOR_BLUE,
         },
         {
-          label: 'Line Teal Backlog',
+          label: 'Teal Backlog',
           data: newChartArrays.tealBacklog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#ffbf00',
-          borderColor: '#ffbf00',
+          backgroundColor: COLOR_YELLOW,
+          borderColor: COLOR_YELLOW,
         },
         {
-          label: 'Line OCP Backlog',
+          label: 'OCP Backlog',
           data: newChartArrays.ocpBacklog,
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#cc0000',
-          borderColor: '#cc0000',
+          backgroundColor: COLOR_RED,
+          borderColor: COLOR_RED,
         },
       ],
       labels: newChartArrays.yearWeek,
@@ -219,6 +224,7 @@ export default function ChartAno() {
     <div>
       <GridContainer>
         <Card xs={12} sm={12} md={12} className={classes.card}>
+          {chartState.loading ? <SpinnerChart />: null}
           <CardBody>
             <Grid
               xs={12}
@@ -232,7 +238,7 @@ export default function ChartAno() {
               <Button
                 variant='contained'
                 color='secondary'
-                className={classes.btn}
+                className={classes.btn + " " + classes.buttonRedColor}
               >
                 <GetAppIcon className={classes.buttonicon} />
                 All PNG
@@ -268,7 +274,7 @@ export default function ChartAno() {
 
               <Button
                 variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
+                className={classes.buttonTealColor + ' ' + classes.btn}
               >
                 <TableChartIcon className={classes.buttonicon} />
                 Table PNG
@@ -276,7 +282,7 @@ export default function ChartAno() {
             </Grid>
 
             <MaterialTable
-              title='Anomaly'
+              title='Service Request'
               columns={statecolumns.columns}
               data={chartTable}
               options={{
@@ -286,6 +292,7 @@ export default function ChartAno() {
           </CardBody>
         </Card>
         <Card xs={12} sm={12} md={12} className={classes.card}>
+          {chartState.loading ? <SpinnerChart />: null}
           <CardBody>
             <Grid
               xs={12}
@@ -298,20 +305,20 @@ export default function ChartAno() {
             >
               <Button
                 variant='contained'
-                className={classes.buttonGreen + ' ' + classes.btn}
+                className={classes.buttonTealColor + ' ' + classes.btn}
               >
                 <GetAppIcon className={classes.buttonicon} />
                 Chart PNG
               </Button>
             </Grid>
-            {!chartState.loading && <Bar
+            <Bar
               data={chartData}
               width='670vw'
               height='400vh'
               options={{
                 title: {
                   display: true,
-                  text: 'Anomaly : Input / Output / Week',
+                  text: 'Service Request : Input / Output / Week',
                   fontSize: 20,
                 },
                 plugins: {
@@ -338,7 +345,7 @@ export default function ChartAno() {
                   ],
                 },
               }}
-            />}
+            />
             
           </CardBody>
         </Card>

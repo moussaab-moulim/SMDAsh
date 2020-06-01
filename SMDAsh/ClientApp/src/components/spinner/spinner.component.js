@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './spinner.css';
 
 const Spinner = ({ isLoading }) => (
     <React.Fragment>
         {
             isLoading ? (<div id="spinner-fade">
-                <div className="default-spinner spinner-border" role="status"></div>
+                <CircularProgress className="spinner" style={{color:"#008080"}}/>
             </div>) : null}
     </React.Fragment>
 );

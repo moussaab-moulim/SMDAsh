@@ -1,3 +1,13 @@
 .btn {
     white-space: nowrap;
 }
+#root {
+    background-color: "#f9f9f9" ,
+}
+.Toastify__toast--default {
+    padding: 0px !important;
+    border-radius: 10px !important;
+}
+.Toastify__toast {
+    min-height: 48px !important;
+}

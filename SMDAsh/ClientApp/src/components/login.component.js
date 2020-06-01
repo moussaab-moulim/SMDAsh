@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState }from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
-
-import { loginUser } from './../redux/actions/authActionCreators';
+import Alert from '@material-ui/lab/Alert';
+import { loginUser } from './../redux/actions/auth/authActionCreators';
+import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
 
 const LoginForm = ({ dispatchLoginAction }) => {
 
@@ -15,11 +16,17 @@ const LoginForm = ({ dispatchLoginAction }) => {
         if (isFormInvalid()) {
             updateErrorFlags();
         } 
-        else {
+        else {  
             dispatchLoginAction(username, password,
-            () => {toast.success("Logged In Successfully!")},
+            () => {
+                toast(<Alert severity="success">Logged In Successfully!</Alert>)
+                const userName = JSON.parse(localStorage.getItem('USER_INFO')) || '';
+                
+                toast(<Alert icon={false} severity="success"> <SentimentVerySatisfiedIcon /> Hello <b>{userName.fullName} !</b></Alert>, { delay: 500 })
+            },
             (message) =>{
-                toast.error(`Error: ${message}`)
+            toast(<Alert severity="error">{message}</Alert>) 
+            
             });
         }
     };
@@ -70,7 +77,7 @@ const LoginForm = ({ dispatchLoginAction }) => {
                     <p className="invalid-feedback">Required</p>
                 </div>
 
-                <button type="submit" className="btn btn-primary mr-2">
+                <button type="submit" className="btn btn-primary mr-2" style={{backgroundColor: "#008080"}}>
                     Login | <i className="fas fa-sign-in-alt"></i>
                 </button>
                 <button onClick={handleCancelForm} className="btn btn-outline-secondary">

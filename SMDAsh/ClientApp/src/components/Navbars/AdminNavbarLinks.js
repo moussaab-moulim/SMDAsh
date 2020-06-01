@@ -6,7 +6,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Person from "@material-ui/icons/Person";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Button from "components/CustomButtons/Button.js";
-import { logoutUser } from 'redux/actions/authActionCreators';
+import { logoutUser } from 'redux/actions/auth/authActionCreators';
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import { connect } from 'react-redux';
 

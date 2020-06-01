@@ -1,23 +1,25 @@
+import * as constants from '../../constants';
+
 const initalState = {
   loading: true,
   dataTable:[]
 };
 
-const chartAnoReducer = (state = initalState, action) => {
+const chartEvolutionReducer = (state = initalState, action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case "AWAITING_CHARTANO":
+    case constants.AWAITING_CHARTEVOLUTION:
       return {
         ...state,
         loading: true
       }
-    case "REJECTED_CHARTANO":
+    case constants.REJECTED_CHARTEVOLUTION:
       return {
         ...state,
         loading: false,
       }
-    case "SUCCESS_CHARTANO":
+    case constants.SUCCESS_CHARTEVOLUTION:
       return {
         ...state,
         loading: false,
@@ -29,4 +31,4 @@ const chartAnoReducer = (state = initalState, action) => {
   return state;
 }
 
-export default chartAnoReducer;
+export default chartEvolutionReducer;

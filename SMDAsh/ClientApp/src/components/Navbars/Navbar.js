@@ -14,7 +14,7 @@ import AdminNavbarLinks from "./AdminNavbarLinks.js";
 import RTLNavbarLinks from "./RTLNavbarLinks.js";
 import Button from "components/CustomButtons/Button.js";
 import { connect } from 'react-redux';
-import { logoutUser } from './../../redux/actions/authActionCreators';
+import { logoutUser } from './../../redux/actions/auth/authActionCreators';
 import styles from "assets/jss/material-dashboard-react/components/headerStyle.js";
 
 const useStyles = makeStyles(styles);
