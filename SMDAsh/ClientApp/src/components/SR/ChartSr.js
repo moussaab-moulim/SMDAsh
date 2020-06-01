@@ -116,7 +116,7 @@ export default function ChartSr() {
     if(chartState.loading)dispatch(getDataThunk());
     
     if(!chartState.loading && chartState.dataTable.length > 0) {orginizeData(chartState.dataTable,filter)}
-    console.log(chartState,chartTable);
+  
     
   }, [chartState.loading]);
 
@@ -124,13 +124,11 @@ export default function ChartSr() {
   const handleFilter = (event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event,newFilter);
       orginizeData(chartState.dataTable,newFilter);
     }
   };
 
   const orginizeData = (dt, filter) => {
-    console.log(filter)
     let datatable = dt;
     switch (filter) {
       case '1 Months':
@@ -170,8 +168,8 @@ export default function ChartSr() {
       newChartArrays.in.push(datatable[i].in);
       newChartArrays.out.push(datatable[i].out);
       newChartArrays.backlog.push(datatable[i].backlog);
-      newChartArrays.tealBacklog.push(0);
-      newChartArrays.ocpBacklog.push(0);
+      newChartArrays.tealBacklog.push(Math.floor(Math.random() * 101)+150);
+      newChartArrays.ocpBacklog.push(Math.floor(Math.random() * 101)+150);
     }
     const newChartData = {
       datasets: [

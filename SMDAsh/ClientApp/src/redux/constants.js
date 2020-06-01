@@ -15,6 +15,11 @@ export const SUCCESS_CHARTSR = 'SUCCESS_CHARTSR';
 export const AWAITING_CHARTSR = 'AWAITING_CHARTSR';
 export const REJECTED_CHARTSR = 'REJECTED_CHARTSR';
 
+// Evolution
+export const SUCCESS_CHARTEVOLUTION = 'SUCCESS_CHARTEVOLUTION';
+export const AWAITING_CHARTEVOLUTION = 'AWAITING_CHARTEVOLUTION';
+export const REJECTED_CHARTEVOLUTION = 'REJECTED_CHARTEVOLUTION';
+
 // Chart Colors
 export const COLOR_TEAL = '#008080';
 export const COLOR_ORANGE = '#e6765b';
@@ -26,6 +31,7 @@ export const COLOR_RED = '#d44320';
 export const APIS = {
     getBacklogAnomaly: '/api/GetBacklog/anomalie',
     getBacklogSr: '/api/GetBacklog/sr',
+    getBacklogEvolution: '/api/GetBacklog/evolution',
     upload:'/api/upload',
     registerUser: '/api/users/register',
     loginUser: '/api/users/authenticate',

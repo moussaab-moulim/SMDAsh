@@ -7,6 +7,8 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 // core components/views for Admin layout
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import AnomalyPage from "views/Anomaly/Anomaly.js";
+import EvolutionPage from "views/Evolution/Evolution.js"
+
 import SrPage from "views/SR/Sr.js";
 
 
@@ -36,7 +38,7 @@ const dashboardRoutes = [
     path: "/evolution",
     name: "Evolution",
     icon: TrendingUpIcon,
-    component: DashboardPage,
+    component: EvolutionPage,
     layout: "/admin"
   },
 ];

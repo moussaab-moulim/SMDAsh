@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../../redux/actions/Anomaly/chartAnoActions';
+import { getData, getDataThunk } from '../../redux/actions/Evolution/chartEvolutionActions';
 
 import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
 
@@ -23,7 +23,7 @@ import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 
-import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
+import SpinnerChart from '../spinner/SpinnerChart/spinnerChart.component';
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
@@ -97,8 +97,12 @@ const initialChartState = {
   datasets: [],
   labels: [],
 };
+const initialChartChargeState = {
+  datasets: [],
+  labels: [],
+};
 
-export default function ChartAno() {
+export default function ChartEvolution() {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
       { title: 'Year/Week', field: 'yearWeek' },
@@ -107,12 +111,16 @@ export default function ChartAno() {
       { title: 'Backlog', field: 'backlog', type: 'numeric' },
       { title: 'Teal Backlog', field: 'tealBacklog', type: 'numeric' },
       { title: 'OCP Backlog', field: 'ocpBacklog', type: 'numeric' },
+      { title: 'In Charge', field: 'inCharge', type: 'numeric' },
+      { title: 'Out Charge', field: 'inCharge', type: 'numeric' },
+      { title: 'Backlog Charge', field: 'inCharge', type: 'numeric' },
     ],
   });
   const [chartData, setChartData] = useState(initialChartState);
+  const [chartDataCharge, setChartDataCharge] = useState(initialChartChargeState);
 
   const dispatch = useDispatch();
-  const chartState = useSelector((state) => state.chartAno, []) || [];
+  const chartState = useSelector((state) => state.chartEvolution, []) || [];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
@@ -129,13 +137,11 @@ export default function ChartAno() {
   const handleFilter = (event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event, newFilter);
       orginizeData(chartState.dataTable, newFilter);
     }
   };
 
   const orginizeData = (dt, filter) => {
-    console.log(filter)
     let datatable = dt;
     switch (filter) {
       case '1 Months':
@@ -168,6 +174,9 @@ export default function ChartAno() {
       backlog: [],
       tealBacklog: [],
       ocpBacklog: [],
+      inCharge: [],
+      outCharge: [],
+      backlogCharge: []
     };
 
     for (let i = 0; i < datatable.length; i++) {
@@ -177,6 +186,9 @@ export default function ChartAno() {
       newChartArrays.backlog.push(datatable[i].backlog);
       newChartArrays.tealBacklog.push(Math.floor(Math.random() * 101)+150);
       newChartArrays.ocpBacklog.push(Math.floor(Math.random() * 101)+150);
+      newChartArrays.inCharge.push(Math.floor(Math.random() * 80)+5);
+      newChartArrays.outCharge.push(Math.floor(Math.random() * 80)+5);
+      newChartArrays.backlogCharge.push(Math.floor(Math.random() * 80)+5);
     }
     const newChartData = {
       datasets: [
@@ -221,8 +233,26 @@ export default function ChartAno() {
       labels: newChartArrays.yearWeek,
     };
 
+    const newChartDataCharge = {
+      datasets: [
+        {
+          label: 'In Charge',
+          data: newChartArrays.inCharge,
+          backgroundColor: COLOR_TEAL,
+        },
+        {
+          label: 'Out Charge',
+          data: newChartArrays.outCharge,
+          backgroundColor: COLOR_ORANGE,
+        },
+      ],
+      labels: newChartArrays.yearWeek,
+    };
+    
+
     setChartData(newChartData);
     setChartTable(datatable);
+    setChartDataCharge(newChartDataCharge);
   };
 
 
@@ -290,7 +320,7 @@ export default function ChartAno() {
               </Grid>
 
               <MaterialTable
-                title='Anomaly'
+                title='Evolution'
                 columns={statecolumns.columns}
                 data={chartTable}
                 options={{
@@ -330,7 +360,7 @@ export default function ChartAno() {
                 options={{
                   title: {
                     display: true,
-                    text: 'Anomaly : Input / Output / Week',
+                    text: 'Evolution : Input / Output / Week',
                     fontSize: 20,
                   },
                   plugins: {
@@ -363,6 +393,70 @@ export default function ChartAno() {
             </CardBody>
           
         </Card>
+
+        <Card xs={12} sm={12} md={12} className={classes.card}>
+          {chartState.loading ? <SpinnerChart />: null}
+            <CardBody>
+              <Grid
+                xs={12}
+                sm={12}
+                md={12}
+                container
+                direction='row'
+                justify='flex-end'
+                alignItems='center'
+              >
+                <Button
+                  variant='contained'
+                  className={classes.buttonTealColor + ' ' + classes.btn}
+                >
+                  <GetAppIcon className={classes.buttonicon} />
+                Chart PNG
+              </Button>
+              </Grid>
+
+              <Bar
+                data={chartDataCharge}
+                width='670vw'
+                height='400vh'
+                options={{
+                  title: {
+                    display: true,
+                    text: 'Evolution Charge: Input / Output / Week (j / h)',
+                    fontSize: 20,
+                  },
+                  plugins: {
+                    labels: {
+                      render: 'value',
+                      fontSize: 12,
+
+                      fontColor: '#000',
+                      fontFamily: '"Lucida Console", Monaco, monospace',
+                    },
+                  },
+                  responsive: true,
+
+                  scales: {
+                    yAxes: [
+                      {
+                        gridLines: {
+                          display: false,
+                        },
+                        ticks: {
+                          beginAtZero: true,
+                        },
+                      },
+                    ],
+                  },
+                }}
+              />
+
+
+            </CardBody>
+          
+        </Card>
+
+
       </GridContainer>
     </div>
   );
