@@ -16,7 +16,6 @@ namespace SMDAsh.Models
         }
 
         public virtual DbSet<Tickets> Tickets { get; set; }
-        public DbSet<Backlogs> Backlogs { get; set; }
         public DbSet<Users.User> Users { get; set; }
 
 

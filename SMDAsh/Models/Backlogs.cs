@@ -11,6 +11,8 @@ namespace SMDAsh.Models
         public string SourceTool { get; set; }
         [Key]
         public string YearWeek { get; set; }
+        public int Year { get; set; }
+        public int Week { get; set; }
         public int In { get; set; }
         public int Out { get; set; }
 
