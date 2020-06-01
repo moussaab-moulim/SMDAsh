@@ -15,6 +15,12 @@ export const SUCCESS_CHARTSR = 'SUCCESS_CHARTSR';
 export const AWAITING_CHARTSR = 'AWAITING_CHARTSR';
 export const REJECTED_CHARTSR = 'REJECTED_CHARTSR';
 
+// Chart Colors
+export const COLOR_TEAL = '#008080';
+export const COLOR_ORANGE = '#e6765b';
+export const COLOR_BLUE = '#007fc9';
+export const COLOR_YELLOW = '#f0d461';
+export const COLOR_RED = '#d44320';
 
 
 export const APIS = {

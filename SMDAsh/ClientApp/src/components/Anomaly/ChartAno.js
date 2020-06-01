@@ -6,6 +6,8 @@ import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 import { getData, getDataThunk } from '../../redux/actions/Anomaly/chartAnoActions';
 
+import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
+
 // core components
 import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
@@ -181,12 +183,12 @@ export default function ChartAno() {
         {
           label: 'In',
           data: newChartArrays.in,
-          backgroundColor: '#008080',
+          backgroundColor: COLOR_TEAL,
         },
         {
           label: 'Out',
           data: newChartArrays.out,
-          backgroundColor: '#e6765b',
+          backgroundColor: COLOR_ORANGE,
         },
         {
           label: 'Backlog',
@@ -194,8 +196,8 @@ export default function ChartAno() {
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#007fc9',
-          borderColor: '#007fc9',
+          backgroundColor: COLOR_BLUE,
+          borderColor: COLOR_BLUE,
         },
         {
           label: 'Teal Backlog',
@@ -203,8 +205,8 @@ export default function ChartAno() {
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#f0d461',
-          borderColor: '#f0d461',
+          backgroundColor: COLOR_YELLOW,
+          borderColor: COLOR_YELLOW,
         },
         {
           label: 'OCP Backlog',
@@ -212,8 +214,8 @@ export default function ChartAno() {
           order: 1,
           type: 'line',
           fill: false,
-          backgroundColor: '#d44320',
-          borderColor: '#d44320',
+          backgroundColor: COLOR_RED,
+          borderColor: COLOR_RED,
         },
       ],
       labels: newChartArrays.yearWeek,
