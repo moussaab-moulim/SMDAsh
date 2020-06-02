@@ -4,10 +4,15 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../../redux/actions/Anomaly/chartAnoActions';
+import { getData,  
+  getBacklogAnomalyThreeMonth, 
+  getBacklogAnomalyOneMonth, 
+  getBacklogAnomalySixMonth, 
+  getBacklogAnomalyOneYear, 
+  getBacklogAnomalyAll } from '../../redux/actions/Anomaly/chartAnoActions';
 
 import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
-
+import { connect } from 'react-redux';
 // core components
 import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
@@ -98,7 +103,7 @@ const initialChartState = {
   labels: [],
 };
 
-export default function ChartAno() {
+const ChartAno = () => {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
       { title: 'Year/Week', field: 'yearWeek' },
@@ -114,53 +119,56 @@ export default function ChartAno() {
   const dispatch = useDispatch();
   const chartState = useSelector((state) => state.chartAno, []) || [];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
-  const [filter, setFilter] = useState('1 Months');
+  const [filter, setFilter] = useState('3 Months');
   const classes = useStyles();
+  const[reloardData,setReloadData]=useState(true);
 
   useEffect(() => {
-    if (chartState.loading) dispatch(getDataThunk());
+    if (chartState.loading || reloardData) {
 
-    if (!chartState.loading && chartState.dataTable.length > 0) { orginizeData(chartState.dataTable, filter) }
+      if (filter == "1 Months") {
+        dispatch(getBacklogAnomalyOneMonth());
+  
+      } else if (filter == "3 Months") {
+        dispatch(getBacklogAnomalyThreeMonth());
+      }
+      else if (filter == "6 Months") {
+        dispatch(getBacklogAnomalySixMonth());
+      }
+      else if (filter == "Year") {
+        dispatch(getBacklogAnomalyOneYear());
+      }
+      else if (filter == "All") {
+        dispatch(getBacklogAnomalyAll());
+      }
+      setReloadData(false);
+    } 
+    
+    if (!chartState.loading && chartState.dataTable.length > 0) { 
+      orginizeData(filter)
   
 
-  }, [chartState.loading]);
+     }
 
 
-  const handleFilter = (event, newFilter) => {
+  }, [chartState.loading, filter]);
+
+
+  const handleFilter =(event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event, newFilter);
-      orginizeData(chartState.dataTable, newFilter);
+      console.log(event,newFilter);
+      setReloadData((prevState)=>{return !prevState});
     }
   };
 
-  const orginizeData = (dt, filter) => {
-    console.log(filter)
-    let datatable = dt;
-    switch (filter) {
-      case '1 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 4;
-        });
-        break;
-      case '3 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 13;
-        });
-        break;
-      case '6 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 26;
-        });
-        break;
-      case 'Year':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 52;
-        });
-        break;
-      default:
-        break;
-    }
+
+
+  const orginizeData = (filter) => {
+    console.log("orginizeData");
+    
+
+    let datatable = chartState.dataTable;
     const newChartArrays = {
       yearWeek: [],
       in: [],
@@ -220,7 +228,7 @@ export default function ChartAno() {
       ],
       labels: newChartArrays.yearWeek,
     };
-
+    console.log(datatable);
     setChartData(newChartData);
     setChartTable(datatable);
   };
@@ -367,3 +375,23 @@ export default function ChartAno() {
     </div>
   );
 }
+
+const mapStateToProps = state => {
+  return {
+    chartState: state.chartAno
+  };
+};
+
+const mapDispatchtoProps = (dispatch) => {
+  return {
+    getBacklogAnomalyOneMonth: () => dispatch(getBacklogAnomalyOneMonth()),
+    /*
+    getBacklogAnomalySixMonth: () => dispatch(getBacklogAnomalySixMonth()),
+    getBacklogAnomalyThreeMonth: () => dispatch(getBacklogAnomalyThreeMonth()),
+    getBacklogAnomalyOneYear: () => dispatch(getBacklogAnomalyOneYear()),
+    getBacklogAnomalyAll: () => dispatch(getBacklogAnomalyAll()),
+    */
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchtoProps)(ChartAno);
