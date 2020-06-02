@@ -89,7 +89,7 @@ namespace SMDAsh.Controllers
                                     {
                                         if (thecurrentcell.DataType == CellValues.SharedString)
                                         {
-                                            int id;
+                                            int id = -1;
                                             if (Int32.TryParse(thecurrentcell.InnerText, out id))
                                             {
                                                 SharedStringItem item = wbPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
@@ -112,8 +112,11 @@ namespace SMDAsh.Controllers
                                     }
                                     else
                                     {
-                                         currentcellvalue = thecurrentcell.CellValue.ToString();
-                                       
+                                    //currentcellvalue = DateTime.FromOADate(double.Parse(thecurrentcell.CellValue.InnerText)).ToString();
+                                        currentcellvalue = thecurrentcell.CellValue.InnerText;
+                                        
+                                        System.Diagnostics.Debug.WriteLine(thecurrentcell.DataType);
+                                    // System.Diagnostics.Debug.WriteLine(thecurrentcell.CellValue.InnerText);
                                     }
 
                                     if (i == 0)
@@ -133,7 +136,7 @@ namespace SMDAsh.Controllers
                                     if (sf.SourceTool.ToLower().Equals("mantis")) {
 
                                         tickets.Add(new Tickets() {
-                                        TicketID = ligne["Identifiant"], 
+                                       TicketID = ligne["Identifiant"], 
                                        SourceTool = sourcetool, 
                                        AssignedTo = ligne["Assigné à"], 
                                        DateSent = ligne["Date de soumission"], 
