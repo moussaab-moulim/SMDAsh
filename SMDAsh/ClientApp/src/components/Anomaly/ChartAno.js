@@ -121,25 +121,30 @@ const ChartAno = () => {
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
-  const[reloardData,setReloadData]=useState(true);
+  const[reloardData,setReloadData]=useState(false);
 
   useEffect(() => {
     if (chartState.loading || reloardData) {
 
       if (filter == "1 Months") {
         dispatch(getBacklogAnomalyOneMonth());
+        console.log("1 Months "+reloardData);
   
       } else if (filter == "3 Months") {
         dispatch(getBacklogAnomalyThreeMonth());
+        console.log("3 Months "+reloardData);
       }
       else if (filter == "6 Months") {
         dispatch(getBacklogAnomalySixMonth());
+        console.log("6 Months "+reloardData);
       }
       else if (filter == "Year") {
         dispatch(getBacklogAnomalyOneYear());
+        console.log("Year "+reloardData);
       }
       else if (filter == "All") {
         dispatch(getBacklogAnomalyAll());
+        console.log("All "+reloardData);
       }
       setReloadData(false);
     } 

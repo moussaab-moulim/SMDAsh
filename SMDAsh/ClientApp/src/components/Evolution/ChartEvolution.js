@@ -4,7 +4,12 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData, getDataThunk } from '../../redux/actions/Evolution/chartEvolutionActions';
+import { getData,  
+  getBacklogEvolutionThreeMonth, 
+  getBacklogEvolutionOneMonth, 
+  getBacklogEvolutionSixMonth, 
+  getBacklogEvolutionOneYear, 
+  getBacklogEvolutionAll } from '../../redux/actions/Evolution/chartEvolutionActions';
 
 import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
 
@@ -124,49 +129,46 @@ export default function ChartEvolution() {
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
+  const[reloardData,setReloadData]=useState(false);
 
   useEffect(() => {
-    if (chartState.loading) dispatch(getDataThunk());
+    if (chartState.loading || reloardData) {
 
-    if (!chartState.loading && chartState.dataTable.length > 0) { orginizeData(chartState.dataTable, filter) }
+      if (filter == "1 Months") {
+        dispatch(getBacklogEvolutionOneMonth());
   
+      } else if (filter == "3 Months") {
+        dispatch(getBacklogEvolutionThreeMonth());
+      }
+      else if (filter == "6 Months") {
+        dispatch(getBacklogEvolutionSixMonth());
+      }
+      else if (filter == "Year") {
+        dispatch(getBacklogEvolutionOneYear());
+      }
+      else if (filter == "All") {
+        dispatch(getBacklogEvolutionAll());
+      }
+      setReloadData(false);
+    } 
+    
+    if (!chartState.loading && chartState.dataTable.length > 0) { 
+      orginizeData()
+     }
 
-  }, [chartState.loading]);
+  }, [chartState.loading, filter]);
 
 
-  const handleFilter = (event, newFilter) => {
+  const handleFilter =(event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      orginizeData(chartState.dataTable, newFilter);
+      setReloadData((prevState)=>{return !prevState});
     }
   };
 
-  const orginizeData = (dt, filter) => {
-    let datatable = dt;
-    switch (filter) {
-      case '1 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 4;
-        });
-        break;
-      case '3 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 13;
-        });
-        break;
-      case '6 Months':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 26;
-        });
-        break;
-      case 'Year':
-        datatable = datatable.filter((item, i) => {
-          return i >= datatable.length - 52;
-        });
-        break;
-      default:
-        break;
-    }
+  const orginizeData = () => {
+
+    let datatable = chartState.dataTable;
     const newChartArrays = {
       yearWeek: [],
       in: [],

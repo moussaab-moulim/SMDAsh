@@ -42,7 +42,11 @@ export const APIS = {
     getBacklogSrOneYear: '/api/GetBacklog/sr?take=52',
     getBacklogSrAll: '/api/GetBacklog/sr',
     // Evolution
-    getBacklogEvolution: '/api/GetBacklog/evolution',
+    getBacklogEvolutionOneMonth: '/api/GetBacklog/evolution?take=4',
+    getBacklogEvolutionThreeMonth: '/api/GetBacklog/evolution?take=13',
+    getBacklogEvolutionSixMonth: '/api/GetBacklog/evolution?take=26',
+    getBacklogEvolutionOneYear: '/api/GetBacklog/evolution?take=52',
+    getBacklogEvolutionAll: '/api/GetBacklog/sr',
 
     upload:'/api/upload',
     registerUser: '/api/users/register',
