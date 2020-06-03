@@ -119,7 +119,7 @@ const ChartAno = () => {
   const dispatch = useDispatch();
   const chartState = useSelector((state) => state.chartAno, []) || [];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
-  const [filter, setFilter] = useState('3 Months');
+  const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
   const[reloardData,setReloadData]=useState(true);
 
@@ -145,11 +145,8 @@ const ChartAno = () => {
     } 
     
     if (!chartState.loading && chartState.dataTable.length > 0) { 
-      orginizeData(filter)
-  
-
+      orginizeData()
      }
-
 
   }, [chartState.loading, filter]);
 
@@ -157,17 +154,14 @@ const ChartAno = () => {
   const handleFilter =(event, newFilter) => {
     if (newFilter !== null) {
       setFilter(newFilter);
-      console.log(event,newFilter);
       setReloadData((prevState)=>{return !prevState});
     }
   };
 
 
 
-  const orginizeData = (filter) => {
-    console.log("orginizeData");
-    
-
+  const orginizeData = () => {
+  
     let datatable = chartState.dataTable;
     const newChartArrays = {
       yearWeek: [],
@@ -228,7 +222,7 @@ const ChartAno = () => {
       ],
       labels: newChartArrays.yearWeek,
     };
-    console.log(datatable);
+   
     setChartData(newChartData);
     setChartTable(datatable);
   };

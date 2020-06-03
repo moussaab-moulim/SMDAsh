@@ -29,13 +29,21 @@ export const COLOR_RED = '#d44320';
 
 
 export const APIS = {
+    // Anomalie
     getBacklogAnomalyOneMonth: '/api/GetBacklog/anomalie?take=4',
     getBacklogAnomalyThreeMonth: '/api/GetBacklog/anomalie?take=13',
     getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie?take=26',
     getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie?take=52',
     getBacklogAnomalyAll: '/api/GetBacklog/anomalie',
-    getBacklogSr: '/api/GetBacklog/sr',
+    // SR
+    getBacklogSrOneMonth: '/api/GetBacklog/sr?take=4',
+    getBacklogSrThreeMonth: '/api/GetBacklog/sr?take=13',
+    getBacklogSrSixMonth: '/api/GetBacklog/sr?take=26',
+    getBacklogSrOneYear: '/api/GetBacklog/sr?take=52',
+    getBacklogSrAll: '/api/GetBacklog/sr',
+    // Evolution
     getBacklogEvolution: '/api/GetBacklog/evolution',
+
     upload:'/api/upload',
     registerUser: '/api/users/register',
     loginUser: '/api/users/authenticate',
