@@ -130,8 +130,9 @@ namespace SMDAsh.Controllers
                     Affectation = ligne["Affectation"],
                     MD = ligne["M/D"],
                     Application = ligne["Projet Court"] + ":" + ligne["Projet"],
-                    AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService")
-                });
+                    AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService"),
+                    Update = ligne["Mis à jour"]
+                });;
 
 
             }
