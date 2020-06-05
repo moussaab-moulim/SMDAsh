@@ -9,7 +9,6 @@ namespace SMDAsh.Models
     public class Backlogs
     {
         public string SourceTool { get; set; }
-        [Key]
         public string YearWeek { get; set; }
         public int Year { get; set; }
         public int Week { get; set; }

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoQueryable.AspNetCore.Filter.FilterAttributes;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using SMDAsh.Helpers.Params;
 using SMDAsh.Models;
 using SMDAsh.Models.Charts;
@@ -57,10 +52,12 @@ namespace SMDAsh.Controllers
 
             var queryIn = (from t in _context.Tickets
                            where t.Category.Contains((Category.Equals("all") ? "" : Category))
-                           select t).ToList().GroupBy( t =>t.YearWeekIn).ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
+                           select t).ToList().GroupBy( t =>t.YearWeekIn)
+                           .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
             var queryOut = (from t in _context.Tickets
                             where t.Category.Contains((Category.Equals("all") ? "" : Category)) && t.YearWeekOut != ""
-                            select t).ToList().GroupBy(t => t.YearWeekOut).ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
+                            select t).ToList().GroupBy(t => t.YearWeekOut)
+                            .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
             
 
@@ -209,6 +206,61 @@ namespace SMDAsh.Controllers
 
 
             return Ok(back.AsQueryable());
+        }
+
+        [HttpGet("[action]/{Category}/{Year}/{Week}")]
+        [AutoQueryable]
+        public ActionResult<IQueryable> SlaByProject(string Category, string Year,string Week)
+        {
+            List<string> allCategory = CategoryParams.GetAll();
+            //bad request error;
+            List<BadUrl> lit = new List<BadUrl>();
+
+            if (!allCategory.Contains(Category, StringComparer.OrdinalIgnoreCase) && !Category.Equals("all"))
+            {
+
+                BadUrl obj = new BadUrl(Category);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+
+            var query = (from t in _context.Tickets
+                         where t.Category.Contains((Category.Equals("all") ? "" : Category))
+                         && t.YearOut.Contains((Year.Equals("all") ? "" : Year))
+                         && t.WeekOut.Contains((Week.Equals("all") ? "" : Week))
+                         select t).ToList();
+
+            var queryOK = query.Where(t => t.SLA == "OK").GroupBy(t => t.Application)
+                                   .ToDictionary(g => g.Key.Split(":")[1],
+                                   g => new SlaCount() { category = g.First().Category,
+                                       year = Year,
+                                       application = g.Key.Split(":")[1],
+                                       week = Week,
+                                       ok = g.Count() });
+            var queryKO = query.Where(t => t.SLA == "KO").GroupBy(t => t.Application)
+                           .ToDictionary(g => g.Key.Split(":")[1]
+                           , g => new SlaCount() { category = g.First().Category, 
+                               year = Year, 
+                               application = g.Key.Split(":")[1], 
+                               week = Week, 
+                               ko = g.Count() });
+            var okKeys = queryOK.Keys;
+            var koKeys = queryKO.Keys;
+            foreach (var key in koKeys)
+            {
+                if (okKeys.Contains(key))
+                {
+                    queryOK[key].ko = queryKO[key].ko;
+                }
+                else
+                {
+                    queryOK.Add(key, queryKO[key]);
+                }
+            }
+
+            
+
+            return Ok(queryOK.Select(t => t.Value).ToList().OrderBy(t => t.application).AsQueryable());
         }
     }
 }

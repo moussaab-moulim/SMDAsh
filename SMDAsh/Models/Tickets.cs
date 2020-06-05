@@ -13,6 +13,7 @@ namespace SMDAsh.Models
         public string DateSent { get; set; }
         public string DateResolved { get; set; }
         public string DateClosed { get; set; }
+        public string Update { get; set; }
         public string Priority { get; set; }
         public string P { get; set; }
         public string Status { get; set; }

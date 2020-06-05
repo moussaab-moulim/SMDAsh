@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using SMDAsh.Helpers;
 using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Helpers.Params;
@@ -30,7 +24,6 @@ namespace SMDAsh.Controllers
             _context = context;
      
         }
-
         [HttpPost("")]
         public async Task<IActionResult> Upload([FromForm]SourceFile sf)
         {
@@ -44,179 +37,138 @@ namespace SMDAsh.Controllers
             if (excelFile.Length <= 0)
                 return BadRequest("FileNotFound");
             string fileExtension = Path.GetExtension(excelFile.FileName);
-               
 
-            int count  = 0;
 
-            if (fileExtension == ".xls" || fileExtension == ".xlsx")
+            int count = 0;
+
+            string filename = Path.Combine("Data", sourcetool + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + fileExtension);
+            //Load excel stream
+            using (var stream = new FileStream(filename, FileMode.Create))
             {
+                await excelFile.CopyToAsync(stream);
+                //excelPack.Load(stream);
+            
+            using (var excelPack = new ExcelPackage(stream))
+            {
+                
+                //Lets Deal with first worksheet.
+                //System.Diagnostics.Debug.WriteLine(excelPack.Workbook.Worksheets.Count);
+                var ws = excelPack.Workbook.Worksheets[0];
 
-                string filename = Path.Combine("Data", sourcetool + "_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm") + fileExtension)  ;
-
-
-                using (var fileStream = new FileStream(filename, FileMode.Create))
+                // list to save the data of excel as tickets
+                List<Tickets> tickets = new List<Tickets>();
+                //list to save the first row of data sheet as keys
+                List<string> keys = new List<string>();
+                foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
                 {
-                    await excelFile.CopyToAsync(fileStream);
-
-                    try
+                    //Get names from first row
+                    if (!string.IsNullOrEmpty(firstRowCell.Text))
                     {
-
-                        //Lets open the existing excel file and read through its content . Open the excel using openxml sdk
-                        using (SpreadsheetDocument doc = SpreadsheetDocument.Open(fileStream, false))
-                        {
-                            WorkbookPart wbPart = doc.WorkbookPart;
-                            Sheet mysheet = doc.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
-                            Worksheet worksheet = ((WorksheetPart)wbPart.GetPartById(mysheet.Id)).Worksheet;
-                            SheetData sheetData = worksheet.GetFirstChild<SheetData>();
-
-
-                            // list to save the data of excel as tickets
-                            List < Tickets > tickets= new List<Tickets>();
-                            //list to save the first row of data sheet as keys
-                            List<string> keys = new List<string>();
-                            for (int i = 0;i< sheetData.ChildElements.Count;i++)
-                            {
-                                var row = sheetData.ChildElements[i];
-                                Dictionary<string, string> ligne = new Dictionary<string, string>();
-
-                                
-                                for(int j = 0; j< (row as Row).ChildElements.Count;j++)
-                                {
-                                    var cell = (row as Row).ChildElements[j];
-                                    Cell thecurrentcell = cell as Cell;
-                                    string currentcellvalue = string.Empty;
-                                    if (thecurrentcell.DataType != null)
-                                    {
-                                        if (thecurrentcell.DataType == CellValues.SharedString)
-                                        {
-                                            int id;
-                                            if (Int32.TryParse(thecurrentcell.InnerText, out id))
-                                            {
-                                                SharedStringItem item = wbPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
-                                                if (item.Text != null)
-                                                {
-                                                    //code to take the string value  
-                                                    currentcellvalue = item.Text.Text;
-                                                }
-                                                else if (item.InnerText != null)
-                                                {
-                                                    currentcellvalue = item.InnerText;
-                                                }
-                                                else if (item.InnerXml != null)
-                                                {
-                                                    currentcellvalue = item.InnerXml;
-                                                }
-                                               // System.Diagnostics.Debug.WriteLineIf(j == 21, "cell" + j + thecurrentcell.DataType + currentcellvalue);
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                         currentcellvalue = thecurrentcell.CellValue.ToString();
-                                       
-                                    }
-
-                                    if (i == 0)
-                                    {
-                                        keys.Add(currentcellvalue);
-                                    }
-                                    else
-                                    {                                        
-                                            ligne.Add(keys[j], currentcellvalue);
-
-                                    }
-
-                                }
-                                
-                                if (i != 0) {
-
-                                    if (sf.SourceTool.ToLower().Equals("mantis")) {
-
-                                        tickets.Add(new Tickets() {
-                                        TicketID = ligne["Identifiant"], 
-                                       SourceTool = sourcetool, 
-                                       AssignedTo = ligne["Assigné à"], 
-                                       DateSent = ligne["Date de soumission"], 
-                                       DateResolved = ligne["Date résolution"], 
-                                       DateClosed = ligne["Clos"], 
-                                       Priority = integrateColumn(ligne["Priorité"], "Priority"), 
-                                       P = integrateColumn(ligne["P"], "P"), 
-                                       Status = integrateColumn(ligne["Statut"], "Status"), 
-                                       Description = ligne["Résumé"], 
-                                       Category = integrateColumn(ligne["Catégorie"], "Category"), 
-                                       WeekIn = ligne["Week in"], 
-                                       WeekOut = ligne["Week out"], 
-                                       YearIn = ligne["Year in"], 
-                                       YearOut = ligne["Year out"], 
-                                       YearWeekIn = ligne["Year / Week in"], 
-                                       YearWeekOut = ligne["Year / Week Out"], 
-                                       SLO = ligne["SLO"], 
-                                       ResolutionDuration = ligne["TimeResol"], 
-                                       SLA = ligne["SLA"], 
-                                       SR = ligne["SR"], 
-                                       Affectation = ligne["Affectation"], 
-                                       MD = ligne["M/D"], 
-                                       Application=ligne["Projet Court"],
-                                       AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService")
-                                        });
-
-                            count++;
-                                    }
-                                    else if (sf.SourceTool.ToLower().Equals("sm9")) {
-                                        tickets.Add(new Tickets() {
-                                            TicketID = ligne["ID Incident"], 
-                                            SourceTool = sourcetool, 
-                                            AssignedTo = ligne["Responsable"], 
-                                            DateSent = ligne["Date/Heure d'ouverture"], 
-                                            DateResolved = ligne["Date/Heure de résolution"], 
-                                            DateClosed = ligne["Date/Heure de clôture"], 
-                                            Priority = integrateColumn(ligne["Priorité"], "Priority"), 
-                                            P = integrateColumn(ligne["P"], "P"), 
-                                            Status = integrateColumn(ligne["État"], "Status"),
-                                            Description = ligne["Titre"], 
-                                            Category = integrateColumn(ligne["New Cat"], "Category"), 
-                                            WeekIn = ligne["week in"], 
-                                            WeekOut = ligne["week out"], 
-                                            YearIn = ligne["year in"], 
-                                            YearOut = ligne["year out"], 
-                                            YearWeekIn = ligne["Year / Week in"], 
-                                            YearWeekOut = ligne["Year / Week Out"], 
-                                            SLO = ligne["Slo"], 
-                                            ResolutionDuration = ligne["Realisation time"], 
-                                            SLA = ligne["SLA"], 
-                                            SR = ligne["SR"], 
-                                            Affectation = ligne["Best effort"], 
-                                            MD = ligne["M/D"], 
-                                            Application = ligne["Application"],
-                                            AssignedToService = integrateColumn(ligne["État"], "AssignedToService")
-                                        });
-                                        count++;
-                                    }
-                                }
-
-                            }
-                            // IMPORT TO DATABASE
-                            _context.AddRange(tickets);
-                            int created = _context.SaveChanges();
-                            return Created("File imported successfully", new { name = filename, SourceTool = sourcetool ,RowsInserted = created });
-                        }
-
-                    }
-
-                    catch (Exception e)
-                    {
-                        //throw e;
-                        return StatusCode(StatusCodes.Status500InternalServerError,new { 
-                            errorMessage = e.Message, exception = e.ToString() ,
-                            innerException=e.InnerException.ToString()});
+                        keys.Add(firstRowCell.Text);
+   
                     }
                 }
-                
-            }else
-            {
-                return BadRequest("File type Not Supported: " +fileExtension);
+                var startRow = 2;
+                var endRow = ws.Dimension.End.Row;
+                //Get row details
+                for (int rowNum = startRow; rowNum <= endRow; rowNum++)
+                {
+                    var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
+                    Dictionary<string, string> ligne = new Dictionary<string, string>();
+                    int j = 0;
+                        var endCell = ws.Dimension.End.Column;
+                    for(int cellNum = 1; cellNum <= endCell; cellNum++)
+                        {
+                            var cell = ws.Cells[rowNum, cellNum];
+                            string currentcellvalue = cell.Text;
+                            ligne.Add(keys[j++], currentcellvalue);
+                        }
+                    
+
+                    tickets.Add(createNewTicket(ligne, sourcetool));
+                    count++;
+
+
+                }
+                // IMPORT TO DATABASE
+                _context.AddRange(tickets);
+                int created = _context.SaveChanges();
+                return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
             }
 
+        }
+        }
+
+        private Tickets createNewTicket(Dictionary<string, string> ligne,string sourcetool)
+        {
+            if (sourcetool.ToLower().Equals("mantis"))
+            {
+
+                return (new Tickets()
+                {
+                    TicketID = ligne["Identifiant"],
+                    SourceTool = sourcetool,
+                    AssignedTo = ligne["Assigné à"],
+                    DateSent = ligne["Date de soumission"],
+                    DateResolved = ligne["Date résolution"],
+                    DateClosed = ligne["Clos"],
+                    Priority = integrateColumn(ligne["Priorité"], "Priority"),
+                    P = integrateColumn(ligne["P"], "P"),
+                    Status = integrateColumn(ligne["Statut"], "Status"),
+                    Description = ligne["Résumé"],
+                    Category = integrateColumn(ligne["Catégorie"], "Category"),
+                    WeekIn = ligne["Week in"],
+                    WeekOut = ligne["Week out"],
+                    YearIn = ligne["Year in"],
+                    YearOut = ligne["Year out"],
+                    YearWeekIn = ligne["Year / Week in"],
+                    YearWeekOut = ligne["Year / Week Out"],
+                    SLO = ligne["SLO"],
+                    ResolutionDuration = ligne["TimeResol"],
+                    SLA = ligne["SLA"],
+                    SR = ligne["SR"],
+                    Affectation = ligne["Affectation"],
+                    MD = ligne["M/D"],
+                    Application = ligne["Projet Court"] + ":" + ligne["Projet"],
+                    AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService"),
+                    Update = ligne["Mis à jour"]
+                });;
+
+
+            }
+            else if (sourcetool.ToLower().Equals("sm9"))
+            {
+                return new Tickets()
+                {
+                    TicketID = ligne["ID Incident"],
+                    SourceTool = sourcetool,
+                    AssignedTo = ligne["Responsable"],
+                    DateSent = ligne["Date/Heure d'ouverture"],
+                    DateResolved = ligne["Date/Heure de résolution"],
+                    DateClosed = ligne["Date/Heure de clôture"],
+                    Priority = integrateColumn(ligne["Priorité"], "Priority"),
+                    P = integrateColumn(ligne["P"], "P"),
+                    Status = integrateColumn(ligne["État"], "Status"),
+                    Description = ligne["Titre"],
+                    Category = integrateColumn(ligne["New Cat"], "Category"),
+                    WeekIn = ligne["week in"],
+                    WeekOut = ligne["week out"],
+                    YearIn = ligne["year in"],
+                    YearOut = ligne["year out"],
+                    YearWeekIn = ligne["Year / Week in"],
+                    YearWeekOut = ligne["Year / Week Out"],
+                    SLO = ligne["Slo"],
+                    ResolutionDuration = ligne["Realisation time"],
+                    SLA = ligne["SLA"],
+                    SR = ligne["SR"],
+                    Affectation = ligne["Best effort"],
+                    MD = ligne["M/D"],
+                    Application = ligne["Application"],
+                    AssignedToService = integrateColumn(ligne["État"], "AssignedToService")
+                };
+
+            }
+            else return null;
 
         }
 
