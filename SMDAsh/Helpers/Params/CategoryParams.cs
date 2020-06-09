@@ -25,5 +25,21 @@ namespace SMDAsh.Helpers.Params
 
             return allStatus;
         }
+        public static List<string> GetAllForCharts()
+        {
+            var fields = typeof(CategoryParams).GetFields();
+            int paramsCount = fields.Length;
+            List<string> allCategory = new List<string>();
+            for (int i = 0; i < paramsCount; i++)
+            {
+                string category = fields[i].GetValue(null).ToString();
+                if(!category.In(NOT_CONFIGURED))
+                    allCategory.Add(category);
+            }
+
+            return allCategory;
+        }
+
+
     }
 }

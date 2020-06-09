@@ -10,6 +10,7 @@ using SMDAsh.Models.Charts;
 using AutoQueryable;
 using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Models.Errors;
+using System.Globalization;
 
 namespace SMDAsh.Controllers
 {
@@ -261,6 +262,165 @@ namespace SMDAsh.Controllers
             
 
             return Ok(queryOK.Select(t => t.Value).ToList().OrderBy(t => t.application).AsQueryable());
+        }
+
+        [HttpGet("[action]/{Service}/{Year}/")]
+        public ActionResult<IQueryable> TicketsByService(string Service, string Year, string exclude)
+        {
+            List<string> allStatus = StatusParams.GetForTicketsAssigned();
+            List<string> allCategory = CategoryParams.GetAllForCharts();
+            //bad request error;
+            List<BadUrl> lit = new List<BadUrl>();
+
+            if (!AssignedToService.GetAll().Contains(Service, StringComparer.OrdinalIgnoreCase) && !Service.Equals("all"))
+            {
+                BadUrl obj = new BadUrl(Service);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+            if (!_context.Tickets
+                .Select(t => DateTime.Parse(t.Update).Year.ToString())
+                .Distinct().ToList()
+                .Contains(Year, StringComparer.OrdinalIgnoreCase) && !Year.Equals("all"))
+            {
+
+                
+                BadUrl obj = new BadUrl(Year);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+
+            List<string> excludeApp = new List<string>();
+            if (exclude != null && !exclude.Equals(String.Empty))
+                foreach (var item in exclude.Split(","))
+                {
+                    excludeApp.Add(item.Trim());
+                }
+
+            var result = new List<TicketsByType>();
+            var query = (from t in _context.Tickets
+                         where t.AssignedToService.Contains(Service.Equals("all") ? "" : Service) &&
+                         allStatus.Contains(t.Status)
+                         select t).ToList()
+                         .Where(t=> !excludeApp.Contains(t.Application.Split(":")[0]) &&
+                         DateTime.Parse(t.Update).ToString("yyyy").Contains(Year.Equals("all") ? "" : Year)
+                         )
+                        .Select(t => new {
+                            t.AssignedToService,
+                            t.Category,
+                            month = DateTime.Parse(t.Update).ToString("MMMM", CultureInfo.CreateSpecificCulture("en-US")),
+                            m = DateTime.Parse(t.Update).Month,
+                            year = DateTime.Parse(t.Update).ToString("yyyy")
+                        })
+                        .OrderBy(t => t.year)
+                        .GroupBy(t => t.year);
+
+            foreach (var year in query)
+            {
+
+                var entry = new TicketsByType()
+                {
+                    service = year.First().AssignedToService,
+                    year = year.Key
+                };
+
+                //key value for quarter
+                Dictionary<string, List<MonthStats>> quarters = new Dictionary<string, List<MonthStats>>();
+
+                //list of months stats
+                List<MonthStats> months = new List<MonthStats>();
+                var monthStats = year.OrderBy(t => t.m).GroupBy(t => t.month);
+
+                //delcalre quarters
+                foreach (var month in monthStats)
+                {
+                    if (month.First().m < 4)
+                    {
+                        if (!quarters.Keys.Contains("quarter 1"))
+                        {
+                            quarters.Add("quarter 1", new List<MonthStats>());
+                        }
+                    }
+                    else if (month.First().m < 7)
+                    {
+                        if (!quarters.Keys.Contains("quarter 2"))
+                        {
+                            quarters.Add("quarter 2", new List<MonthStats>());
+                        }
+                    }
+                    else if (month.First().m < 10)
+                    {
+                        if (!quarters.Keys.Contains("quarter 3"))
+                        {
+                            quarters.Add("quarter 3", new List<MonthStats>());
+                        }
+                    }
+                    else
+                    {
+                        if (!quarters.Keys.Contains("quarter 4"))
+                        {
+                            quarters.Add("quarter 4", new List<MonthStats>());
+                        }
+                    }
+                }
+
+
+                //get months stats
+                foreach (var month in monthStats)
+                {
+                    var mon = new MonthStats() { month = month.Key, m = month.First().m };
+
+                    Dictionary<string, int> catCount = new Dictionary<string, int>();
+                    var m = month.GroupBy(t => t.Category);
+
+                    foreach (var c in m)
+                    {
+                        catCount.Add(c.Key, c.Count());
+                    }
+                    foreach(var c in allCategory) {
+                        if (!catCount.ContainsKey(c)) catCount.Add(c, 0);
+                    }
+                    
+                    mon.categories = catCount.OrderBy(t=>t.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+                    months.Add(mon);
+                }
+
+                //afect month to each quarter
+                int i = 0;
+                int j = 4;
+                for (int index = 0; index < quarters.Keys.Count; index++)
+                {
+
+                    List<MonthStats> q = new List<MonthStats>();
+                    int qtrInt = Int16.Parse(quarters.ElementAt(index).Key.Split(" ")[1]);
+                    i = (qtrInt == 1) ? 0
+                    : (qtrInt == 2) ? 3
+                    : (qtrInt == 3) ? 6 : 9;
+
+                    j = (qtrInt == 1) ? 4
+                    : (qtrInt == 2) ? 7
+                    : (qtrInt == 3) ? 10 : 13;
+
+                    foreach (var m in months.Where(t => t.m > i && t.m < j))
+                    {
+
+                        q.Add(m);
+
+                    }
+
+                    quarters[quarters.ElementAt(index).Key] = q;
+                    i += 3;
+                    j += 3;
+                }
+
+                entry.quarters = quarters;
+
+                result.Add(entry);
+
+            }
+            
+
+            return Ok(result.AsQueryable());
         }
     }
 }
