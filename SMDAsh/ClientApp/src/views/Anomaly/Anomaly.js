@@ -3,6 +3,7 @@ import React from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartAno from "components/Anomaly/ChartAno";
+import BacklogByOwnerAno from "components/Anomaly/BacklogByOwnerAno";
 import 'chartjs-plugin-labels';
 
 
@@ -45,6 +46,7 @@ export default function Anomaly() {
   return (
     <div>
       <ChartAno></ChartAno>
+      <BacklogByOwnerAno></BacklogByOwnerAno>
     </div>
   );
 }

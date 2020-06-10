@@ -121,7 +121,7 @@ const ChartAno = () => {
   const [chartTable, setChartTable] = useState(chartState.dataTable);
   const [filter, setFilter] = useState('1 Months');
   const classes = useStyles();
-  const[reloardData,setReloadData]=useState(false);
+  const [reloardData,setReloadData] = useState(false);
 
   useEffect(() => {
     if (chartState.loading || reloardData) {

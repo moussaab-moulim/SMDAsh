@@ -11,3 +11,6 @@
 .Toastify__toast {
     min-height: 48px !important;
 }
+button:focus {
+    outline: 0px;
+  }
