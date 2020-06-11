@@ -3,11 +3,12 @@ import React from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartSr from "components/SR/ChartSr";
+import BacklogByOwnerSr from "components/SR/BacklogByOwnerSr";
 import 'chartjs-plugin-labels';
 
 
 const useStyles = makeStyles((theme) => ({
- 
+
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
       color: "rgba(255,255,255,.62)",
@@ -44,7 +45,10 @@ export default function Sr() {
   const classes = useStyles();
   return (
     <div>
+      
       <ChartSr></ChartSr>
+      <BacklogByOwnerSr></BacklogByOwnerSr>
+      
     </div>
   );
 }

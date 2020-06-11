@@ -19,6 +19,11 @@ export const REJECTED_CHART_BACKLOG_BY_OWNER_ANO = 'REJECTED_CHART_BACKLOG_BY_OW
 export const SUCCESS_CHARTSR = 'SUCCESS_CHARTSR';
 export const AWAITING_CHARTSR = 'AWAITING_CHARTSR';
 export const REJECTED_CHARTSR = 'REJECTED_CHARTSR';
+    /* Backlog By Owner */
+export const SUCCESS_CHART_BACKLOG_BY_OWNER_SR = 'SUCCESS_CHART_BACKLOG_BY_OWNER_SR';
+export const AWAITING_CHART_BACKLOG_BY_OWNER_SR = 'AWAITING_CHART_BACKLOG_BY_OWNER_SR';
+export const REJECTED_CHART_BACKLOG_BY_OWNER_SR = 'REJECTED_CHART_BACKLOG_BY_OWNER_SR';
+
 
 // Evolution
 export const SUCCESS_CHARTEVOLUTION = 'SUCCESS_CHARTEVOLUTION';
@@ -51,8 +56,7 @@ export const APIS = {
     getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie?take=26',
     getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie?take=52',
     getBacklogAnomalyAll: '/api/GetBacklog/anomalie',
-        /* BacklogByOwnerAnomaly */ 
-    getBacklogByOwnerAnomaly:'/api/BacklogByOwner',
+    
 
     // SR Backlog
     getBacklogSrOneMonth: '/api/GetBacklog/sr?take=4',
@@ -60,6 +64,7 @@ export const APIS = {
     getBacklogSrSixMonth: '/api/GetBacklog/sr?take=26',
     getBacklogSrOneYear: '/api/GetBacklog/sr?take=52',
     getBacklogSrAll: '/api/GetBacklog/sr',
+    
 
     // Evolution Backlog
     getBacklogEvolutionOneMonth: '/api/GetBacklog/evolution?take=4',
@@ -67,6 +72,9 @@ export const APIS = {
     getBacklogEvolutionSixMonth: '/api/GetBacklog/evolution?take=26',
     getBacklogEvolutionOneYear: '/api/GetBacklog/evolution?take=52',
     getBacklogEvolutionAll: '/api/GetBacklog/sr',
+
+    // BacklogByOwner
+    getBacklogByOwner:'/api/BacklogByOwner',
 
     // Params
     getYearsIn: '/api/Filters/GetYears/In',

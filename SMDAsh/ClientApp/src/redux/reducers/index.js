@@ -3,6 +3,7 @@ import chartAnoReducer from "./Anomaly/chartAnoReducer";
 import chartSrReducer from "./SR/chartSrReducer";
 import chartEvolutionReducer from "./Evolution/chartEvolutionReducer";
 import pieBacklogByOwnerAnoReducer from "./Anomaly/backlogByOwnerAnoReducer";
+import pieBacklogByOwnerSrReducer from "./SR/backlogByOwnerSrReducer";
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
 
 import user from './auth/userReducer';
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
     chartSr:chartSrReducer,
     chartEvolution:chartEvolutionReducer,
     pieBacklogByOwnerAno:pieBacklogByOwnerAnoReducer,
+    pieBacklogByOwnerSr:pieBacklogByOwnerSrReducer,
     yearsIn:yearsInReducer,
     yearsOut:yearsOutReducer
 });

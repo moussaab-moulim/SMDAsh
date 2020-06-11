@@ -3,20 +3,15 @@ import * as constants from '../../constants';
 
 
 
-//Action to get all Repos
-export function getData(response) {
-  return{
-    type: constants.SUCCESS_CHART_BACKLOG_BY_OWNER_ANO,
-    payload: response
-  }
-}
+
 // Thunk function, it calls the getRepos action above after it receives the fetch response.
 //export function getBacklogByOwnerAnomaly(category, year) { 
-export function getBacklogByOwnerAnomaly(category, year) { 
+export function getBacklogByOwnerSr(category, year) { 
+
   return function(dispatch) {
       
       dispatch({
-        type: constants.AWAITING_CHART_BACKLOG_BY_OWNER_ANO,
+        type: constants.AWAITING_CHART_BACKLOG_BY_OWNER_SR,
       });
       
       axios.get(constants.APIS.getBacklogByOwner+"/"+category+"/"+year)
@@ -24,14 +19,14 @@ export function getBacklogByOwnerAnomaly(category, year) {
  
           var arr = response.data;
           dispatch({
-            type: constants.SUCCESS_CHART_BACKLOG_BY_OWNER_ANO,
+            type: constants.SUCCESS_CHART_BACKLOG_BY_OWNER_SR,
             payload: arr
           })
         })
         .catch((error) => {
           
           dispatch({
-            type: constants.REJECTED_CHART_BACKLOG_BY_OWNER_ANO,
+            type: constants.REJECTED_CHART_BACKLOG_BY_OWNER_SR,
             payload: error.message || 'Unexpected Error!!!'
           })
           
