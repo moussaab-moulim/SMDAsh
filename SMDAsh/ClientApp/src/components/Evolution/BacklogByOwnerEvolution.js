@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+//import '../App.css';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Pie } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    getBacklogByOwnerSr
-} from '../../redux/actions/SR/BacklogByOwnerSrAction';
+    getBacklogByOwnerEvolution
+} from '../../redux/actions/Evolution/BacklogByOwnerEvolutionAction';
 
 import { getYearsIn } from '../../redux/actions/Params/yearActions';
 
@@ -115,7 +116,7 @@ const initialChartState = {
     labels: [],
 };
 
-export default function BacklogByOwnerSr() {
+export default function BacklogByOwnerEvolution() {
 
 
     const [chartData, setChartData] = useState(initialChartState);
@@ -124,8 +125,8 @@ export default function BacklogByOwnerSr() {
     const yearsInState = useSelector((state) => state.yearsIn, []) || [];
     const [yearsIn, setYearsIn] = useState(yearsInState.dataTable);
 
-    const chartState = useSelector((state) => state.pieBacklogByOwnerSr, []) || [];
-
+    const chartState = useSelector((state) => state.pieBacklogByOwnerEvolution, []) || [];
+ 
     const [year, setYear] = useState('all');
 
     const classes = useStyles();
@@ -158,7 +159,7 @@ export default function BacklogByOwnerSr() {
 
         if (chartState.loading || yearsInState.loading || reloardData) {
             dispatch(getYearsIn());
-            dispatch(getBacklogByOwnerSr("sr", year));
+            dispatch(getBacklogByOwnerEvolution("evolution", year));
             setReloadData(false);
         }
 
@@ -192,7 +193,7 @@ export default function BacklogByOwnerSr() {
         const labels = [];
         const counts = [];
         const backgroundColor = [];
-       
+
         const OCP = data.filter(status => status.assignedToService === "OCP");
         const RunService = data.filter(status => status.assignedToService === "Run service");
 
@@ -290,7 +291,7 @@ export default function BacklogByOwnerSr() {
 
     return (
         <div >
-            <GridContainer >
+            <GridContainer>
                 <Grid item xs={12} sm={12} md={4} >
                     <Card className={classes.card}>
                         {chartState.loading ? <SpinnerChart /> : null}

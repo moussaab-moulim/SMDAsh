@@ -3,6 +3,7 @@ import React from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartEvolution from "components/Evolution/ChartEvolution";
+import BacklogByOwnerEvolution from "components/Evolution/BacklogByOwnerEvolution";
 import 'chartjs-plugin-labels';
 
 
@@ -45,6 +46,7 @@ export default function Evolution() {
   return (
     <div>
       <ChartEvolution></ChartEvolution>
+      <BacklogByOwnerEvolution></BacklogByOwnerEvolution>
     </div>
   );
 }

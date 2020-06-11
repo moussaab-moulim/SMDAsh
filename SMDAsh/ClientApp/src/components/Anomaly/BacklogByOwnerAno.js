@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 //import '../App.css';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    getData,
     getBacklogByOwnerAnomaly
 } from '../../redux/actions/Anomaly/BacklogByOwnerAnoAction';
 
@@ -127,7 +126,7 @@ export default function BacklogByOwnerAno() {
     const [yearsIn, setYearsIn] = useState(yearsInState.dataTable);
 
     const chartState = useSelector((state) => state.pieBacklogByOwnerAno, []) || [];
-    const [chartTable, setChartTable] = useState(chartState.dataTable);
+    
 
     const [year, setYear] = useState('all');
 
@@ -195,12 +194,8 @@ export default function BacklogByOwnerAno() {
         const labels = [];
         const counts = [];
         const backgroundColor = [];
-        const hoverBackgroundColor = [];
-
-        const newChartArrays = {
-            Status: [],
-            CountOfStatus: [],
-        };
+       
+        
         const OCP = data.filter(status => status.assignedToService === "OCP");
         const RunService = data.filter(status => status.assignedToService === "Run service");
 
@@ -288,7 +283,6 @@ export default function BacklogByOwnerAno() {
 
 
         setChartData(newChartData);
-        setChartTable(data);
         setChartTableOCP(OCP);
         setChartTableRunService(RunService);
         setTotal(total);
@@ -299,12 +293,10 @@ export default function BacklogByOwnerAno() {
 
 
     return (
-        <div >
-            <GridContainer xs={12}
-                sm={12}
-                md={12}>
-                <Grid item xs={4} sm={12} md={4} >
-                    <Card xs={6} sm={6} md={6} className={classes.card}>
+        <div>
+            <GridContainer>
+                <Grid item xs={12} sm={12} md={4} >
+                    <Card  className={classes.card}>
                         {chartState.loading ? <SpinnerChart /> : null}
                         <CardBody>
                             <Grid item
@@ -472,8 +464,8 @@ export default function BacklogByOwnerAno() {
                     </Card>
 
                 </Grid>
-                <Grid item xs={8} sm={12} md={8} >
-                    <Card xs={6} sm={6} md={6} className={classes.card}>
+                <Grid item xs={12} sm={12} md={8} >
+                    <Card className={classes.card}>
                         {chartState.loading ? <SpinnerChart /> : null}
                         <CardBody>
                             <Grid
@@ -518,7 +510,6 @@ export default function BacklogByOwnerAno() {
                     </Card>
 
                 </Grid>
-
             </GridContainer>
         </div>
     );

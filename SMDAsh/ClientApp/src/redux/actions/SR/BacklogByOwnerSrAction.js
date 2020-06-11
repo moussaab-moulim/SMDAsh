@@ -1,9 +1,6 @@
 import axios from 'axios';
 import * as constants from '../../constants';
 
-
-
-
 // Thunk function, it calls the getRepos action above after it receives the fetch response.
 //export function getBacklogByOwnerAnomaly(category, year) { 
 export function getBacklogByOwnerSr(category, year) { 
