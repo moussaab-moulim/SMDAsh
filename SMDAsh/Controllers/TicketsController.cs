@@ -128,8 +128,8 @@ namespace SMDAsh.Controllers
             var results = query.ToList().GroupBy(t => t.Application)
                                    .Select(t => new TicketsAssigned()
                                    {
-                                       category = Category,
-                                       assignedToService = Service,
+                                       category = t.First().Category,
+                                       assignedToService = t.First().AssignedToService,
                                        application = t.Key,
                                        count = t.Count()
                                    })
