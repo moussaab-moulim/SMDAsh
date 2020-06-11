@@ -93,15 +93,15 @@ export default function Admin({ ...rest }) {
     };
   }, [mainPanel]);
   return (
-    <div className={classes.wrapper}>
-      <Sidebar
+    <div className={classes.wrapper} >
+      <Sidebar 
         routes={routes}
         logoText={"ETL Dashboard"}
         //logo={logo}
         image={image}
         handleDrawerToggle={handleDrawerToggle}
         open={mobileOpen}
-        color={"green"}
+        color={"teal"}
         {...rest}
       />
       <div className={classes.mainPanel} ref={mainPanel}>

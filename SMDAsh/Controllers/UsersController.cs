@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using SMDAsh.Services;
 using SMDAsh.Helpers;
 using SMDAsh.Models.Users;
+using SMDAsh.Models;
 using AutoMapper;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
@@ -82,8 +83,34 @@ namespace SMDAsh.Controllers
             try
             {
                 // create user
-                _userService.Create(user, model.Password);
-                return Ok();
+               var userregister = _userService.Create(user, model.Password);
+                if (userregister == null)
+                    return BadRequest(new { message = "Your information is incorrect" });
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, userregister.Id.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                // return basic user info and authentication token
+                return Ok(new
+                {
+                    Id = userregister.Id,
+                    Username = userregister.Username,
+                    FirstName = userregister.FirstName,
+                    LastName = userregister.LastName,
+                    Token = tokenString
+                });
+
             }
             catch (AppException ex)
             {

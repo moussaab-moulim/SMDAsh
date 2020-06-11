@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
-import constants from '../../constants';
+import * as constants from '../../redux/constants';
 class Upload extends Component {
   constructor(props) {
     super(props);

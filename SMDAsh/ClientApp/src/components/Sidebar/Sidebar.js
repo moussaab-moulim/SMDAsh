@@ -83,7 +83,7 @@ export default function Sidebar(props) {
   var brand = (
     <div className={classes.logo}>
       <a
-        href="https://www.creative-tim.com?ref=mdr-sidebar"
+        href=""
         className={classNames(classes.logoLink, {
           [classes.logoLinkRTL]: props.rtlActive
         })}
@@ -152,7 +152,7 @@ export default function Sidebar(props) {
 Sidebar.propTypes = {
   rtlActive: PropTypes.bool,
   handleDrawerToggle: PropTypes.func,
-  bgColor: PropTypes.oneOf(["purple", "blue", "green", "orange", "red"]),
+  bgColor: PropTypes.oneOf(["purple", "blue", "teal", "orange", "red"]),
   logo: PropTypes.string,
   image: PropTypes.string,
   logoText: PropTypes.string,
