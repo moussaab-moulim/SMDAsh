@@ -55,6 +55,11 @@ export const SUCCESS_SERVICES = 'SUCCESS_SERVICES';
 export const AWAITING_SERVICES = 'AWAITING_SERVICES';
 export const REJECTED_SERVICES = 'REJECTED_SERVICES';    
 
+    /* Get Applications */
+export const SUCCESS_APPLICATIONS = 'SUCCESS_APPLICATIONS';
+export const AWAITING_APPLICATIONS = 'AWAITING_APPLICATIONS';
+export const REJECTED_APPLICATIONS = 'REJECTED_APPLICATIONS';  
+
 
 
 // Chart Colors
@@ -103,6 +108,9 @@ export const APIS = {
 
         /* Get Services */
         getGetServices: '/api/Filters/GetServices',
+
+        /* Get Applications */
+        getGetApplications: '/api/Filters/GetApplications',
         
 
     upload:'/api/upload',

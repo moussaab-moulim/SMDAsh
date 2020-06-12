@@ -11,6 +11,7 @@ import pieBacklogByOwnerEvolutionReducer from "./Evolution/backlogByOwnerEvoluti
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
 import { categoriesReducer } from './Params/categoryReducer';
 import { servicesReducer } from './Params/serviceReducer';
+import { ApplicationReducer } from './Params/applicationReducer';
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
@@ -32,7 +33,8 @@ const rootReducer = combineReducers({
     yearsIn:yearsInReducer,
     yearsOut:yearsOutReducer,
     categories:categoriesReducer,
-    services:servicesReducer
+    services:servicesReducer,
+    applications:ApplicationReducer
 });
 
 export default rootReducer;
