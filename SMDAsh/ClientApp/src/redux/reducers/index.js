@@ -8,13 +8,16 @@ import pieBacklogByOwnerAnoReducer from "./Anomaly/backlogByOwnerAnoReducer";
 import pieBacklogByOwnerSrReducer from "./SR/backlogByOwnerSrReducer";
 import pieBacklogByOwnerEvolutionReducer from "./Evolution/backlogByOwnerEvolutionReducer";
 
+// Params
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
 import { categoriesReducer } from './Params/categoryReducer';
 import { servicesReducer } from './Params/serviceReducer';
 import { ApplicationReducer } from './Params/applicationReducer';
+import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekReducer';
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+
 
 
 
@@ -34,7 +37,12 @@ const rootReducer = combineReducers({
     yearsOut:yearsOutReducer,
     categories:categoriesReducer,
     services:servicesReducer,
-    applications:ApplicationReducer
+    applications:ApplicationReducer,
+        /* Weeks */
+    weeks:weeksReducer,
+    weeksIn:weeksInReducer,
+    weeksOut:weeksOutReducer,    
+
 });
 
 export default rootReducer;

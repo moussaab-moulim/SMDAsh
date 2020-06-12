@@ -4,7 +4,7 @@ import * as constants from '../../constants';
 // Thunk function, it calls the getRepos action above after it receives the fetch response.
 export function getYearsIn() { 
   
-  return function(dispatch, getState) {
+  return function(dispatch) {
       
       dispatch({
         type: constants.AWAITING_YEARSIN,
@@ -31,7 +31,7 @@ export function getYearsIn() {
 }
 export function getYearsOut() { 
   
-    return function(dispatch, getState) {
+    return function(dispatch) {
         
         dispatch({
           type: constants.AWAITING_YEARSOUT,

@@ -45,6 +45,20 @@ export const SUCCESS_YEARSOUT = 'SUCCESS_YEARSOUT';
 export const AWAITING_YEARSOUT = 'AWAITING_YEARSOUT';
 export const REJECTED_YEARSOUT = 'REJECTED_YEARSOUT';
 
+    /* Weeks */
+export const SUCCESS_WEEKS = 'SUCCESS_WEEKS';
+export const AWAITING_WEEKS = 'AWAITING_WEEKS';
+export const REJECTED_WEEKS = 'REJECTED_WEEKS';
+    /* WeeksIn */
+export const SUCCESS_WEEKSIN = 'SUCCESS_WEEKSIN';
+export const AWAITING_WEEKSIN = 'AWAITING_WEEKSIN';
+export const REJECTED_WEEKSIN = 'REJECTED_WEEKSIN';
+    /* WeeksOut */
+export const SUCCESS_WEEKSOUT = 'SUCCESS_WEEKSOUT';
+export const AWAITING_WEEKSOUT = 'AWAITING_WEEKSOUT';
+export const REJECTED_WEEKSOUT = 'REJECTED_WEEKSOUT';
+
+
     /* Get Categories */
 export const SUCCESS_CATEGORIES = 'SUCCESS_CATEGORIES';
 export const AWAITING_CATEGORIES = 'AWAITING_CATEGORIES';
@@ -99,9 +113,14 @@ export const APIS = {
 
     // Params
 
-        /* Years */
+        /* Get Years */
         getYearsIn: '/api/Filters/GetYears/In',
         getYearsOut: '/api/Filters/GetYears/Out',
+
+        /* Get Weeks */
+        getWeeks: '/api/Filters/GetWeeks/all',
+        getWeeksIn: '/api/Filters/GetWeeks/in',
+        getWeeksOut: '/api/Filters/GetWeeks/out',
 
         /* Get Categories */
         getCategories: '/api/Filters/GetCategories',
@@ -111,6 +130,7 @@ export const APIS = {
 
         /* Get Applications */
         getGetApplications: '/api/Filters/GetApplications',
+
         
 
     upload:'/api/upload',
