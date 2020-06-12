@@ -11,6 +11,7 @@ import {
   getBacklogAnomalyOneYear, 
   getBacklogAnomalyAll } from '../../redux/actions/Anomaly/chartAnoActions';
 
+
 import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
 import { connect } from 'react-redux';
 // core components
@@ -125,7 +126,7 @@ const ChartAno = () => {
 
   useEffect(() => {
     if (chartState.loading || reloardData) {
-
+       
       if (filter == "1 Months") {
         dispatch(getBacklogAnomalyOneMonth());
        

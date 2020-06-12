@@ -49,7 +49,13 @@ export const REJECTED_YEARSOUT = 'REJECTED_YEARSOUT';
 export const SUCCESS_CATEGORIES = 'SUCCESS_CATEGORIES';
 export const AWAITING_CATEGORIES = 'AWAITING_CATEGORIES';
 export const REJECTED_CATEGORIES = 'REJECTED_CATEGORIES';
-    
+
+    /* Get Services */
+export const SUCCESS_SERVICES = 'SUCCESS_SERVICES';
+export const AWAITING_SERVICES = 'AWAITING_SERVICES';
+export const REJECTED_SERVICES = 'REJECTED_SERVICES';    
+
+
 
 // Chart Colors
 export const COLOR_TEAL = '#008080';
@@ -94,6 +100,10 @@ export const APIS = {
 
         /* Get Categories */
         getCategories: '/api/Filters/GetCategories',
+
+        /* Get Services */
+        getGetServices: '/api/Filters/GetServices',
+        
 
     upload:'/api/upload',
     registerUser: '/api/users/register',
