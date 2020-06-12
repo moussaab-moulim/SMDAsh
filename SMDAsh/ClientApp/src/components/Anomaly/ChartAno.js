@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import { getData,  
+import { 
   getBacklogAnomalyThreeMonth, 
   getBacklogAnomalyOneMonth, 
   getBacklogAnomalySixMonth, 
@@ -128,23 +128,23 @@ const ChartAno = () => {
 
       if (filter == "1 Months") {
         dispatch(getBacklogAnomalyOneMonth());
-        console.log("1 Months "+reloardData);
+       
   
       } else if (filter == "3 Months") {
         dispatch(getBacklogAnomalyThreeMonth());
-        console.log("3 Months "+reloardData);
+        
       }
       else if (filter == "6 Months") {
         dispatch(getBacklogAnomalySixMonth());
-        console.log("6 Months "+reloardData);
+        
       }
       else if (filter == "Year") {
         dispatch(getBacklogAnomalyOneYear());
-        console.log("Year "+reloardData);
+        
       }
       else if (filter == "All") {
         dispatch(getBacklogAnomalyAll());
-        console.log("All "+reloardData);
+        
       }
       setReloadData(false);
     } 

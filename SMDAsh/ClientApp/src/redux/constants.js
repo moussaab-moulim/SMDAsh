@@ -45,6 +45,11 @@ export const SUCCESS_YEARSOUT = 'SUCCESS_YEARSOUT';
 export const AWAITING_YEARSOUT = 'AWAITING_YEARSOUT';
 export const REJECTED_YEARSOUT = 'REJECTED_YEARSOUT';
 
+    /* Get Categories */
+export const SUCCESS_CATEGORIES = 'SUCCESS_CATEGORIES';
+export const AWAITING_CATEGORIES = 'AWAITING_CATEGORIES';
+export const REJECTED_CATEGORIES = 'REJECTED_CATEGORIES';
+    
 
 // Chart Colors
 export const COLOR_TEAL = '#008080';
@@ -82,8 +87,13 @@ export const APIS = {
     getBacklogByOwner:'/api/BacklogByOwner',
 
     // Params
-    getYearsIn: '/api/Filters/GetYears/In',
-    getYearsOut: '/api/Filters/GetYears/Out',
+
+        /* Years */
+        getYearsIn: '/api/Filters/GetYears/In',
+        getYearsOut: '/api/Filters/GetYears/Out',
+
+        /* Get Categories */
+        getCategories: '/api/Filters/GetCategories',
 
     upload:'/api/upload',
     registerUser: '/api/users/register',
