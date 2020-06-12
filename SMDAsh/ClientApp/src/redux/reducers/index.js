@@ -12,13 +12,11 @@ import pieBacklogByOwnerEvolutionReducer from "./Evolution/backlogByOwnerEvoluti
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
 import { categoriesReducer } from './Params/categoryReducer';
 import { servicesReducer } from './Params/serviceReducer';
-import { ApplicationReducer } from './Params/applicationReducer';
+import { ApplicationBarReducer, ApplicationProjectCourtTrueReducer, ApplicationProjectCourtFalseReducer } from './Params/applicationReducer';
 import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekReducer';
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
-
-
 
 
 const rootReducer = combineReducers({ 
@@ -37,11 +35,15 @@ const rootReducer = combineReducers({
     yearsOut:yearsOutReducer,
     categories:categoriesReducer,
     services:servicesReducer,
-    applications:ApplicationReducer,
         /* Weeks */
     weeks:weeksReducer,
     weeksIn:weeksInReducer,
-    weeksOut:weeksOutReducer,    
+    weeksOut:weeksOutReducer,   
+        /* Applications */
+        
+    applications:ApplicationBarReducer,
+    applicationsProjectCourtTrue:ApplicationProjectCourtTrueReducer,
+    applicationsProjectCourtFalse:ApplicationProjectCourtFalseReducer,  
 
 });
 

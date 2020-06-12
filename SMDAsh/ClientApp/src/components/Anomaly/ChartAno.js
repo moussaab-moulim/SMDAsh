@@ -30,6 +30,7 @@ import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 
 import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
+import { formatDiagnostic } from 'typescript';
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {
@@ -126,7 +127,7 @@ const ChartAno = () => {
 
   useEffect(() => {
     if (chartState.loading || reloardData) {
-       
+     
       if (filter == "1 Months") {
         dispatch(getBacklogAnomalyOneMonth());
        

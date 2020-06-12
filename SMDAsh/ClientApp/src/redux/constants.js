@@ -69,10 +69,19 @@ export const SUCCESS_SERVICES = 'SUCCESS_SERVICES';
 export const AWAITING_SERVICES = 'AWAITING_SERVICES';
 export const REJECTED_SERVICES = 'REJECTED_SERVICES';    
 
-    /* Get Applications */
-export const SUCCESS_APPLICATIONS = 'SUCCESS_APPLICATIONS';
-export const AWAITING_APPLICATIONS = 'AWAITING_APPLICATIONS';
-export const REJECTED_APPLICATIONS = 'REJECTED_APPLICATIONS';  
+    /* Get Applications Bar */
+export const SUCCESS_APPLICATIONSBAR = 'SUCCESS_APPLICATIONSBAR';
+export const AWAITING_APPLICATIONSBAR = 'AWAITING_APPLICATIONSBAR';
+export const REJECTED_APPLICATIONSBAR = 'REJECTED_APPLICATIONSBAR'; 
+    /* Get Applications ProjectCourt = True */
+export const SUCCESS_APPLICATIONSPROJECTCOURTTRUE = 'SUCCESS_APPLICATIONSPROJECTCOURTTRUE';
+export const AWAITING_APPLICATIONSPROJECTCOURTTRUE = 'AWAITING_APPLICATIONSPROJECTCOURTTRUE';
+export const REJECTED_APPLICATIONSPROJECTCOURTTRUE = 'REJECTED_APPLICATIONSPROJECTCOURTTRUE';
+    /* Get Applications ProjectCourt = FALSE */
+export const SUCCESS_APPLICATIONSPROJECTCOURTFALSE = 'SUCCESS_APPLICATIONSPROJECTCOURTFALSE';
+export const AWAITING_APPLICATIONSPROJECTCOURTFALSE = 'AWAITING_APPLICATIONSPROJECTCOURTFALSE';
+export const REJECTED_APPLICATIONSPROJECTCOURTFALSE = 'REJECTED_APPLICATIONSPROJECTCOURTFALSE';  
+
 
 
 
@@ -129,9 +138,11 @@ export const APIS = {
         getGetServices: '/api/Filters/GetServices',
 
         /* Get Applications */
-        getGetApplications: '/api/Filters/GetApplications',
+        getGetApplicationsBar: '/api/Filters/GetApplications',
+        getGetApplicationsProjectCourtTrue: '/api/Filters/GetApplications?projectCourt=true',
+        getGetApplicationsProjectCourtFalse: '/api/Filters/GetApplications?projectCourt=false',
 
-        
+           
 
     upload:'/api/upload',
     registerUser: '/api/users/register',
