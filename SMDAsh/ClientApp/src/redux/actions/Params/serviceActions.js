@@ -10,7 +10,7 @@ export function getServices() {
         type: constants.AWAITING_SERVICES,
       });
       
-      axios.get(constants.APIS.getCategories)
+      axios.get(constants.APIS.getServices)
         .then(function(response){
  
           var arr = response.data;

@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartAno from "components/Anomaly/ChartAno";
 import BacklogByOwnerAno from "components/Anomaly/BacklogByOwnerAno";
+import TicketAssignedAno from "components/Anomaly/TicketAssignedAno";
 import 'chartjs-plugin-labels';
 
 
@@ -45,8 +46,12 @@ export default function Anomaly() {
   const classes = useStyles();
   return (
     <div>
-      <ChartAno></ChartAno>
-      <BacklogByOwnerAno></BacklogByOwnerAno>
+        <TicketAssignedAno/>
+        {/*
+        <ChartAno></ChartAno>
+        <TicketAssignedAno></TicketAssignedAno>
+        */}
+      
     </div>
   );
 }

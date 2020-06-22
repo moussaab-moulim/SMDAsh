@@ -373,9 +373,9 @@ export default function BacklogByOwnerAno() {
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
                                                     ) : (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleOCP() }} color="primary" aria-label="add to shopping cart">
-                                                                <AddIcon fontSize="small" /> 
-                                                            </IconButton>
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleOCP() }} color="primary" aria-label="add to shopping cart">
+                                                            <AddIcon fontSize="small" /> 
+                                                        </IconButton>
                                                         )
                                                     }
 

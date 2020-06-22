@@ -12,11 +12,13 @@ import pieBacklogByOwnerEvolutionReducer from "./Evolution/backlogByOwnerEvoluti
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
 import { categoriesReducer } from './Params/categoryReducer';
 import { servicesReducer } from './Params/serviceReducer';
+import { ticketAssignedOcpAnoReducer, ticketAssignedRunServiceAnoReducer } from './Anomaly/ticketAssignedAnoReducer';
 import { ApplicationBarReducer, ApplicationProjectCourtTrueReducer, ApplicationProjectCourtFalseReducer } from './Params/applicationReducer';
 import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekReducer';
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+
 
 
 const rootReducer = combineReducers({ 
@@ -30,6 +32,12 @@ const rootReducer = combineReducers({
     pieBacklogByOwnerAno:pieBacklogByOwnerAnoReducer,
     pieBacklogByOwnerSr:pieBacklogByOwnerSrReducer,
     pieBacklogByOwnerEvolution:pieBacklogByOwnerEvolutionReducer,
+
+    ticketAssignedOcpAno:ticketAssignedOcpAnoReducer,
+    ticketAssignedRunServiceAno:ticketAssignedRunServiceAnoReducer,
+
+
+
     // Params
     yearsIn:yearsInReducer,
     yearsOut:yearsOutReducer,
@@ -39,8 +47,7 @@ const rootReducer = combineReducers({
     weeks:weeksReducer,
     weeksIn:weeksInReducer,
     weeksOut:weeksOutReducer,   
-        /* Applications */
-        
+        /* Applications */  
     applications:ApplicationBarReducer,
     applicationsProjectCourtTrue:ApplicationProjectCourtTrueReducer,
     applicationsProjectCourtFalse:ApplicationProjectCourtFalseReducer,  

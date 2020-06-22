@@ -9,10 +9,24 @@ export const RESET_USER_INFO = 'RESET_USER_INFO';
 export const SUCCESS_CHARTANO = 'SUCCESS_CHARTANO';
 export const AWAITING_CHARTANO = 'AWAITING_CHARTANO';
 export const REJECTED_CHARTANO = 'REJECTED_CHARTANO';
+
     /* Backlog By Owner */
 export const SUCCESS_CHART_BACKLOG_BY_OWNER_ANO = 'SUCCESS_CHART_BACKLOG_BY_OWNER_ANO';
 export const AWAITING_CHART_BACKLOG_BY_OWNER_ANO = 'AWAITING_CHART_BACKLOG_BY_OWNER_ANO';
 export const REJECTED_CHART_BACKLOG_BY_OWNER_ANO = 'REJECTED_CHART_BACKLOG_BY_OWNER_ANO';
+
+    /* Ticket Assigned OCP */
+export const SUCCESS_CHART_TICKET_ASSIGNED_OCP_ANO = 'SUCCESS_CHART_TICKET_ASSIGNED_OCP_ANO';
+export const AWAITING_CHART_TICKET_ASSIGNED_OCP_ANO = 'AWAITING_CHART_TICKET_ASSIGNED_OCP_ANO';
+export const REJECTED_CHART_TICKET_ASSIGNED_OCP_ANO = 'REJECTED_CHART_TICKET_ASSIGNED_OCP_ANO';
+    /* Ticket Assigned Run Service */
+export const SUCCESS_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO = 'SUCCESS_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO';
+export const AWAITING_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO = 'AWAITING_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO';
+export const REJECTED_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO = 'REJECTED_CHART_TICKET_ASSIGNED_RUN_SERVICE_ANO';
+    /* Ticket Assigned Prestataire */
+export const SUCCESS_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO = 'SUCCESS_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO';
+export const AWAITING_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO = 'AWAITING_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO';
+export const REJECTED_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO = 'REJECTED_CHART_TICKET_ASSIGNED_PRESTATAIRE_ANO';
 
 
 // SR
@@ -35,7 +49,7 @@ export const AWAITING_CHART_BACKLOG_BY_OWNER_EVOLUTION = 'AWAITING_CHART_BACKLOG
 export const REJECTED_CHART_BACKLOG_BY_OWNER_EVOLUTION = 'REJECTED_CHART_BACKLOG_BY_OWNER_EVOLUTION';
 
 
-// Params
+// Start Params
     /* YearsIn */
 export const SUCCESS_YEARSIN = 'SUCCESS_YEARSIN';
 export const AWAITING_YEARSIN = 'AWAITING_YEARSIN';
@@ -81,7 +95,7 @@ export const REJECTED_APPLICATIONSPROJECTCOURTTRUE = 'REJECTED_APPLICATIONSPROJE
 export const SUCCESS_APPLICATIONSPROJECTCOURTFALSE = 'SUCCESS_APPLICATIONSPROJECTCOURTFALSE';
 export const AWAITING_APPLICATIONSPROJECTCOURTFALSE = 'AWAITING_APPLICATIONSPROJECTCOURTFALSE';
 export const REJECTED_APPLICATIONSPROJECTCOURTFALSE = 'REJECTED_APPLICATIONSPROJECTCOURTFALSE';  
-
+// End Params
 
 
 
@@ -120,6 +134,9 @@ export const APIS = {
     // BacklogByOwner
     getBacklogByOwner:'/api/BacklogByOwner',
 
+    // TicketAssigned
+    getTicketAssigned:'/api/TicketsAssigned',
+
     // Params
 
         /* Get Years */
@@ -135,12 +152,12 @@ export const APIS = {
         getCategories: '/api/Filters/GetCategories',
 
         /* Get Services */
-        getGetServices: '/api/Filters/GetServices',
+        getServices: '/api/Filters/GetServices',
 
         /* Get Applications */
-        getGetApplicationsBar: '/api/Filters/GetApplications',
-        getGetApplicationsProjectCourtTrue: '/api/Filters/GetApplications?projectCourt=true',
-        getGetApplicationsProjectCourtFalse: '/api/Filters/GetApplications?projectCourt=false',
+        getApplicationsBar: '/api/Filters/GetApplications',
+        getApplicationsProjectCourtTrue: '/api/Filters/GetApplications?projectCourt=true',
+        getApplicationsProjectCourtFalse: '/api/Filters/GetApplications?projectCourt=false',
 
            
 

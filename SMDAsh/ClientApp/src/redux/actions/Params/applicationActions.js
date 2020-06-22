@@ -10,7 +10,7 @@ export function getApplicationsBar() {
         type: constants.AWAITING_APPLICATIONSBAR,
       });
 
-      axios.get(constants.APIS.getGetApplicationsBar)
+      axios.get(constants.APIS.getApplicationsBar)
       .then(function(response){
 
         var arr = response.data;
@@ -38,7 +38,7 @@ export function getApplicationsProjectCourtTrue() {
         type: constants.AWAITING_APPLICATIONSPROJECTCOURTTRUE,
       });
 
-      axios.get(constants.APIS.getGetApplicationsProjectCourtTrue)
+      axios.get(constants.APIS.getApplicationsProjectCourtTrue)
       .then(function(response){
 
         var arr = response.data;
@@ -66,7 +66,7 @@ export function getApplicationsProjectCourtFalse() {
         type: constants.AWAITING_APPLICATIONSPROJECTCOURTFALSE,
       });
 
-      axios.get(constants.APIS.getGetApplicationsProjectCourtFalse)
+      axios.get(constants.APIS.getApplicationsProjectCourtFalse)
       .then(function(response){
 
         var arr = response.data;
