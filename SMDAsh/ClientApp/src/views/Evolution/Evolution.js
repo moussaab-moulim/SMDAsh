@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartEvolution from "components/Evolution/ChartEvolution";
 import BacklogByOwnerEvolution from "components/Evolution/BacklogByOwnerEvolution";
+import TicketAssignedEvolution from "components/Evolution/TicketAssignedEvolution";
 import 'chartjs-plugin-labels';
 
 
@@ -45,8 +46,11 @@ export default function Evolution() {
   const classes = useStyles();
   return (
     <div>
-      <ChartEvolution></ChartEvolution>
-      <BacklogByOwnerEvolution></BacklogByOwnerEvolution>
+
+      <ChartEvolution />
+      <BacklogByOwnerEvolution />
+      <TicketAssignedEvolution />
+
     </div>
   );
 }

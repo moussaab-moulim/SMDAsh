@@ -49,14 +49,9 @@ export default function Sr() {
     <div>
 
       <TicketAssignedSr />
-
-      {/*
-
-       <ChartSr />
+      <ChartSr />
       <BacklogByOwnerSr />
-       
-      */}
-     
+
     </div>
   );
 }

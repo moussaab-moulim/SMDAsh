@@ -19,6 +19,7 @@ import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekRedu
 import user from './auth/userReducer';
 import loading from './loadingReducer';
 import { ticketAssignedOcpSrReducer, ticketAssignedRunServiceSrReducer } from './SR/ticketAssignedSrReducer';
+import { ticketAssignedOcpEvolutionReducer, ticketAssignedRunServiceEvolutionReducer } from './Evolution/ticketAssignedEvolutionReducer';
 
 
 
@@ -40,6 +41,9 @@ const rootReducer = combineReducers({
         /* Service Request */
     ticketAssignedOcpSr:ticketAssignedOcpSrReducer,
     ticketAssignedRunServiceSr:ticketAssignedRunServiceSrReducer,
+        /* Evolution */
+    ticketAssignedOcpEvolution:ticketAssignedOcpEvolutionReducer,
+    ticketAssignedRunServiceEvolution:ticketAssignedRunServiceEvolutionReducer,
 
 
     // Params
