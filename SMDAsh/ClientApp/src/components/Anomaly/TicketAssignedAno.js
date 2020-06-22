@@ -8,7 +8,8 @@ import {
     getServices
 } from '../../redux/actions/Params/serviceActions';
 import {
-    getTicketAssignedOcpAnomaly
+    getTicketAssignedOcpAnomaly,
+    getTicketAssignedRunServiceAnomaly,
 } from '../../redux/actions/Anomaly/TicketAssignedAnoActions';
 
 import { getYearsIn } from '../../redux/actions/Params/yearActions';
@@ -144,10 +145,13 @@ export default function TicketAssignedAno() {
     const [totalRS, setTotalRS] = useState(0);
 
     const [seeMoreOCP, setSeeMoreOCP] = useState(false);
-    const [seeLessOcp, setSeeLessOcp] = useState(false);
+    const [seeMoreRS, setSeeMoreRS] = useState(false);
 
     const toggleOCP = () => {
         setSeeMoreOCP(!seeMoreOCP);
+    }
+    const toggleRS = () => {
+        setSeeMoreRS(!seeMoreRS);
     }
 
 
@@ -157,17 +161,17 @@ export default function TicketAssignedAno() {
 
             dispatch(getServices());
             dispatch(getTicketAssignedOcpAnomaly());
+            dispatch(getTicketAssignedRunServiceAnomaly());
             setReloadData(false);
 
         }
-
         if (!chartTicketAssignedOcpState.loading && chartTicketAssignedOcpState.dataTable.length > 0) {
 
             orginizeData();
 
         }
 
-    }, [chartTicketAssignedOcpState.loading]);
+    }, [chartTicketAssignedOcpState.loading, chartTicketAssignedRunServiceState.loading]);
 
 
 
@@ -218,6 +222,15 @@ export default function TicketAssignedAno() {
         }
         if (serviceRunService.length) {
             console.log("RS");
+            const dataRS = chartTicketAssignedRunServiceState.dataTable;
+
+            for (let i = 0; i < dataRS.length; i++) {
+                labelsRS.push(dataRS[i].application)
+                countsRS.push(dataRS[i].count)
+                dataTableRS.push(dataRS[i])
+
+                backgroundColorRS.push(dynamicColors());
+            }
         }
 
 
@@ -337,20 +350,20 @@ export default function TicketAssignedAno() {
                                                     seeMoreOCP ?
 
                                                         <TableRow href="" className={classes.paddingTable} onClick={() => { toggleOCP() }}>
-                                                            
-                                                                <TableCell align="right"><b>See Less</b></TableCell>
-                                                                <TableCell align="left">
-                                                                    <KeyboardArrowUpIcon fontSize="small" />
-                                                                </TableCell>
-                                                            
+
+                                                            <TableCell align="right"><b>See Less</b></TableCell>
+                                                            <TableCell align="left">
+                                                                <KeyboardArrowUpIcon fontSize="small" />
+                                                            </TableCell>
+
 
                                                         </TableRow>
                                                         :
                                                         <TableRow href="" className={classes.paddingTable} onClick={() => { toggleOCP() }}>
-                                                            
-                                                                <TableCell align="right"><b>See More</b></TableCell>
-                                                                <TableCell align="left"><b>...</b></TableCell>
-                                                            
+
+                                                            <TableCell align="right"><b>See More</b></TableCell>
+                                                            <TableCell align="left"><b>...</b></TableCell>
+
 
                                                         </TableRow>
                                                 }
@@ -434,6 +447,179 @@ export default function TicketAssignedAno() {
 
 
 
+
+                                </CardBody>
+
+                            </Card>
+
+                        </Grid>
+
+                    </GridContainer>
+                    : null
+            }
+
+            {
+                chartTicketAssignedRunServiceState.dataTable.length ?
+                    <GridContainer>
+                        <Grid item xs={12} sm={12} md={4} >
+                            <Card className={classes.card}>
+
+                                {chartDataRS.loading ? <SpinnerChart /> : null}
+                                <CardBody>
+                                    <Grid item
+                                        xs={12}
+                                        sm={12}
+                                        md={12}
+                                        container
+                                        direction='row'
+                                        justify='space-between'
+                                        alignItems='center'
+                                    >
+
+                                        <Button
+                                            variant='contained'
+                                            className={classes.buttonTealColor + ' ' + classes.btn}
+                                        >
+                                            <TableChartIcon className={classes.buttonicon} />
+                                 Table PNG
+                                </Button>
+
+                                    </Grid>
+
+                                    <TableContainer component={Paper} >
+                                        <Table className={classes.table} aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>Owner</TableCell>
+                                                    <TableCell >Count Of Status</TableCell>
+
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+
+                                                {seeMoreRS ? (
+                                                    chartTableRunService.map((row) => (
+
+                                                        <TableRow className={classes.paddingTable}>
+
+                                                            <TableCell align="left">{row.application}</TableCell>
+                                                            <TableCell align="left">{row.count}</TableCell>
+
+                                                        </TableRow>
+                                                    ))
+
+                                                )
+                                                    :
+                                                    (
+                                                        chartTableRunService.slice(0, 10).map((row) => (
+
+                                                            <TableRow className={classes.paddingTable}>
+
+                                                                <TableCell align="left">{row.application}</TableCell>
+                                                                <TableCell align="left">{row.count}</TableCell>
+
+                                                            </TableRow>
+                                                        ))
+
+                                                    )
+
+
+
+                                                }
+
+                                                {
+                                                    seeMoreRS ?
+
+                                                        <TableRow href="" className={classes.paddingTable} onClick={() => { toggleRS() }}>
+
+                                                            <TableCell align="right"><b>See Less</b></TableCell>
+                                                            <TableCell align="left">
+                                                                <KeyboardArrowUpIcon fontSize="small" />
+                                                            </TableCell>
+
+
+                                                        </TableRow>
+                                                        :
+                                                        <TableRow href="" className={classes.paddingTable} onClick={() => { toggleRS() }}>
+
+                                                            <TableCell align="right"><b>See More</b></TableCell>
+                                                            <TableCell align="left"><b>...</b></TableCell>
+
+
+                                                        </TableRow>
+                                                }
+
+
+
+
+
+
+
+                                                <TableRow >
+                                                    <TableCell align="left"><b>Total :</b></TableCell>
+                                                    <TableCell style={{
+                                                        color: '#008080'
+
+                                                    }} align="left"><b>{totalRS}</b></TableCell>
+                                                </TableRow>
+
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+
+                                </CardBody>
+
+                            </Card>
+
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={8} >
+                            <Card className={classes.card}>
+                                {chartDataOCP.loading ? <SpinnerChart /> : null}
+                                <CardBody>
+                                    <Grid
+
+                                        container
+                                        direction='row'
+                                        justify='flex-end'
+                                        alignItems='left'
+                                    >
+                                        <Button
+                                            variant='contained'
+                                            className={classes.buttonTealColor + ' ' + classes.btn}
+                                        >
+                                            <GetAppIcon className={classes.buttonicon} />
+                Chart PNG
+              </Button>
+                                    </Grid>
+
+                                    <Pie height="196" data={chartDataRS} options={{
+                                        plugins: {
+                                            labels: {
+                                                render: 'value',
+                                                fontSize: 13,
+
+                                                fontColor: '#000',
+                                                fontFamily: '"Lucida Console", Monaco, monospace'
+                                            },
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Ticket Assigned To Run Service',
+                                            fontSize: 20,
+                                        },
+                                        responsive: true,
+                                        cutoutPercentage: 50,
+                                        legend: {
+                                            display: true,
+                                            position: 'bottom',
+                                            labels: {
+                                                fontSize: 9,
+                                                usePointStyle: true
+                                            },
+                                        },
+
+                                    }} />
 
                                 </CardBody>
 
