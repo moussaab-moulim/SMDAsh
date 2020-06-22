@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 // core components
 import ChartSr from "components/SR/ChartSr";
 import BacklogByOwnerSr from "components/SR/BacklogByOwnerSr";
+import TicketAssignedSr from "components/SR/TicketAssignedSr";
+
 import 'chartjs-plugin-labels';
 
 
@@ -45,10 +47,16 @@ export default function Sr() {
   const classes = useStyles();
   return (
     <div>
-      
-      <ChartSr></ChartSr>
-      <BacklogByOwnerSr></BacklogByOwnerSr>
-      
+
+      <TicketAssignedSr />
+
+      {/*
+
+       <ChartSr />
+      <BacklogByOwnerSr />
+       
+      */}
+     
     </div>
   );
 }

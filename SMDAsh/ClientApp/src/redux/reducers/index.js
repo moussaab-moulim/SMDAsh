@@ -18,6 +18,7 @@ import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekRedu
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+import { ticketAssignedOcpSrReducer, ticketAssignedRunServiceSrReducer } from './SR/ticketAssignedSrReducer';
 
 
 
@@ -33,9 +34,12 @@ const rootReducer = combineReducers({
     pieBacklogByOwnerSr:pieBacklogByOwnerSrReducer,
     pieBacklogByOwnerEvolution:pieBacklogByOwnerEvolutionReducer,
 
+        /* Anomaly */
     ticketAssignedOcpAno:ticketAssignedOcpAnoReducer,
     ticketAssignedRunServiceAno:ticketAssignedRunServiceAnoReducer,
-
+        /* Service Request */
+    ticketAssignedOcpSr:ticketAssignedOcpSrReducer,
+    ticketAssignedRunServiceSr:ticketAssignedRunServiceSrReducer,
 
 
     // Params

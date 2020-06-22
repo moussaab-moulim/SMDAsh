@@ -46,12 +46,11 @@ export default function Anomaly() {
   const classes = useStyles();
   return (
     <div>
-        <TicketAssignedAno/>
-        {/*
-        <ChartAno></ChartAno>
-        <TicketAssignedAno></TicketAssignedAno>
-        */}
-      
+       
+        <ChartAno />
+        <BacklogByOwnerAno />
+        <TicketAssignedAno/> 
+  
     </div>
   );
 }
