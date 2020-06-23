@@ -48,9 +48,9 @@ export default function Sr() {
   return (
     <div>
 
-      <TicketAssignedSr />
       <ChartSr />
       <BacklogByOwnerSr />
+      <TicketAssignedSr />
 
     </div>
   );

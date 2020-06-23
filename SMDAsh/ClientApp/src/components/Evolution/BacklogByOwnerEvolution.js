@@ -498,6 +498,12 @@ export default function BacklogByOwnerEvolution() {
                                     fontSize: 20,
                                 },
                                 responsive: true,
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        usePointStyle: true
+                                    },
+                                },
                             }} />
 
 

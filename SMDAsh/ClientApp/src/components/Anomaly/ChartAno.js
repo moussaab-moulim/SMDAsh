@@ -386,12 +386,6 @@ const mapStateToProps = state => {
 const mapDispatchtoProps = (dispatch) => {
   return {
     getBacklogAnomalyOneMonth: () => dispatch(getBacklogAnomalyOneMonth()),
-    /*
-    getBacklogAnomalySixMonth: () => dispatch(getBacklogAnomalySixMonth()),
-    getBacklogAnomalyThreeMonth: () => dispatch(getBacklogAnomalyThreeMonth()),
-    getBacklogAnomalyOneYear: () => dispatch(getBacklogAnomalyOneYear()),
-    getBacklogAnomalyAll: () => dispatch(getBacklogAnomalyAll()),
-    */
   }
 }
 
