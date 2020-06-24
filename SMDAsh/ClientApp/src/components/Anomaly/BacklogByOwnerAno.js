@@ -118,7 +118,6 @@ const initialChartState = {
 
 export default function BacklogByOwnerAno() {
 
-
     const [chartData, setChartData] = useState(initialChartState);
 
     const dispatch = useDispatch();
@@ -126,7 +125,6 @@ export default function BacklogByOwnerAno() {
     const [yearsIn, setYearsIn] = useState(yearsInState.dataTable);
 
     const chartState = useSelector((state) => state.pieBacklogByOwnerAno, []) || [];
-    
 
     const [year, setYear] = useState('all');
 

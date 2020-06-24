@@ -5,11 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import ChartAno from "components/Anomaly/ChartAno";
 import BacklogByOwnerAno from "components/Anomaly/BacklogByOwnerAno";
 import TicketAssignedAno from "components/Anomaly/TicketAssignedAno";
+import SlaByProjectAno from "components/Anomaly/SlaByProjectAno";
 import 'chartjs-plugin-labels';
 
 
 const useStyles = makeStyles((theme) => ({
- 
+
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
       color: "rgba(255,255,255,.62)",
@@ -46,11 +47,12 @@ export default function Anomaly() {
   const classes = useStyles();
   return (
     <div>
-       
-        <ChartAno />
-        <BacklogByOwnerAno />
-        <TicketAssignedAno/> 
-  
+
+      <ChartAno />
+      <BacklogByOwnerAno />
+      <TicketAssignedAno />
+      <SlaByProjectAno />
+      
     </div>
   );
 }

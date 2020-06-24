@@ -20,16 +20,13 @@ import GridContainer from 'components/Grid/GridContainer.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
-import { IconButton, Button } from '@material-ui/core';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import { ToggleButtonGroup } from '@material-ui/lab';
+import { Button } from '@material-ui/core';
+
 import GetAppIcon from '@material-ui/icons/GetApp';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
 
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -39,10 +36,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
 
 import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
 
