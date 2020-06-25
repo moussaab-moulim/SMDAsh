@@ -11,7 +11,8 @@ import pieBacklogByOwnerEvolutionReducer from "./Evolution/backlogByOwnerEvoluti
 import { ticketAssignedOcpSrReducer, ticketAssignedRunServiceSrReducer } from './SR/ticketAssignedSrReducer';
 import { ticketAssignedOcpEvolutionReducer, ticketAssignedRunServiceEvolutionReducer } from './Evolution/ticketAssignedEvolutionReducer';
 
-import { slaByProjectYearOutAnoReducer } from './Anomaly/SlaByProjectAnoReducer';
+import { slaByProjectYearOutAnoReducer } from './Anomaly/slaByProjectAnoReducer';
+import { slaByProjectYearOutSrReducer } from './SR/slaByProjectSrReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
@@ -23,6 +24,7 @@ import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekRedu
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+
 
 
 
@@ -48,8 +50,11 @@ const rootReducer = combineReducers({
     ticketAssignedOcpEvolution:ticketAssignedOcpEvolutionReducer,
     ticketAssignedRunServiceEvolution:ticketAssignedRunServiceEvolutionReducer,
     
+
         /* Anomaly */
     slaByProjectYearOutAno:slaByProjectYearOutAnoReducer,
+        /* Service Request */
+    slaByProjectYearOutSr:slaByProjectYearOutSrReducer,
 
 
     // Params

@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     getSlaByProjectYearOutAnomaly
 } from '../../redux/actions/Anomaly/SlaByProjectAnoAction';
+import {
+    getSlaByProjectYearOutSr
+} from '../../redux/actions/SR/SlaByProjectSrAction';
 
 import { getYearsOut } from '../../redux/actions/Params/yearActions';
 
@@ -140,9 +143,12 @@ export default function SlaByProjectYearOut(props) {
     const [chartTable, setChartTable] = useState([]);
 
     const ano = useSelector((state) => state.slaByProjectYearOutAno, []) || [];
+    const sr = useSelector((state) => state.slaByProjectYearOutSr, []) || [];
 
     if(props.categorie == "anomalie"){
         chartState = ano;
+    }else if(props.categorie == "sr"){
+        chartState = sr;
     }
     
 
@@ -159,6 +165,8 @@ export default function SlaByProjectYearOut(props) {
             dispatch(getYearsOut());
             if(props.categorie == "anomalie"){
                 dispatch(getSlaByProjectYearOutAnomaly(props.categorie, year));
+            }else if(props.categorie == "sr"){
+                dispatch(getSlaByProjectYearOutSr(props.categorie, year));
             }else{
                 toast(<Alert severity="error">The category to use on the graphic SLA does not exist !</Alert>, { autoClose: 10000 }) 
             }
@@ -356,7 +364,6 @@ export default function SlaByProjectYearOut(props) {
                                 responsive: true,
                                 legend: {
                                     display: true,
-                                    position: "right",
                                     labels: {
                                         usePointStyle: true
                                     },
