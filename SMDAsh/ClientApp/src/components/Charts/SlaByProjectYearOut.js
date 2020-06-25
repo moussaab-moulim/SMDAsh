@@ -9,7 +9,7 @@ import { getSlaByProjectYearOutSr } from '../../redux/actions/SR/SlaByProjectSrA
 import { getSlaByProjectYearOutEvolution } from '../../redux/actions/Evolution/SlaByProjectEvolutionAction';
 
 import { getYearsOut } from '../../redux/actions/Params/yearActions';
-
+import { getWeeksOut } from '../../redux/actions/Params/weekActions';
 
 
 // core components
@@ -132,10 +132,15 @@ export default function SlaByProjectYearOut(props) {
     const classes = useStyles();
 
     const yearsOutState = useSelector((state) => state.yearsOut, []) || [];
+    const weeksOutState = useSelector((state) => state.weeksOut, []) || [];
+
     const [yearsOut, setYearsOut] = useState(yearsOutState.dataTable);
+    const [weeksOut, setWeeksOut] = useState(weeksOutState.dataTable);
+
+    const [year, setYear] = useState('all');
+    const [week, setWeek] = useState('all');
 
     const [reloardData, setReloadData] = useState(false);
-    const [year, setYear] = useState('all');
     const [total, setTotal] = useState(0);
     const [chartTable, setChartTable] = useState([]);
 
@@ -154,6 +159,11 @@ export default function SlaByProjectYearOut(props) {
 
     const handleChangeYears = (event) => {
         setYear(event.target.value);
+        setWeek("all");
+        setReloadData((prevState) => { return !prevState });
+    };
+    const handleChangeWeeks = (event) => {
+        setWeek(event.target.value);
         setReloadData((prevState) => { return !prevState });
     };
 
@@ -161,17 +171,21 @@ export default function SlaByProjectYearOut(props) {
 
     useEffect(() => {
 
-        if (chartState.loading || yearsOutState.loading || reloardData) {
+        if (chartState.loading || yearsOutState.loading || weeksOutState.loading || reloardData) {
+
             dispatch(getYearsOut());
+            dispatch(getWeeksOut());
+
             if(props.categorie == "anomalie"){
-                dispatch(getSlaByProjectYearOutAnomaly(props.categorie, year));
+                dispatch(getSlaByProjectYearOutAnomaly(props.categorie, year, week));
             }else if(props.categorie == "sr"){
-                dispatch(getSlaByProjectYearOutSr(props.categorie, year));
+                dispatch(getSlaByProjectYearOutSr(props.categorie, year, week));
             }else if(props.categorie == "evolution"){
-                dispatch(getSlaByProjectYearOutEvolution(props.categorie, year));
+                dispatch(getSlaByProjectYearOutEvolution(props.categorie, year, week));
             }else{
                 toast(<Alert severity="error">The category to use on the graphic SLA does not exist !</Alert>, { autoClose: 10000 }) 
             }
+
             setReloadData(false);
         }
 
@@ -179,12 +193,13 @@ export default function SlaByProjectYearOut(props) {
         if (!chartState.loading && chartState.dataTable.length > 0) {
 
             orginizeData();
-            setYearsOut(yearsOutState.dataTable);
+            setYearsOut(yearsOutState.dataTable.slice().sort((a,b)=>a.yearOut-b.yearOut));
+            setWeeksOut(weeksOutState.dataTable.slice().sort((a,b)=>a.weekOut-b.weekOut));
 
         }
 
 
-    }, [chartState.loading, year]);
+    }, [chartState.loading, year, week]);
 
 
     const orginizeData = () => {
@@ -221,8 +236,7 @@ export default function SlaByProjectYearOut(props) {
         backgroundColor.push("rgb(0,128,255)");
         counts.push(ok);
         dataTable.push({ "title":"OK", "value": ok });
-        console.log(dataTable);
-
+       
         const newChartData = {
             datasets: [{
                 data: counts,
@@ -241,7 +255,7 @@ export default function SlaByProjectYearOut(props) {
 
     return (
         <div> 
-        {chartState.dataTable.length > 0?  <GridContainer>
+        <GridContainer>
                 <Grid item xs={12} sm={12} md={4} >
                     <Card className={classes.card}>
                         {chartState.loading ? <SpinnerChart /> : null}
@@ -257,14 +271,26 @@ export default function SlaByProjectYearOut(props) {
                             >
 
                                 <Button
-                                    variant='contained' style={{ marginTop: 25 }}
+                                    variant='contained' 
                                     className={classes.buttonTealColor + ' ' + classes.btn}
                                 >
                                     <TableChartIcon className={classes.buttonicon} />
                                  Table PNG
                                 </Button>
 
-                                <FormControl className={classes.formControl} style={{ minWidth: 120 }}>
+                               
+
+                            </Grid>
+                            <Grid 
+                                item
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                container
+                                direction='row'
+                                justify='space-between'
+                                alignItems='center'>
+                            <FormControl className={classes.formControl} style={{ minWidth: 120 }}>
                                     <InputLabel id="demo-simple-select-helper-label">Year</InputLabel>
                                     <Select
                                         labelId="demo-simple-select-helper-label"
@@ -285,6 +311,26 @@ export default function SlaByProjectYearOut(props) {
                                     </Select>
                                 </FormControl>
 
+                                <FormControl className={classes.formControl} style={{ minWidth: 120 }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Week</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-helper-label"
+                                        id="demo-simple-select-helper"
+                                        value={week}
+                                        onChange={handleChangeWeeks}
+                                    >
+                                        <MenuItem value="all">
+                                            <em>All</em>
+                                        </MenuItem>
+                                       
+                                        {
+                                            weeksOut.map((row) => (
+                                                <MenuItem value={row.weekOut}>{row.weekOut}</MenuItem>
+                                            ))
+                                        }
+
+                                    </Select>
+                                </FormControl>
                             </Grid>
 
                             <TableContainer component={Paper}>
@@ -298,7 +344,6 @@ export default function SlaByProjectYearOut(props) {
                                     </TableHead>
                                     <TableBody>
 
-                                   
                                         {
                                             chartTable.map((row) => (
                                                 <TableRow>
@@ -346,41 +391,41 @@ export default function SlaByProjectYearOut(props) {
               </Button>
                             </Grid>
 
-                            <Pie data={chartData} options={{
-                                plugins: {
-                                    labels: {
+                        {chartState.dataTable.length > 0? 
+                          <Pie data={chartData} options={{
+                            plugins: {
+                                labels: {
 
-                                        render: 'value',
-                                        fontSize: 12,
+                                    render: 'value',
+                                    fontSize: 12,
 
-                                        fontColor: '#000',
-                                        fontFamily: '"Lucida Console", Monaco, monospace'
-                                    },
+                                    fontColor: '#000',
+                                    fontFamily: '"Lucida Console", Monaco, monospace'
                                 },
-                                title: {
-                                    display: true,
-                                    text: year=='all'? 'SLA All Years': 'SLA Of The Year '+year,
-                                    fontSize: 20,
+                            },
+                            title: {
+                                display: true,
+                                text: year=='all'? (week=='all'? 'SLA All Years' :'SLA All Years, Week '+week): 'SLA Of The Year '+year+', Week '+week,
+                                fontSize: 20,
+                            },
+                            responsive: true,
+                            legend: {
+                                display: true,
+                                labels: {
+                                    usePointStyle: true
                                 },
-                                responsive: true,
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        usePointStyle: true
-                                    },
-                                },
-                            }} />
+                            },
+                        }} />
+                        : <h5> SLA By Year/Week <span style={{color:"red", fontSize:15}}> (Data Not Exist !) </span></h5>
 
-
-
+                        }
+       
                         </CardBody>
 
                     </Card>
 
                 </Grid>
             </GridContainer>
-      : null}
-          
             </div >
     );
 }
