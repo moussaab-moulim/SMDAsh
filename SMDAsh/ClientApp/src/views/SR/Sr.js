@@ -48,11 +48,10 @@ export default function Sr() {
   const classes = useStyles();
   return (
     <div>
-{/*
- <ChartSr />
+
+      <ChartSr />
       <BacklogByOwnerSr />
       <TicketAssignedSr />
-*/}
       <SlaByProjectSr />
 
     </div>

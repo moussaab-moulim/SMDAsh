@@ -13,6 +13,7 @@ import { ticketAssignedOcpEvolutionReducer, ticketAssignedRunServiceEvolutionRed
 
 import { slaByProjectYearOutAnoReducer } from './Anomaly/slaByProjectAnoReducer';
 import { slaByProjectYearOutSrReducer } from './SR/slaByProjectSrReducer';
+import { slaByProjectYearOutEvolutionReducer } from './Evolution/slaByProjectEvolutionReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
@@ -24,6 +25,7 @@ import { weeksReducer, weeksInReducer, weeksOutReducer } from './Params/weekRedu
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+
 
 
 
@@ -55,6 +57,8 @@ const rootReducer = combineReducers({
     slaByProjectYearOutAno:slaByProjectYearOutAnoReducer,
         /* Service Request */
     slaByProjectYearOutSr:slaByProjectYearOutSrReducer,
+        /* Evolution */
+    slaByProjectYearOutEvolution:slaByProjectYearOutEvolutionReducer,
 
 
     // Params

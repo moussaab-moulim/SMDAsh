@@ -4,12 +4,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Pie } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    getSlaByProjectYearOutAnomaly
-} from '../../redux/actions/Anomaly/SlaByProjectAnoAction';
-import {
-    getSlaByProjectYearOutSr
-} from '../../redux/actions/SR/SlaByProjectSrAction';
+import { getSlaByProjectYearOutAnomaly } from '../../redux/actions/Anomaly/SlaByProjectAnoAction';
+import { getSlaByProjectYearOutSr } from '../../redux/actions/SR/SlaByProjectSrAction';
+import { getSlaByProjectYearOutEvolution } from '../../redux/actions/Evolution/SlaByProjectEvolutionAction';
 
 import { getYearsOut } from '../../redux/actions/Params/yearActions';
 
@@ -144,11 +141,14 @@ export default function SlaByProjectYearOut(props) {
 
     const ano = useSelector((state) => state.slaByProjectYearOutAno, []) || [];
     const sr = useSelector((state) => state.slaByProjectYearOutSr, []) || [];
+    const evolution = useSelector((state) => state.slaByProjectYearOutEvolution, []) || [];
 
     if(props.categorie == "anomalie"){
         chartState = ano;
     }else if(props.categorie == "sr"){
         chartState = sr;
+    }else if(props.categorie == "evolution"){
+        chartState = evolution;
     }
     
 
@@ -167,6 +167,8 @@ export default function SlaByProjectYearOut(props) {
                 dispatch(getSlaByProjectYearOutAnomaly(props.categorie, year));
             }else if(props.categorie == "sr"){
                 dispatch(getSlaByProjectYearOutSr(props.categorie, year));
+            }else if(props.categorie == "evolution"){
+                dispatch(getSlaByProjectYearOutEvolution(props.categorie, year));
             }else{
                 toast(<Alert severity="error">The category to use on the graphic SLA does not exist !</Alert>, { autoClose: 10000 }) 
             }
@@ -239,8 +241,7 @@ export default function SlaByProjectYearOut(props) {
 
     return (
         <div> 
-        
-           <GridContainer>
+        {chartState.dataTable.length > 0?  <GridContainer>
                 <Grid item xs={12} sm={12} md={4} >
                     <Card className={classes.card}>
                         {chartState.loading ? <SpinnerChart /> : null}
@@ -378,7 +379,8 @@ export default function SlaByProjectYearOut(props) {
 
                 </Grid>
             </GridContainer>
-     
+      : null}
+          
             </div >
     );
 }
