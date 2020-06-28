@@ -80,27 +80,35 @@ namespace SMDAsh.Controllers
             return Ok(query);
 
         }
-        [HttpGet("[action]/{InOrOut}")]
-        public ActionResult<IQueryable> GetWeeks(string InOrOut)
+        [HttpGet("[action]/{year}")]
+        public ActionResult<IQueryable> GetWeeks(string year, string InOrOut="In")
         {
             IQueryable query = null;
             if (InOrOut.Equals("In", StringComparison.OrdinalIgnoreCase))
             {
                 query = (from t in _context.Tickets
-                         select new { t.WeekIn })
+                         where t.YearIn.Contains((year.Equals("all") ? "" : year))
+                         && t.YearIn != ""
+                         select new { t.YearIn, WeekIn = Int16.Parse(t.WeekIn) })
                           .ToList()
-                          .Distinct()
-                          .OrderBy(t => t.WeekIn).AsQueryable();
+                          .GroupBy(x => x.WeekIn).Select(x => x.FirstOrDefault())
+                          .OrderBy(t => t.YearIn).ThenBy(t => t.WeekIn).AsQueryable();
 
             }
             else if (InOrOut.Equals("Out", StringComparison.OrdinalIgnoreCase))
             {
                 query = (from t in _context.Tickets
-                         select new { t.WeekOut })
+                             where t.YearOut.Contains((year.Equals("all") ? "" : year))
+                             && t.YearOut != ""
+                             select new { t.YearOut, WeekOut = Int16.Parse(t.WeekOut) })
                           .ToList()
-                          .Distinct()
-                          .OrderBy(t => t.WeekOut).AsQueryable();
+                          .GroupBy(x => x.WeekOut).Select(x => x.FirstOrDefault())
+                          .OrderBy(t => t.YearOut).ThenBy(t => t.WeekOut).AsQueryable();
 
+            }
+            else
+            {
+                BadRequest("wrong parameter");
             }
 
 
