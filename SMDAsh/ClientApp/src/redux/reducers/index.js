@@ -14,6 +14,7 @@ import { ticketAssignedOcpEvolutionReducer, ticketAssignedRunServiceEvolutionRed
 import { slaByProjectYearOutAnoReducer } from './Anomaly/slaByProjectAnoReducer';
 import { slaByProjectYearOutSrReducer } from './SR/slaByProjectSrReducer';
 import { slaByProjectYearOutEvolutionReducer } from './Evolution/slaByProjectEvolutionReducer';
+import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from "./Params/yearReducer";
@@ -30,6 +31,7 @@ import loading from './loadingReducer';
 
 
 
+
 const rootReducer = combineReducers({ 
     user, 
     loading,
@@ -41,6 +43,9 @@ const rootReducer = combineReducers({
     pieBacklogByOwnerAno:pieBacklogByOwnerAnoReducer,
     pieBacklogByOwnerSr:pieBacklogByOwnerSrReducer,
     pieBacklogByOwnerEvolution:pieBacklogByOwnerEvolutionReducer,
+
+        /* Digi Self */
+    backlogInOutDaysDS:backlogInOutDaysDSReducer,
 
         /* Anomaly */
     ticketAssignedOcpAno:ticketAssignedOcpAnoReducer,
