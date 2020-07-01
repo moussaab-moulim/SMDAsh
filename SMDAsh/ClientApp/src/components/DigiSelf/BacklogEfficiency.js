@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
-
+//Merge to haitam_DigiSelf_Branch
 
   import {
     getBacklogDigiSelfOneWeek,
