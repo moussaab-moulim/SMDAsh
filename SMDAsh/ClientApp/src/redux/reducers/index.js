@@ -42,6 +42,7 @@ import {
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
+import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
 
 const rootReducer = combineReducers({
   user,
@@ -54,6 +55,8 @@ const rootReducer = combineReducers({
   pieBacklogByOwnerAno: pieBacklogByOwnerAnoReducer,
   pieBacklogByOwnerSr: pieBacklogByOwnerSrReducer,
   pieBacklogByOwnerEvolution: pieBacklogByOwnerEvolutionReducer,
+  /* DigiSelf */
+  backlogInOutDaysDS:backlogInOutDaysDSReducer,
 
   /* Anomaly */
   ticketAssignedOcpAno: ticketAssignedOcpAnoReducer,

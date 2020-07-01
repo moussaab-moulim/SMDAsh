@@ -158,34 +158,35 @@ export const COLOR_RED = '#d44320';
 
 export const APIS = {
     // Anomalie Backlog
-    getBacklogAnomalyOneMonth: '/api/GetBacklog/anomalie?take=4',
-    getBacklogAnomalyThreeMonth: '/api/GetBacklog/anomalie?take=13',
-    getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie?take=26',
-    getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie?take=52',
-    getBacklogAnomalyAll: '/api/GetBacklog/anomalie',
+    getBacklogAnomalyOneMonth: '/api/GetBacklog/anomalie/all/all?take=4',
+    getBacklogAnomalyThreeMonth: '/api/GetBacklog/anomalie/all/all?take=13',
+    getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie/all/all?take=26',
+    getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie/all/all?take=52',
+    getBacklogAnomalyAll: '/api/GetBacklog/anomalie/all/all',
+   
 
     // DigiSelf Backlog
-    getBacklogDigiSelfOneWeek: '/api/GetBacklog/anomalie?take=4',
-    getBacklogDigiSelfOneMonth: '/api/GetBacklog/anomalie?take=13',
-    getBacklogDigiSelfThreeMonth: '/api/GetBacklog/anomalie?take=26',
-    getBacklogDigiSelfOneYear: '/api/GetBacklog/anomalie?take=52',
-    getBacklogDigiSelfAll: '/api/GetBacklog/anomalie',
+    getBacklogDigiSelfOneWeek: '/api/GetBacklog/all/all/all?ByDay=true&take=5',
+    getBacklogDigiSelfOneMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=20',
+    getBacklogDigiSelfThreeMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=60',
+    getBacklogDigiSelfOneYear: '/api/GetBacklog/all/all/all?ByDay=true&take=240',
+    getBacklogDigiSelfAll: '/api/GetBacklog/all/all/all',
     
 
     // SR Backlog
-    getBacklogSrOneMonth: '/api/GetBacklog/sr?take=4',
-    getBacklogSrThreeMonth: '/api/GetBacklog/sr?take=13',
-    getBacklogSrSixMonth: '/api/GetBacklog/sr?take=26',
-    getBacklogSrOneYear: '/api/GetBacklog/sr?take=52',
-    getBacklogSrAll: '/api/GetBacklog/sr',
+    getBacklogSrOneMonth: '/api/GetBacklog/sr/all/all?take=4',
+    getBacklogSrThreeMonth: '/api/GetBacklog/sr/all/all?take=13',
+    getBacklogSrSixMonth: '/api/GetBacklog/sr/all/all?take=26',
+    getBacklogSrOneYear: '/api/GetBacklog/sr/all/all?take=52',
+    getBacklogSrAll: '/api/GetBacklog/sr/all/all',
     
 
     // Evolution Backlog
-    getBacklogEvolutionOneMonth: '/api/GetBacklog/evolution?take=4',
-    getBacklogEvolutionThreeMonth: '/api/GetBacklog/evolution?take=13',
-    getBacklogEvolutionSixMonth: '/api/GetBacklog/evolution?take=26',
-    getBacklogEvolutionOneYear: '/api/GetBacklog/evolution?take=52',
-    getBacklogEvolutionAll: '/api/GetBacklog/sr',
+    getBacklogEvolutionOneMonth: '/api/GetBacklog/evolution/all/all?take=4',
+    getBacklogEvolutionThreeMonth: '/api/GetBacklog/evolution/all/all?take=13',
+    getBacklogEvolutionSixMonth: '/api/GetBacklog/evolution/all/all?take=26',
+    getBacklogEvolutionOneYear: '/api/GetBacklog/evolution/all/all?take=52',
+    getBacklogEvolutionAll: '/api/GetBacklog/evolution/all/all',
 
     // BacklogByOwner
     getBacklogByOwner:'/api/BacklogByOwner',
