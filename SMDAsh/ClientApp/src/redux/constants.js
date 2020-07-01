@@ -5,6 +5,14 @@ export const SET_USER_INFO = 'SET_USER_INFO';
 export const TOGGLE_LOADER = 'TOGGLE_LOADER';
 export const RESET_USER_INFO = 'RESET_USER_INFO';
 
+
+// DigiSelf
+    /* Backlog by days */
+export const SUCCESS_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'SUCCESS_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
+export const AWAITING_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'AWAITING_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
+export const REJECTED_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'REJECTED_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
+
+
 // Anomaly 
 export const SUCCESS_CHARTANO = 'SUCCESS_CHARTANO';
 export const AWAITING_CHARTANO = 'AWAITING_CHARTANO';
@@ -155,6 +163,13 @@ export const APIS = {
     getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie?take=26',
     getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie?take=52',
     getBacklogAnomalyAll: '/api/GetBacklog/anomalie',
+
+    // DigiSelf Backlog
+    getBacklogDigiSelfOneWeek: '/api/GetBacklog/anomalie?take=4',
+    getBacklogDigiSelfOneMonth: '/api/GetBacklog/anomalie?take=13',
+    getBacklogDigiSelfThreeMonth: '/api/GetBacklog/anomalie?take=26',
+    getBacklogDigiSelfOneYear: '/api/GetBacklog/anomalie?take=52',
+    getBacklogDigiSelfAll: '/api/GetBacklog/anomalie',
     
 
     // SR Backlog
