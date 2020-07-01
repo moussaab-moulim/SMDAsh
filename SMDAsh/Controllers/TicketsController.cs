@@ -51,7 +51,7 @@ namespace SMDAsh.Controllers
             }
 
 
-            var month = Month.Length == 2 ? Month : Month.Insert(0, "0");
+            var month = Month.Length == 2 ? Month : Month.Equals("all") ? Month : Month.Insert(0, "0");
             var queryIn = (from t in _context.Tickets
                            where t.Category.Contains((Category.Equals("all") ? "" : Category))
                            && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
@@ -443,6 +443,12 @@ namespace SMDAsh.Controllers
             
 
             return Ok(result.AsQueryable());
+        }
+
+        [HttpGet("[action]/{Service}/{Year}/")]
+        public ActionResult<IQueryable> BacklogByTeam(string Service, string Year, string exclude)
+        {
+            return null;
         }
     }
 }
