@@ -5,7 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 
-
   import {
     getBacklogDigiSelfOneWeek,
     getBacklogDigiSelfOneMonth,
@@ -111,7 +110,7 @@ const initialChartState = {
 const BacklogEfficiencyDigiSelf = () => {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
-      { title: 'Year/Week', field: 'yearWeek' },
+      { title: 'Days', field: 'day' },
       { title: 'Incoming', field: 'in', type: 'numeric' },
       { title: 'Resolved', field: 'out', type: 'numeric' },
       { title: 'Backlog', field: 'backlog', type: 'numeric' },
@@ -173,14 +172,14 @@ const BacklogEfficiencyDigiSelf = () => {
   
     let datatable = chartState.dataTable;
     const newChartArrays = {
-      yearWeek: [],
+      day: [],
       in: [],
       out: [],
       backlog: [],
     };
 
     for (let i = 0; i < datatable.length; i++) {
-      newChartArrays.yearWeek.push(datatable[i].yearWeek);
+      newChartArrays.day.push(datatable[i].day);
       newChartArrays.in.push(datatable[i].in);
       newChartArrays.out.push(datatable[i].out);
       newChartArrays.backlog.push(datatable[i].backlog);
@@ -208,7 +207,7 @@ const BacklogEfficiencyDigiSelf = () => {
           borderColor: COLOR_BLUE,
         },
       ],
-      labels: newChartArrays.yearWeek,
+      labels: newChartArrays.day,
     };
    
     setChartData(newChartData);
