@@ -32,5 +32,6 @@ namespace SMDAsh.Models
         public string Affectation { get; set; }
         public string MD { get; set; }
         public string AssignedToService { get; set; }
+        public string Team { get; set; }
     }
 }
