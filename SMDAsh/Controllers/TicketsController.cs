@@ -27,8 +27,8 @@ namespace SMDAsh.Controllers
             _context = context;
         }
 
-        [HttpGet("[action]/{Category}"), AutoQueryable]
-        public ActionResult<IQueryable> GetBacklog(string Category)
+        [HttpGet("[action]/{Category}/{Year}/{Month}"), AutoQueryable]
+        public ActionResult<IQueryable> GetBacklog(string Category ,string Year,string Month, bool ByDay = false)
 
         {
 
@@ -49,15 +49,34 @@ namespace SMDAsh.Controllers
                 lit.Add(obj);
                 return BadRequest(lit.AsQueryable());
             }
-            
 
+
+            var month = Month.Length == 2 ? Month : Month.Insert(0, "0");
             var queryIn = (from t in _context.Tickets
                            where t.Category.Contains((Category.Equals("all") ? "" : Category))
-                           select t).ToList().GroupBy( t =>t.YearWeekIn)
-                           .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
+                           && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
+                           select t)
+                           .ToList()
+                           .Where(
+                                t => DateTime.Parse(t.DateSent)
+                                .ToString("MM")
+                                .Contains((month.Equals("all") ? "" : month)))
+                            .OrderBy(t => DateTime.Parse(t.DateSent))
+                            .GroupBy(t => (ByDay) ? t.DateSent : t.YearWeekIn)
+                            .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
+
             var queryOut = (from t in _context.Tickets
-                            where t.Category.Contains((Category.Equals("all") ? "" : Category)) && t.YearWeekOut != ""
-                            select t).ToList().GroupBy(t => t.YearWeekOut)
+                            where t.Category.Contains((Category.Equals("all") ? "" : Category))
+                            && t.YearOut.Contains((Year.Equals("all") ? "" : Year))
+                            && t.YearWeekOut != ""
+                            select t)
+                            .ToList()
+                            .Where(
+                                t => DateTime.Parse(t.DateClosed)
+                                .ToString("MM")
+                                .Contains((month.Equals("all") ? "" : month)))
+                            .OrderBy(t => DateTime.Parse(t.DateClosed))
+                            .GroupBy(t => (ByDay) ? t.DateClosed : t.YearWeekOut)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
             
@@ -66,14 +85,15 @@ namespace SMDAsh.Controllers
             int i = 0;
 
             int bBacklog = 0;
-            foreach (var item in queryIn.OrderBy(i => i.Key))
+            foreach (var item in queryIn)
             {
                 string sourceTool = item.Value.first.SourceTool;
-                string yearWeek = item.Key;
-                int year = Int16.Parse(yearWeek.Split("W")[0]);
-                int week = Int16.Parse(yearWeek.Split("W")[1]);
+                string yearWeek = (ByDay)? "":item.Key;
+                string day = (ByDay) ? item.Key : "";
+                int year = Int16.Parse(item.Value.first.YearIn);
+                int week = Int16.Parse(item.Value.first.WeekIn);
                 int bIn = item.Value.count;
-                int bOut = (queryOut.Keys.Contains(yearWeek)) ? queryOut[yearWeek].count : 0;
+                int bOut = (queryOut.Keys.Contains((ByDay)?day:yearWeek)) ? queryOut[ByDay ? day : yearWeek].count : 0;
                 bBacklog = (i == 0) ? bIn - bOut : bIn - bOut + bBacklog;
                 Backlogs b = new Backlogs()
                 {
@@ -81,9 +101,11 @@ namespace SMDAsh.Controllers
                     YearWeek = yearWeek,
                     Year = year,
                     Week = week,
+                    Day = day,
                     In = bIn,
                     Out = bOut,
-                    backlog = bBacklog
+                    backlog = bBacklog,
+                    
                 };
                 back.Add(b);
                 i++;
