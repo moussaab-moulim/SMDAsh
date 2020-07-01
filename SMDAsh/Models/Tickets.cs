@@ -33,5 +33,8 @@ namespace SMDAsh.Models
         public string MD { get; set; }
         public string AssignedToService { get; set; }
         public string Team { get; set; }
+        public string Sharepoint { get; set; }
+        public string CreatedBy { get; set; }
+        public string TicketEtat { get; set; }
     }
 }

@@ -17,15 +17,15 @@ namespace SMDAsh.Controllers
     {
 
         private readonly SmDashboardContext _context;
-      
+
 
         public UploadController(SmDashboardContext context)
         {
             _context = context;
-     
+
         }
         [HttpPost("")]
-        public async Task<IActionResult> Upload([FromForm]SourceFile sf)
+        public async Task<IActionResult> Upload([FromForm] SourceFile sf)
         {
             // Getting source tool
             string sourcetool = sf.SourceTool;
@@ -47,59 +47,59 @@ namespace SMDAsh.Controllers
             {
                 await excelFile.CopyToAsync(stream);
                 //excelPack.Load(stream);
-            
-            using (var excelPack = new ExcelPackage(stream))
-            {
-                
-                //Lets Deal with first worksheet.
-                //System.Diagnostics.Debug.WriteLine(excelPack.Workbook.Worksheets.Count);
-                var ws = excelPack.Workbook.Worksheets[0];
 
-                // list to save the data of excel as tickets
-                List<Tickets> tickets = new List<Tickets>();
-                //list to save the first row of data sheet as keys
-                List<string> keys = new List<string>();
-                foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
+                using (var excelPack = new ExcelPackage(stream))
                 {
-                    //Get names from first row
-                    if (!string.IsNullOrEmpty(firstRowCell.Text))
+
+                    //Lets Deal with first worksheet.
+                    //System.Diagnostics.Debug.WriteLine(excelPack.Workbook.Worksheets.Count);
+                    var ws = excelPack.Workbook.Worksheets[0];
+
+                    // list to save the data of excel as tickets
+                    List<Tickets> tickets = new List<Tickets>();
+                    //list to save the first row of data sheet as keys
+                    List<string> keys = new List<string>();
+                    foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
                     {
-                        keys.Add(firstRowCell.Text);
-   
+                        //Get names from first row
+                        if (!string.IsNullOrEmpty(firstRowCell.Text))
+                        {
+                            keys.Add(firstRowCell.Text);
+
+                        }
                     }
-                }
-                var startRow = 2;
-                var endRow = ws.Dimension.End.Row;
-                //Get row details
-                for (int rowNum = startRow; rowNum <= endRow; rowNum++)
-                {
-                    var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
-                    Dictionary<string, string> ligne = new Dictionary<string, string>();
-                    int j = 0;
+                    var startRow = 2;
+                    var endRow = ws.Dimension.End.Row;
+                    //Get row details
+                    for (int rowNum = startRow; rowNum <= endRow; rowNum++)
+                    {
+                        var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
+                        Dictionary<string, string> ligne = new Dictionary<string, string>();
+                        int j = 0;
                         var endCell = ws.Dimension.End.Column;
-                    for(int cellNum = 1; cellNum <= endCell; cellNum++)
+                        for (int cellNum = 1; cellNum <= endCell; cellNum++)
                         {
                             var cell = ws.Cells[rowNum, cellNum];
                             string currentcellvalue = cell.Text;
                             ligne.Add(keys[j++], currentcellvalue);
                         }
-                    
-
-                    tickets.Add(createNewTicket(ligne, sourcetool));
-                    count++;
 
 
+                        tickets.Add(createNewTicket(ligne, sourcetool));
+                        count++;
+
+
+                    }
+                    // IMPORT TO DATABASE
+                    _context.AddRange(tickets);
+                    int created = _context.SaveChanges();
+                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
                 }
-                // IMPORT TO DATABASE
-                _context.AddRange(tickets);
-                int created = _context.SaveChanges();
-                return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
+
             }
-
-        }
         }
 
-        private Tickets createNewTicket(Dictionary<string, string> ligne,string sourcetool)
+        private Tickets createNewTicket(Dictionary<string, string> ligne, string sourcetool)
         {
             if (sourcetool.ToLower().Equals("mantis"))
             {
@@ -132,7 +132,7 @@ namespace SMDAsh.Controllers
                     Application = ligne["Projet Court"] + ":" + ligne["Projet"],
                     AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService"),
                     Update = ligne["Mis à jour"]
-                });;
+                }); ;
 
 
             }
@@ -168,11 +168,35 @@ namespace SMDAsh.Controllers
                 };
 
             }
+            else if (sourcetool.ToLower().Equals("digiself"))
+            {
+                return new Tickets()
+                {
+                    TicketID = ligne["ID"],
+                    SourceTool = sourcetool,
+                    AssignedTo = ligne["Responsable.Nom"],
+                    DateSent = ligne["Date/Heure de création"],
+                    DateResolved = ligne["Date/Heure de résolution"],
+                    Priority = integrateColumn(ligne["Priorité"], "Priority"),
+                    Status = integrateColumn(ligne["État"], "Status"),
+                    Description = ligne["Titre"],
+                    Category = integrateColumn(ligne["SLA.Titre"], "Category"),
+                    ResolutionDuration = ligne["Elapsed Time for resolution"],
+                    Application = ligne["Catégorie.Titre"],
+                    AssignedToService = AssignedToService.TEAL,
+                    Sharepoint = ligne["Is Sharepoint ?"],
+                   // TypeCible = ligne["Type de cible"],
+                    CreatedBy = ligne["Créé par.Nom"],
+                    TicketEtat = ligne["ID de phase"],
+                    Team = ligne["Groupe d'affectation.Nom"],
+                };
+
+            }
             else return null;
 
         }
 
-        private string integrateColumn(string valueToCompare,string destination)
+        private string integrateColumn(string valueToCompare, string destination)
         {
             string finalVal = String.Empty;
             string ligneVal = valueToCompare;
@@ -180,25 +204,28 @@ namespace SMDAsh.Controllers
             switch (destination)
             {
                 case "Status":
-                    finalVal = ligneVal.In("Fermée", "Abondonnée", "closed", "Clôturé") ? StatusParams.ABANDONED
+                    finalVal = ligneVal.In("Fermée", "Abondonnée", "closed", "Clôturé", "RequestStatusRejected") ? StatusParams.ABANDONED
                                                 : ligneVal.In("Nouvelle", "Accepté") ? StatusParams.NEW
-                                                : ligneVal.In("Prise en charge retours tests", "A tester", "En attente du client") ? StatusParams.TO_BE_TESTED
-                                                : ligneVal.In("ETUDE_A_VALIDER", "Queued") ? StatusParams.QUEUED
+                                                : ligneVal.In("Prise en charge retours tests", "A tester", "En attente du client", "Additional status") ? StatusParams.TO_BE_TESTED
+                                                : ligneVal.In("ETUDE_A_VALIDER", "Queued", "Pending", "RequestStatusPending", "RequestStatusSuspended", "Suspended") ? StatusParams.QUEUED
                                                 : ligneVal.In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? StatusParams.QUEUED_TEAL
-                                                : ligneVal.In("A fermer", "Résolu") ? StatusParams.RESOLVED
+                                                : ligneVal.In("A fermer", "Résolu", "Closed_c", "Resolved_c", "RequestStatusComplete") ? StatusParams.RESOLVED
                                                 : ligneVal.In("") ? StatusParams.EMPTY
-                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire") ? StatusParams.IN_PROCRESS : StatusParams.NOT_CONFIGURED;
+                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire", "Open_c", "RequestStatusAssigned_c", "RequestStatusReopened_c", "RequestStatusInProgress", "InProgress") ? StatusParams.IN_PROCRESS
+                                                : StatusParams.NOT_CONFIGURED;
+
+
                     break;
                 case "Category":
-                    finalVal = ligneVal.In("incident", "réclamation", "Anomalie") ? CategoryParams.INCIDENT
-                    : ligneVal.In("Demande d'extraction", "Demande d'information", "Demande d'accès") ? CategoryParams.SR
+                    finalVal = ligneVal.In("incident", "Incident", "réclamation", "Anomalie", "TEAL RUN SERVICES Incident") ? CategoryParams.INCIDENT
+                    : ligneVal.In("Demande d'extraction", "Request", "Demande d'information", "Demande d'accès", "TEAL RUN SERVICES Service request", "service request") ? CategoryParams.SR
                     : ligneVal.In("Evolution") ? CategoryParams.EVOLUTION : CategoryParams.NOT_CONFIGURED;
                     break;
                 case "Priority":
-                    finalVal = ligneVal.In("basse", "Faible") ? "Faible"
-                     : ligneVal.In("normale", "Moyenne") ? "Moyenne"
-                     : ligneVal.In("élevée") ? "Elevée"
-                     : ligneVal.In("Critique/Elevée", "urgente") ? "Urgente" : "Priority not configured";
+                    finalVal = ligneVal.In("basse", "4 - Faible", "3 - Faible", "Faible", "LowPriority") ? "Faible"
+                     : ligneVal.In("normale", "2 - Moyenne", "3 - Moyenne", "Moyenne", "MediumPriority") ? "Moyenne"
+                     : ligneVal.In("élevée", "HighPriority") ? "Elevée"
+                     : ligneVal.In("Critique/Elevée", "1 - Critique/Elevée", "urgente", "CriticalPriority") ? "Urgente" : "Priority not configured";
                     break;
                 case "P":
                     finalVal = ligneVal.In("P1", "1") ? "P1"
@@ -216,13 +243,14 @@ namespace SMDAsh.Controllers
                      : ligneVal.In("En cours chez le prestataire__") ? AssignedToService.OWNER
                      : ligneVal.In("A fermer", "Fermée", "Abondonnée") ? AssignedToService.EMPTY : AssignedToService.NOT_CONFIGURED;
                     break;
+                
 
 
                 default:
-                    throw new DataIntegrationException(destination,new Exception());
+                    throw new DataIntegrationException(destination, new Exception());
             }
 
-      
+
             //System.Diagnostics.Debug.WriteLine(ligneVal + " to " + finalVal);
 
             return finalVal;
