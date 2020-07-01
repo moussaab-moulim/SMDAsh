@@ -62,21 +62,24 @@ namespace SMDAsh.Controllers
                                 .ToString("MM")
                                 .Contains((month.Equals("all") ? "" : month)))
                             .OrderBy(t => DateTime.Parse(t.DateSent))
-                            .GroupBy(t => (ByDay) ? t.DateSent : t.YearWeekIn)
+                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DateSent).ToString("dd/MM/yyyy") : t.YearWeekIn)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
             var queryOut = (from t in _context.Tickets
                             where t.Category.Contains((Category.Equals("all") ? "" : Category))
                             && t.YearOut.Contains((Year.Equals("all") ? "" : Year))
-                            && t.YearWeekOut != ""
                             select t)
                             .ToList()
+                            .Select(t=> new { 
+                            t.Category,t.DateSent, DateClosed= !t.DateClosed.Equals(string.Empty) ? t.DateClosed : t.DateResolved,
+                            t.YearWeekOut,
+                            })
                             .Where(
                                 t => DateTime.Parse(t.DateClosed)
                                 .ToString("MM")
                                 .Contains((month.Equals("all") ? "" : month)))
                             .OrderBy(t => DateTime.Parse(t.DateClosed))
-                            .GroupBy(t => (ByDay) ? t.DateClosed : t.YearWeekOut)
+                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DateClosed).ToString("dd/MM/yyyy") : t.YearWeekOut)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
             

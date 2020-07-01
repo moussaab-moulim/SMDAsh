@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -170,13 +171,26 @@ namespace SMDAsh.Controllers
             }
             else if (sourcetool.ToLower().Equals("digiself"))
             {
+                var dateSent = ligne["Date/Heure de création"];
+                var dateClosed = ligne["Solved time"];
                 return new Tickets()
                 {
                     TicketID = ligne["ID"],
                     SourceTool = sourcetool,
                     AssignedTo = ligne["Responsable.Nom"],
-                    DateSent = ligne["Date/Heure de création"],
+                    DateSent = dateSent,
+                    YearIn = dateSent.Equals(string.Empty) ? " " : DateTime.Parse(dateSent).ToString("yyyy"),
+                    WeekIn = dateSent.Equals(string.Empty) ? " " : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(dateSent),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday).ToString(),
                     DateResolved = ligne["Date/Heure de résolution"],
+                    DateClosed = dateClosed,
+                    YearOut = dateClosed.Equals(string.Empty) ? " " : DateTime.Parse(dateClosed).ToString("yyyy"),
+                    WeekOut = dateClosed.Equals(string.Empty) ? " " : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(dateClosed),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday).ToString(),
                     Priority = integrateColumn(ligne["Priorité"], "Priority"),
                     Status = integrateColumn(ligne["État"], "Status"),
                     Description = ligne["Titre"],
