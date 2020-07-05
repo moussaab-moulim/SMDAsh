@@ -214,12 +214,80 @@ const BacklogEfficiencyDigiSelf = () => {
     setChartTable(datatable);
   };
 
+  const options = {
+      title: {
+        display: true,
+        text: 'Backlog Per Team',
+        fontSize: 20,
+      },
+      plugins: {
+        labels: {
+          render: 'value',
+          fontSize: 12,
+          fontColor: '#000',
+          fontFamily: '"Lucida Console", Monaco, monospace',
+        },
+      },
+      responsive: true,
+    scales: {
+      datalabels: {
+        color: 'blue',
+        labels: {
+            title: {
+                font: {
+                    weight: 'bold'
+                }
+            },
+            value: {
+                color: 'green'
+            }
+        }
+    },
+         xAxes: [{
+             stacked: true,
+             gridLines: {
+              display: false,
+            },
+         }],
+         yAxes: [{
+             stacked: true,
+             ticks: {
+              beginAtZero: true
+            }
+         }]
+     }
+ }
+ const arbitraryStackKey = "stack1";
+ let data ={ 
+  labels: [
+    ['TEAL_Run_L2',' CustomBuild',' Apps'],
+     'TEAL_Run_L2 Data',
+      'TEAL_Run_L2 Industrial Apps',
+       'TEAL_Run_L2 Middelware',
+        'TEAL_Run_L2 Oracle EBS'],
+  datasets: [
+    // These two will be in the same stack.
+    {
+      stack: arbitraryStackKey,
+      label: 'Pending',
+      data: [1, 2, 3, 4, 10],
+      backgroundColor: COLOR_TEAL,
+    },
+    {
+      stack: arbitraryStackKey,
+      label: 'In Progress',
+      data: [5, 4, 3, 2, 1],
+      backgroundColor: COLOR_ORANGE,   
+    }
+  ]
+ }
+ 
 
 
   return (
     <div>
       <GridContainer>
-
+     
         <Card xs={12} sm={12} md={12} className={classes.card}>
         {chartState.loading ? <SpinnerChart />: null}
             <CardBody>
@@ -352,8 +420,9 @@ const BacklogEfficiencyDigiSelf = () => {
             </CardBody>
           
         </Card>
+      
       </GridContainer>
-    </div>
+      </div>
   );
 }
 

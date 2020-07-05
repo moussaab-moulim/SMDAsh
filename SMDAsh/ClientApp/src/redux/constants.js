@@ -11,6 +11,14 @@ export const RESET_USER_INFO = 'RESET_USER_INFO';
 export const SUCCESS_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'SUCCESS_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
 export const AWAITING_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'AWAITING_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
 export const REJECTED_BACKLOG_IN_OUT_BY_DAYS_DIGISELF = 'REJECTED_BACKLOG_IN_OUT_BY_DAYS_DIGISELF';
+    /* Backlog per Teams */
+export const SUCCESS_BACKLOG_PER_TEAM_DIGISELF = 'SUCCESS_BACKLOG_PER_TEAM_DIGISELF';
+export const AWAITING_BACKLOG_PER_TEAM_DIGISELF = 'AWAITING_BACKLOG_PER_TEAM_DIGISELF';
+export const REJECTED_BACKLOG_PER_TEAM_DIGISELF = 'REJECTED_BACKLOG_PER_TEAM_DIGISELF';
+    /* Backlog by Age */
+export const SUCCESS_BACKLOG_BY_AGE_DIGISELF = 'SUCCESS_BACKLOG_BY_AGE_DIGISELF';
+export const AWAITING_BACKLOG_BY_AGE_DIGISELF = 'AWAITING_BACKLOG_BY_AGE_DIGISELF';
+export const REJECTED_BACKLOG_BY_AGE_DIGISELF = 'REJECTED_BACKLOG_BY_AGE_DIGISELF';
 
 
 // Anomaly 
@@ -171,7 +179,13 @@ export const APIS = {
     getBacklogDigiSelfThreeMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=60',
     getBacklogDigiSelfOneYear: '/api/GetBacklog/all/all/all?ByDay=true&take=240',
     getBacklogDigiSelfAll: '/api/GetBacklog/all/all/all',
-    
+
+    // DigiSelf Backlog Per Team
+    getBacklogDigiSelfPerTeam: '/api/GetBacklogPerTeam/',
+
+    // DigiSelf Backlog By Age
+    getBacklogDigiSelfByAge: '/api/GetBacklogByAge/',
+   
 
     // SR Backlog
     getBacklogSrOneMonth: '/api/GetBacklog/sr/all/all?take=4',
