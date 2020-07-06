@@ -23,6 +23,7 @@ import { slaByProjectYearOutEvolutionReducer } from './Evolution/slaByProjectEvo
 import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
 import backlogPerTeamDSReducer from './DigiSelf/backlogPerTeamDSReducer';
 import backlogByAgeDSReducer from './DigiSelf/backlogByAgeDSReducer';
+import backlogEvolutionByAgeDSReducer from './DigiSelf/backlogEvolutionByAgeDSReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from './Params/yearReducer';
@@ -48,6 +49,7 @@ import loading from './loadingReducer';
 
 
 
+
 const rootReducer = combineReducers({
   user,
   loading,
@@ -63,6 +65,7 @@ const rootReducer = combineReducers({
   backlogInOutDaysDS:backlogInOutDaysDSReducer,
   backlogPerTeamDS:backlogPerTeamDSReducer,
   backlogByAgeDS:backlogByAgeDSReducer,
+  backlogEvolutionByAgeDS:backlogEvolutionByAgeDSReducer,
 
   /* Anomaly */
   ticketAssignedOcpAno: ticketAssignedOcpAnoReducer,

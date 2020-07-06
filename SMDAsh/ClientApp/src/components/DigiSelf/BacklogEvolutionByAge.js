@@ -4,17 +4,16 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
+import { 
+  getBacklogEvolutionByAgeDSOneWeek, 
+  getBacklogEvolutionByAgeDSOneMonth, 
+  getBacklogEvolutionByAgeDSThreeMonth,
+  getBacklogEvolutionByAgeDSSixMonth, 
+  getBacklogEvolutionByAgeDSOneYear, 
+  getBacklogEvolutionByAgeDSAll } from '../../redux/actions/DigiSelf/backlogEvolutionByAgeDSAction';
 
-  import {
-    getBacklogDigiSelfOneWeek,
-    getBacklogDigiSelfOneMonth,
-    getBacklogDigiSelfThreeMonth,
-    getBacklogDigiSelfOneYear,
-    getBacklogDigiSelfAll
-  } from '../../redux/actions/DigiSelf/backlogInOutDaysDSAction';
 
-
-import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
+import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW } from '../../redux/constants';
 import { connect } from 'react-redux';
 // core components
 import GridItem from 'components/Grid/GridItem.js';
@@ -23,7 +22,7 @@ import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
-import { ButtonGroup, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import { ToggleButtonGroup } from '@material-ui/lab';
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -101,52 +100,53 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 const initialChartState = {
   datasets: [],
   labels: [],
 };
 
-const BacklogEfficiencyDigiSelf = () => {
+const BacklogEvolutionByAge = () => {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
-      { title: 'Days', field: 'day' },
-      { title: 'Incoming', field: 'in', type: 'numeric' },
-      { title: 'Resolved', field: 'out', type: 'numeric' },
-      { title: 'Backlog', field: 'backlog', type: 'numeric' },
-     
+      { title: 'Date', field: 'day' },
+      { title: '12 to 20 days', field: 'in', type: 'numeric' },
+      { title: '5 days or less', field: 'out', type: 'numeric' },
+      { title: '6 days to 12 days', field: 'in', type: 'numeric' },
+      { title: 'more then 20 days', field: 'out', type: 'numeric' },
     ],
   });
-  const [chartData, setChartData] = useState(initialChartState);
 
+  const [chartData, setChartData] = useState(initialChartState);
   const dispatch = useDispatch();
-  const chartState = useSelector((state) => state.backlogInOutDaysDS, []) || [];
+  const chartState = useSelector((state) => state.backlogEvolutionByAgeDS, []) || [];
   const [chartTable, setChartTable] = useState(chartState.dataTable);
-  const [filter, setFilter] = useState('1 Week');
+  const [filter, setFilter] = useState('Week');
   const classes = useStyles();
   const [reloardData,setReloadData] = useState(false);
 
   useEffect(() => {
     if (chartState.loading || reloardData) {
      
-      if (filter == "1 Week") {
-        dispatch(getBacklogDigiSelfOneWeek());
+      if (filter == "Week") {
+        dispatch(getBacklogEvolutionByAgeDSOneWeek());
        
-  
-      } else if (filter == "1 Month") {
-        dispatch(getBacklogDigiSelfOneMonth());
+      } else if (filter == "1 Months") {
+        dispatch(getBacklogEvolutionByAgeDSOneMonth());
+        
+      } else if (filter == "3 Months") {
+        dispatch(getBacklogEvolutionByAgeDSThreeMonth());
         
       }
-      else if (filter == "3 Months") {
-        dispatch(getBacklogDigiSelfThreeMonth());
+      else if (filter == "6 Months") {
+        dispatch(getBacklogEvolutionByAgeDSSixMonth());
         
       }
       else if (filter == "Year") {
-        dispatch(getBacklogDigiSelfOneYear());
+        dispatch(getBacklogEvolutionByAgeDSOneYear());
         
       }
       else if (filter == "All") {
-        dispatch(getBacklogDigiSelfAll());
+        dispatch(getBacklogEvolutionByAgeDSAll());
         
       }
       setReloadData(false);
@@ -167,127 +167,76 @@ const BacklogEfficiencyDigiSelf = () => {
   };
 
 
-
   const orginizeData = () => {
   
     let datatable = chartState.dataTable;
     const newChartArrays = {
-      day: [],
-      in: [],
-      out: [],
-      backlog: [],
+      date: [],
+      days12to20: [],
+      days5orLess: [],
+      days6to12: [],
+      morethen20days: [],
     };
 
     for (let i = 0; i < datatable.length; i++) {
-      newChartArrays.day.push(datatable[i].day);
-      newChartArrays.in.push(datatable[i].in);
-      newChartArrays.out.push(datatable[i].out);
-      newChartArrays.backlog.push(datatable[i].backlog);
-     
+      newChartArrays.date.push(datatable[i].day);
+      newChartArrays.days12to20.push(datatable[i].in+10);
+      newChartArrays.days5orLess.push(datatable[i].out+10);
+      newChartArrays.days6to12.push(datatable[i].in+12);
+      newChartArrays.morethen20days.push(datatable[i].out+5);
     }
     const newChartData = {
       datasets: [
         {
-          label: 'Incoming',
-          data: newChartArrays.in,
+          label: '12 to 20 days',
+          data: newChartArrays.days12to20,
+          order: 1,
+          type: 'line',
+          fill: false,
           backgroundColor: COLOR_TEAL,
+          borderColor: COLOR_TEAL,
         },
         {
-          label: 'Resolved',
-          data: newChartArrays.out,
+          label: '5 days or less',
+          data: newChartArrays.days5orLess,
+          order: 1,
+          type: 'line',
+          fill: false,
           backgroundColor: COLOR_ORANGE,
+          borderColor: COLOR_ORANGE,
         },
         {
-          label: 'Backlog',
-          data: newChartArrays.backlog,
+          label: '6 to 12 days',
+          data: newChartArrays.days6to12,
           order: 1,
           type: 'line',
           fill: false,
           backgroundColor: COLOR_BLUE,
           borderColor: COLOR_BLUE,
         },
+        {
+            label: 'more then 20 days',
+            data: newChartArrays.morethen20days,
+            order: 1,
+            type: 'line',
+            fill: false,
+            backgroundColor: COLOR_YELLOW,
+            borderColor: COLOR_YELLOW,
+          },
       ],
-      labels: newChartArrays.day,
+      labels: newChartArrays.date,
     };
    
     setChartData(newChartData);
     setChartTable(datatable);
   };
 
-  const options = {
-      title: {
-        display: true,
-        text: 'Backlog Per Team',
-        fontSize: 20,
-      },
-      plugins: {
-        labels: {
-          render: 'value',
-          fontSize: 10,
-          fontColor: '#000',
-          fontFamily: '"Lucida Console", Monaco, monospace',
-        },
-      },
-      responsive: true,
-    scales: {
-      datalabels: {
-        color: 'blue',
-        labels: {
-            title: {
-                font: {
-                    weight: 'bold'
-                }
-            },
-            value: {
-                color: 'green'
-            }
-        }
-    },
-         xAxes: [{
-             stacked: true,
-             gridLines: {
-              display: false,
-            },
-         }],
-         yAxes: [{
-             stacked: true,
-             ticks: {
-              beginAtZero: true
-            }
-         }]
-     }
- }
- const arbitraryStackKey = "stack1";
- let data ={ 
-  labels: [
-    ['TEAL_Run_L2',' CustomBuild',' Apps'],
-     'TEAL_Run_L2 Data',
-      'TEAL_Run_L2 Industrial Apps',
-       'TEAL_Run_L2 Middelware',
-        'TEAL_Run_L2 Oracle EBS'],
-  datasets: [
-    // These two will be in the same stack.
-    {
-      stack: arbitraryStackKey,
-      label: 'Pending',
-      data: [1, 2, 3, 4, 10],
-      backgroundColor: COLOR_TEAL,
-    },
-    {
-      stack: arbitraryStackKey,
-      label: 'In Progress',
-      data: [5, 4, 3, 2, 1],
-      backgroundColor: COLOR_ORANGE,   
-    }
-  ]
- }
- 
 
 
   return (
     <div>
       <GridContainer>
-     
+
         <Card xs={12} sm={12} md={12} className={classes.card}>
         {chartState.loading ? <SpinnerChart />: null}
             <CardBody>
@@ -300,14 +249,6 @@ const BacklogEfficiencyDigiSelf = () => {
                 justify='space-between'
                 alignItems='center'
               >
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  className={classes.btn + " " + classes.buttonRedColor}
-                >
-                  <GetAppIcon className={classes.buttonicon} />
-              All PNG
-            </Button>
                 <ToggleButtonGroup
                   value={filter}
                   className={classes.btn}
@@ -318,16 +259,19 @@ const BacklogEfficiencyDigiSelf = () => {
                 >
                   <ToggleButton
                     className={classes.togglbtn}
-                    value='1 Week'
+                    value='Week'
                     aligned
                   >
                     1W
               </ToggleButton>
-                  <ToggleButton className={classes.togglbtn} value='1 Month'>
+                  <ToggleButton className={classes.togglbtn} value='1 Months'>
                     1M
               </ToggleButton>
-                  <ToggleButton className={classes.togglbtn} value='3 Months'>
+              <ToggleButton className={classes.togglbtn} value='3 Months'>
                     3M
+              </ToggleButton>
+                  <ToggleButton className={classes.togglbtn} value='6 Months'>
+                    6M
               </ToggleButton>
                   <ToggleButton className={classes.togglbtn} value='Year'>
                     1Y
@@ -347,7 +291,7 @@ const BacklogEfficiencyDigiSelf = () => {
               </Grid>
 
               <MaterialTable
-                title='Backlog Efficiency'
+                title='Backlog Evolution (by Age Category)'
                 columns={statecolumns.columns}
                 data={chartTable}
                 options={{
@@ -355,7 +299,6 @@ const BacklogEfficiencyDigiSelf = () => {
                 }}
               />
             </CardBody>
-
           
         </Card>
 
@@ -387,13 +330,13 @@ const BacklogEfficiencyDigiSelf = () => {
                 options={{
                   title: {
                     display: true,
-                    text: 'Incoming vs Resolved Tickets',
+                    text: 'Backlog Evolution by Age Category',
                     fontSize: 20,
                   },
                   plugins: {
                     labels: {
                       render: 'value',
-                      fontSize: 12,
+                      fontSize: 10,
 
                       fontColor: '#000',
                       fontFamily: '"Lucida Console", Monaco, monospace',
@@ -415,14 +358,11 @@ const BacklogEfficiencyDigiSelf = () => {
                   },
                 }}
               />
-
-
             </CardBody>
           
         </Card>
-      
       </GridContainer>
-      </div>
+    </div>
   );
 }
 
@@ -434,8 +374,8 @@ const mapStateToProps = state => {
 
 const mapDispatchtoProps = (dispatch) => {
   return {
-    getBacklogDigiSelfOneWeek: () => dispatch(getBacklogDigiSelfOneWeek()),
+    getBacklogEvolutionByAgeDSOneWeek: () => dispatch(getBacklogEvolutionByAgeDSOneWeek()),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchtoProps)(BacklogEfficiencyDigiSelf);
+export default connect(mapStateToProps, mapDispatchtoProps)(BacklogEvolutionByAge);

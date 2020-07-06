@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import BacklogEfficiencyDigiSelf from "components/DigiSelf/BacklogEfficiency";
 import BacklogPerTeamDigiSelf from "components/DigiSelf/BacklogPerTeam";
 import BacklogByAge from "components/DigiSelf/BacklogByAge";
+import BacklogEvolutionByAge from "components/DigiSelf/BacklogEvolutionByAge";
 
 import 'chartjs-plugin-labels';
 
@@ -47,16 +48,12 @@ export default function Digiself() {
   const classes = useStyles();
   return (
     <div>
-{
-  /**
-   *  <BacklogEfficiencyDigiSelf />
 
- <BacklogPerTeamDigiSelf></BacklogPerTeamDigiSelf>
-    
-   */
-}
-<BacklogByAge/>
-      
+      <BacklogEfficiencyDigiSelf />
+      <BacklogPerTeamDigiSelf />
+      <BacklogByAge />
+      <BacklogEvolutionByAge />
+
     </div>
   );
 }
