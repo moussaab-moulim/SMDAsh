@@ -11,6 +11,7 @@ using AutoQueryable;
 using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Models.Errors;
 using System.Globalization;
+using SMDAsh.Helpers;
 
 namespace SMDAsh.Controllers
 {
@@ -62,27 +63,43 @@ namespace SMDAsh.Controllers
                                 .ToString("MM")
                                 .Contains((month.Equals("all") ? "" : month)))
                             .OrderBy(t => DateTime.Parse(t.DateSent))
-                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DateSent).ToString("dd/MM/yyyy") : t.YearWeekIn)
+                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedInDay).ToString("dd/MM/yyyy") : t.YearWeekIn)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
+
 
             var queryOut = (from t in _context.Tickets
                             where t.Category.Contains((Category.Equals("all") ? "" : Category))
                             && t.YearOut.Contains((Year.Equals("all") ? "" : Year))
+                            && !t.YearOut.Equals(string.Empty)
                             select t)
                             .ToList()
-                            .Select(t=> new { 
-                            t.Category,t.DateSent, DateClosed= !t.DateClosed.Equals(string.Empty) ? t.DateClosed : t.DateResolved,
-                            t.YearWeekOut,
+                            .Select(t => new {
+                                t.Category,
+                                t.DateSent,
+                                t.DsFormattedOutDay,
+                                t.YearWeekOut,
                             })
                             .Where(
-                                t => DateTime.Parse(t.DateClosed)
+                                t => DateTime.Parse(t.DsFormattedOutDay)
                                 .ToString("MM")
                                 .Contains((month.Equals("all") ? "" : month)))
-                            .OrderBy(t => DateTime.Parse(t.DateClosed))
-                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DateClosed).ToString("dd/MM/yyyy") : t.YearWeekOut)
+                            .OrderBy(t => DateTime.Parse(t.DsFormattedOutDay))
+                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedOutDay).ToString("dd/MM/yyyy") : t.YearWeekOut)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
-            
+            var queryB = (from t in _context.Tickets
+                          where t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING")
+                          && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
+                          select t)
+                               .ToList()
+                               .Where(
+                                    t => DateTime.Parse(t.DateSent)
+                                    .ToString("MM")
+                                    .Contains((month.Equals("all") ? "" : month)))
+                                .OrderBy(t => DateTime.Parse(t.DsFormattedInDay))
+                                .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedInDay).ToString("dd/MM/yyyy") : t.YearWeekIn)
+                                .ToDictionary(g => g.Key, g => g.Count());
+
 
             List<Backlogs> back = new List<Backlogs>();
             int i = 0;
@@ -91,13 +108,14 @@ namespace SMDAsh.Controllers
             foreach (var item in queryIn)
             {
                 string sourceTool = item.Value.first.SourceTool;
-                string yearWeek = (ByDay)? "":item.Key;
+                string yearWeek = (ByDay) ? "" : item.Key;
                 string day = (ByDay) ? item.Key : "";
                 int year = Int16.Parse(item.Value.first.YearIn);
                 int week = Int16.Parse(item.Value.first.WeekIn);
                 int bIn = item.Value.count;
-                int bOut = (queryOut.Keys.Contains((ByDay)?day:yearWeek)) ? queryOut[ByDay ? day : yearWeek].count : 0;
-                bBacklog = (i == 0) ? bIn - bOut : bIn - bOut + bBacklog;
+                int bOut = (queryOut.Keys.Contains((ByDay) ? day : yearWeek)) ? queryOut[ByDay ? day : yearWeek].count : 0;
+                int bck = ByDay ? (queryB.Keys.Contains(day) ? queryB[day] : 0) : 0;
+                bBacklog = (i == 0) ? bIn - bOut + bck : bBacklog + bIn - bOut;
                 Backlogs b = new Backlogs()
                 {
                     SourceTool = sourceTool,
@@ -108,7 +126,7 @@ namespace SMDAsh.Controllers
                     In = bIn,
                     Out = bOut,
                     backlog = bBacklog,
-                    
+
                 };
                 back.Add(b);
                 i++;
@@ -448,10 +466,20 @@ namespace SMDAsh.Controllers
             return Ok(result.AsQueryable());
         }
 
-        [HttpGet("[action]/{Service}/{Year}/")]
-        public ActionResult<IQueryable> BacklogByTeam(string Service, string Year, string exclude)
+        [HttpGet("[action]/{application}/")]
+        public ActionResult<IQueryable> BacklogByTeam(string application="all")
         {
-            return null;
+
+            var result = (from t in _context.Tickets
+                         where t.Sharepoint == false
+                         && (t.DsFormattedStatus == "IN PROGRESS"
+                         || t.DsFormattedStatus == "PENDING")
+                         select t).ToList().Where(t=>application.Equals("all")?true: t.Application.In(application.Split(",")))
+                         .OrderBy(o => Int32.Parse(o.TicketID)).GroupBy(g => g.Team)
+                         .Select(t =>
+                         new
+                         {status=t.Key,backlog = t.GroupBy(g => g.DsFormattedStatus).Select(t => new { t.Key, count = t.Count() })});
+            return Ok(result.AsQueryable());
         }
     }
 }

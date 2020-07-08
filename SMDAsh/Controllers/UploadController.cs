@@ -8,6 +8,7 @@ using OfficeOpenXml;
 using SMDAsh.Helpers;
 using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Helpers.Params;
+using SMDAsh.Helpers.Params.digiself;
 using SMDAsh.Models;
 
 namespace SMDAsh.Controllers
@@ -171,44 +172,79 @@ namespace SMDAsh.Controllers
             }
             else if (sourcetool.ToLower().Equals("digiself"))
             {
-                var dateSent = ligne["Date/Heure de création"];
-                var dateClosed = ligne["Solved time"];
+                DateTime tempDate;
+                var dateSent = DateTime.TryParse(ligne["Date/Heure de création"],out tempDate)?
+                    tempDate.ToString("dd/MM/yyyy"):string.Empty;
+                var dateClosed = DateTime.TryParse(ligne["Solved time"], out tempDate) ?
+                    tempDate.ToString("dd/MM/yyyy") : string.Empty;
+                var dateResolved = DateTime.TryParse(ligne["Date/Heure de résolution"], out tempDate) ?
+                    tempDate.ToString("dd/MM/yyyy") : string.Empty; ;
+                
+
+                var digiselfStatus = DigislefStatusParams.StatusParams();
+
+                
+                var dsFormattedStatus = digiselfStatus.ContainsKey(ligne["État"])?(digiselfStatus[ligne["État"]].Equals(DigislefStatusParams.PENDING)?
+                    (ligne["Code Achèvement"].Equals(string.Empty)?DigislefStatusParams.PENDING:DigislefStatusParams.RESOLVED_WAIT_USER)
+                    : digiselfStatus[ligne["État"]]):string.Empty;
+                var dsFormattedIn = dateSent;
+                var dsFormattedOut = (integrateColumn(ligne["SLA.Titre"], "Category").Equals(CategoryParams.SR)&& !dateClosed.Equals(string.Empty)?
+                    dateClosed:dateResolved);
+                var dsAge = (dateResolved.Equals(string.Empty)) ?
+                    (DateTime.Today - DateTime.Parse(dsFormattedIn)).TotalDays:
+                    (DateTime.Parse(dsFormattedOut) - DateTime.Parse(dsFormattedOut)).TotalDays;
+                var isSharepoint = (ligne["Catégorie.Parent de 2e niveau"].Equals("Sharepoint", StringComparison.OrdinalIgnoreCase)) ?
+                    true :
+                    (ligne["Service.Libellé d'affichage"].Equals("Sharepoint", StringComparison.OrdinalIgnoreCase) ? true :
+                    (ligne["Titre"].Contains("Sharepoint", StringComparison.OrdinalIgnoreCase) ?true:false)
+                    );
+                var yearIn = dsFormattedIn.Equals(string.Empty) ? " " : DateTime.Parse(dsFormattedIn).ToString("yyyy");
+                var weekIn = dsFormattedIn.Equals(string.Empty) ? "" : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(dsFormattedIn),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday).ToString();
+                var yearOut = dsFormattedOut.Equals(string.Empty) ? "" : DateTime.Parse(dsFormattedOut).ToString("yyyy");
+                var weekOut = dsFormattedOut.Equals(string.Empty) ? "" : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(dsFormattedOut),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday).ToString();
+
                 return new Tickets()
                 {
                     TicketID = ligne["ID"],
                     SourceTool = sourcetool,
                     AssignedTo = ligne["Responsable.Nom"],
                     DateSent = dateSent,
-                    YearIn = dateSent.Equals(string.Empty) ? " " : DateTime.Parse(dateSent).ToString("yyyy"),
-                    WeekIn = dateSent.Equals(string.Empty) ? " " : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                        DateTime.Parse(dateSent),
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday).ToString(),
+                    YearIn = yearIn,
+                    WeekIn = weekIn,
                     DateResolved = ligne["Date/Heure de résolution"],
                     DateClosed = dateClosed,
-                    YearOut = dateClosed.Equals(string.Empty) ? " " : DateTime.Parse(dateClosed).ToString("yyyy"),
-                    WeekOut = dateClosed.Equals(string.Empty) ? " " : CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                        DateTime.Parse(dateClosed),
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday).ToString(),
+                    YearOut = yearOut,
+                    WeekOut = weekOut,
                     Priority = integrateColumn(ligne["Priorité"], "Priority"),
-                    Status = integrateColumn(ligne["État"], "Status"),
+                    Status = ligne["État"],
                     Description = ligne["Titre"],
                     Category = integrateColumn(ligne["SLA.Titre"], "Category"),
                     ResolutionDuration = ligne["Elapsed Time for resolution"],
                     Application = ligne["Catégorie.Titre"],
                     AssignedToService = AssignedToService.TEAL,
-                    Sharepoint = ligne["Is Sharepoint ?"],
-                   // TypeCible = ligne["Type de cible"],
+                    Sharepoint = isSharepoint,
+                    // TypeCible = ligne["Type de cible"],
                     CreatedBy = ligne["Créé par.Nom"],
                     TicketEtat = ligne["ID de phase"],
                     Team = ligne["Groupe d'affectation.Nom"],
+                    DsFormattedStatus = dsFormattedStatus,
+                    DsFormattedInDay = dsFormattedIn,
+                    DsFormattedOutDay = dsFormattedOut,
+                    DsAge=dsAge
                 };
 
             }
             else return null;
 
         }
+
+        
 
         private string integrateColumn(string valueToCompare, string destination)
         {
@@ -225,7 +261,7 @@ namespace SMDAsh.Controllers
                                                 : ligneVal.In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? StatusParams.QUEUED_TEAL
                                                 : ligneVal.In("A fermer", "Résolu", "Closed_c", "Resolved_c", "RequestStatusComplete") ? StatusParams.RESOLVED
                                                 : ligneVal.In("") ? StatusParams.EMPTY
-                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire", "Open_c", "RequestStatusAssigned_c", "RequestStatusReopened_c", "RequestStatusInProgress", "InProgress") ? StatusParams.IN_PROCRESS
+                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire", "Open_c", "RequestStatusAssigned_c", "RequestStatusReopened_c", "RequestStatusInProgress", "InProgress") ? StatusParams.IN_PROGRESS
                                                 : StatusParams.NOT_CONFIGURED;
 
 
@@ -258,6 +294,67 @@ namespace SMDAsh.Controllers
                      : ligneVal.In("A fermer", "Fermée", "Abondonnée") ? AssignedToService.EMPTY : AssignedToService.NOT_CONFIGURED;
                     break;
                 
+
+
+                default:
+                    throw new DataIntegrationException(destination, new Exception());
+            }
+
+
+            //System.Diagnostics.Debug.WriteLine(ligneVal + " to " + finalVal);
+
+            return finalVal;
+        }
+
+        private string integrateDigislefColumn(string valueToCompare, string destination)
+        {
+            string finalVal = String.Empty;
+            string ligneVal = valueToCompare;
+
+            switch (destination)
+            {
+                case "DsFormatte":
+                    finalVal = ligneVal.In("Fermée", "Abondonnée", "closed", "Clôturé", "RequestStatusRejected") ? StatusParams.ABANDONED
+                                                : ligneVal.In("Nouvelle", "Accepté") ? StatusParams.NEW
+                                                : ligneVal.In("Prise en charge retours tests", "A tester", "En attente du client", "Additional status") ? StatusParams.TO_BE_TESTED
+                                                : ligneVal.In("ETUDE_A_VALIDER", "Queued", "Pending", "RequestStatusPending", "RequestStatusSuspended", "Suspended") ? StatusParams.QUEUED
+                                                : ligneVal.In("Queued_first_TEAL", "Prise en charge/Etude de faisabilité SI", "A appliquer en PROD", "A appliquer en RECETTE") ? StatusParams.QUEUED_TEAL
+                                                : ligneVal.In("A fermer", "Résolu", "Closed_c", "Resolved_c", "RequestStatusComplete") ? StatusParams.RESOLVED
+                                                : ligneVal.In("") ? StatusParams.EMPTY
+                                                : ligneVal.In("Travail en cours", "En cours chez le métier", "En cours DEV SI", "En Cours DEV SI", "En cours chez le prestataire", "Open_c", "RequestStatusAssigned_c", "RequestStatusReopened_c", "RequestStatusInProgress", "InProgress") ? StatusParams.IN_PROGRESS
+                                                : StatusParams.NOT_CONFIGURED;
+
+
+                    break;
+                case "Category":
+                    finalVal = ligneVal.In( "TEAL RUN SERVICES Incident") ? CategoryParams.INCIDENT
+                    : ligneVal.In("TEAL RUN SERVICES Service request") ? CategoryParams.SR
+                    : ligneVal.In("Evolution") ? CategoryParams.EVOLUTION : CategoryParams.NOT_CONFIGURED;
+                    break;
+                case "Priority":
+                    finalVal = ligneVal.In("basse", "4 - Faible", "3 - Faible", "Faible", "LowPriority") ? "Faible"
+                     : ligneVal.In("normale", "2 - Moyenne", "3 - Moyenne", "Moyenne", "MediumPriority") ? "Moyenne"
+                     : ligneVal.In("élevée", "HighPriority") ? "Elevée"
+                     : ligneVal.In("Critique/Elevée", "1 - Critique/Elevée", "urgente", "CriticalPriority") ? "Urgente" : "Priority not configured";
+                    break;
+                case "P":
+                    finalVal = ligneVal.In("P1", "1") ? "P1"
+                    : ligneVal.In("P2", "2") ? "P2"
+                    : ligneVal.In("P3", "3") ? "P3"
+                    : ligneVal.In("P4", "4") ? "P4" : "P not configured";
+                    break;
+                case "AssignedToService":
+                    finalVal = ligneVal.In("A appliquer en PROD__", "A appliquer en recette__", "A tester", "Demande de clarification métier",
+                                        "En cours chez le métier", "ETUDE_A_VALIDER") ? AssignedToService.OCP
+                     : ligneVal.In("SR Oracle en cours") ? AssignedToService.EDITOR
+                     : ligneVal.In("A appliquer en RECETTE", "En cours chez le prestataire", "A appliquer en PROD",
+                                         "En cours DEV SI", "Prise en charge retours tests", "Prise en charge/Etude de faisabilité SI",
+                                         "Nouvelle") ? AssignedToService.TEAL
+                     : ligneVal.In("En cours chez le prestataire__") ? AssignedToService.OWNER
+                     : ligneVal.In("A fermer", "Fermée", "Abondonnée") ? AssignedToService.EMPTY : AssignedToService.NOT_CONFIGURED;
+                    break;
+                
+
 
 
                 default:

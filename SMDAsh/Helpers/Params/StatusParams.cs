@@ -7,16 +7,16 @@ namespace SMDAsh.Helpers.Params
 {
     public static class StatusParams
     {
-        public const string ABANDONED = "Abandonnée";
-        public const string NEW = "Nouvelle";
-        public const string TO_BE_TESTED = "A tester";
-        public const string QUEUED = "Queued";
-        public const string QUEUED_TEAL = "Queued TEAL";
-        public const string RESOLVED = "Resolved";
+        public const string ABANDONED = "ABANDONED";
+        public const string NEW = "NEW";
+        public const string TO_BE_TESTED = "TO BE TESTED";
+        public const string QUEUED = "QUEUED";
+        public const string QUEUED_TEAL = "QUEUED TEAL";
+        public const string RESOLVED = "RESOLVED";
         public const string EMPTY = "-";
-        public const string IN_PROCRESS = "En Cours";
-        public const string NOT_CONFIGURED = "status not parametered";
-            
+        public const string IN_PROGRESS = "IN PROGRESS";
+        public const string NOT_CONFIGURED = "STATUS NOT CONFIGURED";
+
         public static List<string> GetAll() {
             var fields = typeof(StatusParams).GetFields();
             int paramsCount = fields.Length;
@@ -42,6 +42,9 @@ namespace SMDAsh.Helpers.Params
             }
 
             return allStatus;
+        }
+        public static List<string> GetGigiselfStatus(){
+            return null;
         }
     }
 }
