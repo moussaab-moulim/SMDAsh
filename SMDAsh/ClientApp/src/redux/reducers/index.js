@@ -20,6 +20,10 @@ import {
 import { slaByProjectYearOutAnoReducer } from './Anomaly/SlaByProjectAnoReducer';
 import { slaByProjectYearOutSrReducer } from './SR/slaByProjectSrReducer';
 import { slaByProjectYearOutEvolutionReducer } from './Evolution/slaByProjectEvolutionReducer';
+import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
+import backlogPerTeamDSReducer from './DigiSelf/backlogPerTeamDSReducer';
+import backlogByAgeDSReducer from './DigiSelf/backlogByAgeDSReducer';
+import backlogEvolutionByAgeDSReducer from './DigiSelf/backlogEvolutionByAgeDSReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from './Params/yearReducer';
@@ -42,7 +46,9 @@ import {
 
 import user from './auth/userReducer';
 import loading from './loadingReducer';
-import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
+
+
+
 
 const rootReducer = combineReducers({
   user,
@@ -57,6 +63,9 @@ const rootReducer = combineReducers({
   pieBacklogByOwnerEvolution: pieBacklogByOwnerEvolutionReducer,
   /* DigiSelf */
   backlogInOutDaysDS:backlogInOutDaysDSReducer,
+  backlogPerTeamDS:backlogPerTeamDSReducer,
+  backlogByAgeDS:backlogByAgeDSReducer,
+  backlogEvolutionByAgeDS:backlogEvolutionByAgeDSReducer,
 
   /* Anomaly */
   ticketAssignedOcpAno: ticketAssignedOcpAnoReducer,
