@@ -469,8 +469,9 @@ namespace SMDAsh.Controllers
         [HttpGet("[action]/{application}/")]
         public ActionResult<IQueryable> BacklogByTeam(string application="all")
         {
+            var result = new List<BacklogByTeam>();
 
-            var result = (from t in _context.Tickets
+            var query = (from t in _context.Tickets
                          where t.Sharepoint == false
                          && (t.DsFormattedStatus == "IN PROGRESS"
                          || t.DsFormattedStatus == "PENDING")
@@ -479,6 +480,21 @@ namespace SMDAsh.Controllers
                          .Select(t =>
                          new
                          {status=t.Key,backlog = t.GroupBy(g => g.DsFormattedStatus).Select(t => new { t.Key, count = t.Count() })});
+            foreach(var t in query)
+            {
+                var res = new BacklogByTeam() { status = t.status,backlog=new List<TeamStats>() };
+                var keys = new List<string>();
+                foreach(var g in t.backlog)
+                {
+                    var ts = new TeamStats() { key = g.Key, count = g.count };
+                    keys.Add(g.Key);
+                    res.backlog.Add(ts);
+                }
+                if (!keys.Contains("IN PROGRESS")) res.backlog.Add(new TeamStats() { key= "IN PROGRESS", count=0 });
+                if (!keys.Contains("PENDING")) res.backlog.Add(new TeamStats() { key = "PENDING", count = 0 });
+               
+                result.Add(res);
+            }
             return Ok(result.AsQueryable());
         }
     }

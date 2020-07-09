@@ -21,6 +21,10 @@ import {
     getBacklogDigiSelfAll
 } from '../../redux/actions/DigiSelf/backlogInOutDaysDSAction';
 
+import {
+    getBacklogPerTeamDigiSelf
+} from '../../redux/actions/DigiSelf/backlogPerteamAction'
+
 
 import { COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE } from '../../redux/constants';
 // core components
@@ -127,16 +131,18 @@ export default function BacklogPerTeamDigiSelf() {
 
     const [chartData, setChartData] = useState(initialChartState);
     const dispatch = useDispatch();
-    const chartState = useSelector((state) => state.backlogInOutDaysDS, []) || [];
+    const chartState = useSelector((state) => state.backlogPerTeamDS, []) || [];
     const [chartTable, setChartTable] = useState(chartState.dataTable);
-   
+
     const classes = useStyles();
     const [reloardData, setReloadData] = useState(false);
-/*
+    const [totalPending, setTotalPending] = useState([]);
+    const [totalInProgress, setTotalInProgress] = useState([]);
+
     useEffect(() => {
         if (chartState.loading || reloardData) {
 
-           
+            dispatch(getBacklogPerTeamDigiSelf());
             setReloadData(false);
         }
 
@@ -151,45 +157,61 @@ export default function BacklogPerTeamDigiSelf() {
     const orginizeData = () => {
 
         let datatable = chartState.dataTable;
+        
         const arbitraryStackKey = "stack1";
+        let totalPending = 0;
+        let totalInProgress = 0;
+
         const newChartArrays = {
             team: [],
-            in: [],
-            out: [],
-            totalIn: 0,
-            totalOut: 0,
+            pending: [],
+            inprogress: [],
         };
 
         for (let i = 0; i < datatable.length; i++) {
-            newChartArrays.day.push(datatable[i].team);
-            newChartArrays.in.push(datatable[i].in);
-            newChartArrays.out.push(datatable[i].out);
-            newChartArrays.totalIn += datatable[i].in; 
-            newChartArrays.totalIn += datatable[i].out; 
+            newChartArrays.team.push(datatable[i].status.split(" "));
+            let sortBacklog = datatable[i].backlog.sort(function(a, b) {
+                if (a.key < b.key) {
+                  return -1;
+                }
+                if (a.key> b.key) {
+                  return 1;
+                }
+                return 0;
+              });
+              console.log(sortBacklog);
+            newChartArrays.inprogress.push(sortBacklog[0].count);
+            newChartArrays.pending.push(sortBacklog[1].count);
         }
+
+        totalPending = newChartArrays.pending.reduce((a, b) => a + b, 0);
+        totalInProgress = newChartArrays.inprogress.reduce((a, b) => a + b, 0);
+
         const newChartData = {
             datasets: [
                 {
                     stack: arbitraryStackKey,
-                    label: 'Pending',
-                    data: [1, 2, 3, 4, 10],
-                    backgroundColor: COLOR_ORANGE,
+                    label: 'In Progress',
+                    data: newChartArrays.inprogress,
+                    backgroundColor: COLOR_TEAL,
                 },
                 {
                     stack: arbitraryStackKey,
-                    label: 'In Progress',
-                    data: [5, 4, 3, 2, 1],
-                    backgroundColor: COLOR_TEAL,
+                    label: 'Pending',
+                    data: newChartArrays.pending,
+                    backgroundColor: COLOR_ORANGE,
                 }
-               
+
             ],
-            labels: newChartArrays.day,
+            labels: newChartArrays.team,
         };
 
         setChartData(newChartData);
         setChartTable(datatable);
+        setTotalPending(totalPending);
+        setTotalInProgress(totalInProgress);
     };
-*/
+
     const options = {
         title: {
             display: true,
@@ -234,6 +256,7 @@ export default function BacklogPerTeamDigiSelf() {
         }
     }
     const arbitraryStackKey = "stack1";
+    /*
     let data = {
         labels: [
             ['TEAL_Run_L2', ' CustomBuild', ' Apps'],
@@ -259,7 +282,7 @@ export default function BacklogPerTeamDigiSelf() {
             
         ]
     }
-
+    */
 
 
     return (
@@ -268,7 +291,7 @@ export default function BacklogPerTeamDigiSelf() {
             <GridContainer>
                 <Grid item xs={12} sm={12} md={4} >
                     <Card className={classes.card}>
-                        
+
                         <CardBody>
                             <Grid item
                                 xs={12}
@@ -302,42 +325,25 @@ export default function BacklogPerTeamDigiSelf() {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        <TableRow>
-                                            <TableCell align="left">TEAL_Run_L2 CustomBuild Apps</TableCell>
-                                            <TableCell align="left">5</TableCell>
-                                            <TableCell align="left">1</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align="left">TEAL_Run_L2 Data</TableCell>
-                                            <TableCell align="left">4</TableCell>
-                                            <TableCell align="left">2</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align="left">TEAL_Run_L2 Industrial Apps</TableCell>
-                                            <TableCell align="left">3</TableCell>
-                                            <TableCell align="left">3</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align="left">TEAL_Run_L2 Middelware</TableCell>
-                                            <TableCell align="left">2</TableCell>
-                                            <TableCell align="left">4</TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell align="left">TEAL_Run_L2 Oracle EBS</TableCell>
-                                            <TableCell align="left">1</TableCell>
-                                            <TableCell align="left">10</TableCell>
-                                        </TableRow>
-
+                                        {chartTable.map((row) => (
+                                                <TableRow>
+                                                   
+                                                    <TableCell align="left">{row.status}</TableCell>
+                                                    <TableCell align="left">{row.backlog[0].count}</TableCell>
+                                                    <TableCell align="left">{row.backlog[1].count}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        }
 
 
                                         <TableRow >
                                             <TableCell align="left"><b>Total :</b></TableCell>
                                             <TableCell style={{
                                                 color: '#008080'
-                                            }} align="left"><b>15</b></TableCell>
+                                            }} align="left"><b>{totalInProgress}</b></TableCell>
                                             <TableCell style={{
                                                 color: '#008080'
-                                            }} align="left"><b>20</b></TableCell>
+                                            }} align="left"><b>{totalPending}</b></TableCell>
                                         </TableRow>
 
                                     </TableBody>
@@ -351,7 +357,7 @@ export default function BacklogPerTeamDigiSelf() {
                 </Grid>
                 <Grid item xs={12} sm={12} md={8} >
                     <Card className={classes.card}>
-                       
+
                         <CardBody>
                             <Grid
                                 xs={12}
@@ -370,7 +376,7 @@ export default function BacklogPerTeamDigiSelf() {
                                      Chart PNG
                                      </Button>
                             </Grid>
-                            <Bar data={data} options={options} />
+                            <Bar data={chartData} options={options} />
                         </CardBody>
 
                     </Card>

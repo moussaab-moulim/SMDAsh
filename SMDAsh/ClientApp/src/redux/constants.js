@@ -194,7 +194,7 @@ export const APIS = {
     
 
     // DigiSelf Backlog Per Team
-    getBacklogDigiSelfPerTeam: '/api/GetBacklogPerTeam/',
+    getBacklogDigiSelfPerTeam: '/api/BacklogByTeam/',
 
     // DigiSelf Backlog By Age
     getBacklogDigiSelfByAge: '/api/GetBacklogByAge/',

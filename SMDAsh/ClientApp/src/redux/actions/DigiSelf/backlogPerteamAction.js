@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as constants from '../../constants';
 
 // Thunk function, it calls the getRepos action above after it receives the fetch response.
-export function getBacklogPerTeamDigiSelf() { 
+export function getBacklogPerTeamDigiSelf(application="all") { 
   
   return function(dispatch, getState) {
       
@@ -10,7 +10,7 @@ export function getBacklogPerTeamDigiSelf() {
         type: constants.AWAITING_BACKLOG_PER_TEAM_DIGISELF,
       });
       
-      axios.get(constants.APIS.getBacklogDigiSelfPerTeam)
+      axios.get(constants.APIS.getBacklogDigiSelfPerTeam + application)
         .then(function(response){
  
           var arr = response.data;

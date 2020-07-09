@@ -1,0 +1,18 @@
+=SI(
+ET(Y2=Params!$H$1;NON(ESTVIDE(AA2)));
+DATE(ANNEE(AA2);MOIS(AA2);JOUR(AA2));
+DATE(ANNEE(K2);MOIS(K2);JOUR(K2))
+)
+
+AA2 : Solved Time
+Y2  : SLA.Title
+K2  : Date/Heure de résolution
+Params!$H$1 : TEAL RUN SERVICES Service request
+
+// Algo
+si ( Y2 == Params!$H$1 && !(AA2.empty) ) alors :
+
+	var Date = AA2.year + AA2.month ++ AA2.day;
+sinon : 
+	var Date = K2.year + K2.month + K2.day;
+fin si
