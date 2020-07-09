@@ -1,188 +1,187 @@
-import React, { Component } from "react";
-import Dropzone from "./dropzone/Dropzone";
-import Progress from "./progress/Progress";
-import checkedIcon from "assets/img/baseline-check_circle_outline-24px.svg";
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import * as constants from '../../redux/constants';
-class Upload extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      files: [],
-      uploading: false,
-      uploadProgress: {},
-      successfullUploaded: false,
-      sourceTool:''
-    };
-    this.classes= makeStyles((theme) => ({
-      formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
-      },
-      selectEmpty: {
-        marginTop: theme.spacing(2),
-      },
-    }));
-    this.onFilesAdded = this.onFilesAdded.bind(this);
-    this.uploadFiles = this.uploadFiles.bind(this);
-    this.sendRequest = this.sendRequest.bind(this);
-    this.renderActions = this.renderActions.bind(this);
-    this.handleSourceToolChange = this.handleSourceToolChange.bind(this);
-  }
-   handleSourceToolChange (event) {
-    this.setState({sourceTool : event.target.value});
-  }
-  
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import ImageButton from 'components/UploadZone/ImageButton';
+import SheetSettings from 'components/UploadZone/SheetSettings';
+import { DropzoneArea } from 'material-ui-dropzone';
 
-  onFilesAdded(files) {
-    this.setState(prevState => ({
-      files: prevState.files.concat(files)
-    }));
-  }
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: '100%',
+  },
+  backButton: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+}));
 
-  async uploadFiles() {
-    this.setState({ uploadProgress: {}, uploading: true });
-    const promises = [];
-    this.state.files.forEach(file => {
-      promises.push(this.sendRequest(file));
-    });
-    try {
-      await Promise.all(promises);
-
-      this.setState({ successfullUploaded: true, uploading: false });
-    } catch (e) {
-      // Not Production ready! Do some error handling here instead...
-      this.setState({ successfullUploaded: true, uploading: false });
-    }
-  }
-
-  sendRequest(file) {
-    return new Promise((resolve, reject) => {
-      const req = new XMLHttpRequest();
-
-      req.upload.addEventListener("progress", event => {
-        if (event.lengthComputable) {
-          const copy = { ...this.state.uploadProgress };
-          copy[file.name] = {
-            state: "pending",
-            percentage: (event.loaded / event.total) * 100
-          };
-          this.setState({ uploadProgress: copy });
-        }
-      });
-
-      req.upload.addEventListener("load", event => {
-        const copy = { ...this.state.uploadProgress };
-        copy[file.name] = { state: "done", percentage: 100 };
-        this.setState({ uploadProgress: copy });
-        resolve(req.response);
-      });
-
-      req.upload.addEventListener("error", event => {
-        const copy = { ...this.state.uploadProgress };
-        copy[file.name] = { state: "error", percentage: 0 };
-        this.setState({ uploadProgress: copy });
-        reject(req.response);
-      });
-
-      const formData = new FormData();
-      formData.set("SourceTool",this.state.sourceTool)
-      formData.append("DataFile", file, file.name);
-
-      req.open("POST", constants.APIS.upload);
-      req.send(formData);
-    });
-  }
-
-  renderProgress(file) {
-    const uploadProgress = this.state.uploadProgress[file.name];
-    if (this.state.uploading || this.state.successfullUploaded) {
-      return (
-        <div className="ProgressWrapper">
-          <Progress progress={uploadProgress ? uploadProgress.percentage : 0} />
-          <img
-            className="CheckIcon"
-            alt="done"
-            src={checkedIcon}
-            style={{
-              opacity:
-                uploadProgress && uploadProgress.state === "done" ? 0.5 : 0
-            }}
-          />
-        </div>
-      );
-    }
-  }
-
-  renderActions() {
-    if (this.state.successfullUploaded) {
-      return (
-        <button
-          onClick={() =>
-            this.setState({ files: [], successfullUploaded: false })
-          }
-        >
-          Clear
-        </button>
-      );
-    } else {
-      return (
-        <button
-          disabled={this.state.files.length < 0 || this.state.uploading}
-          onClick={this.uploadFiles}
-        >
-          Upload
-        </button>
-      );
-    }
-  }
-
-  render() {
-    return (
-      <div className="Upload">
-        <span className="Title">Upload Files</span>
-        <div className="Content">
-          
-            <Dropzone
-              onFilesAdded={this.onFilesAdded}
-              disabled={this.state.uploading || this.state.successfullUploaded}
-            />
-          
-          <div className="Files">
-            {this.state.files.map(file => {
-              return (
-                <div key={file.name} className="Row">
-                  <span className="Filename">{file.name}</span>
-                  {this.renderProgress(file)}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="Actions"><div className= "actionsContainer">
-        <FormControl className={this.classes.formControl}>
-        <InputLabel id="demo-simple-select-label">Source Tool</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={this.state.sourceTool}
-          onChange={this.handleSourceToolChange}
-        >
-          <MenuItem value={'SM9'}>SM9</MenuItem>
-          <MenuItem value={'Mantis'}>Mantis</MenuItem>
-          
-        </Select>
-      </FormControl>
-      {this.renderActions()}
-        </div>
-      </div>
-      </div>
-    );
-  }
+function getSteps() {
+  return ['Select service management tool', 'Upload file', 'Sheet settings'];
 }
 
-export default Upload;
+const images = [
+  {
+    url: 'https://www.logiciel-libre.org/stock/img/product/logo-mantis.png',
+    title: 'Mantis',
+    width: '30%',
+  },
+  {
+    url:
+      'https://342sv54cwf1w32bxz36tm0bv-wpengine.netdna-ssl.com/wp-content/uploads/2017/08/HP-service-manager-logo1.png',
+    title: 'Sm9',
+    width: '30%',
+  },
+  {
+    url:
+      'https://www.andeditions.org/wp-content/uploads/2015/11/grey-square-300x300.jpg',
+    title: 'Digiself',
+    width: '30%',
+  },
+];
+
+export default function Upload() {
+  const classes = useStyles();
+  const [activeStep, setActiveStep] = useState(0);
+  const [sourceTool, setSourceTool] = useState('');
+  const [droppedFile, setDroppedFile] = useState([]);
+
+  const [dataSheet, setdataSheet] = useState(0);
+  const [lastRowData, setlastRowData] = useState(0);
+  const [lastColumnData, setlastColumnData] = useState('A');
+
+  const [slaSheet, setslaSheet] = useState(0);
+  const [lastRowSla, setlastRowSla] = useState(0);
+  const [lastColumnSla, setlastColumnSla] = useState('A');
+  const steps = getSteps();
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleUpload = () => {
+    setActiveStep(0);
+  };
+
+  const chooseSourceTool = (tool) => {
+    setSourceTool(tool);
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+  const handleDropFile = (file) => {
+    console.log(file);
+    setDroppedFile(file);
+  };
+  const selectDataSheet = (params) => {
+    console.log(params);
+    setdataSheet(params);
+  };
+  const selectSlaSheet = (params) => {
+    setslaSheet(params);
+  };
+  const selectLastRowData = (params) => {
+    setlastRowData(params);
+  };
+  const selectLastRowSla = (params) => {
+    selectLastRowSla(params);
+  };
+  const selectLastColumnData = (params) => {
+    setlastColumnData(params);
+  };
+  const selectLastColumnSla = (params) => {
+    setlastColumnSla(params);
+  };
+
+  function getStepContent(stepIndex) {
+    switch (stepIndex) {
+      case 0:
+        return (
+          <ImageButton images={images} chooseSourceTool={chooseSourceTool} />
+        );
+      case 1:
+        return <DropzoneArea onChange={handleDropFile} filesLimit={1} />;
+      case 2:
+        return (
+          <SheetSettings
+            sourceTool={sourceTool}
+            selectDataSheets={{
+              selectDataSheet,
+              selectSlaSheet,
+              selectLastColumnData,
+              selectLastColumnSla,
+              selectLastRowData,
+              selectLastRowSla,
+            }}
+          />
+        );
+      default:
+        return 'Unknown stepIndex';
+    }
+  }
+
+  return (
+    <div className={classes.root}>
+      <Stepper activeStep={activeStep} alternativeLabel>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+      <React.Fragment>
+        {activeStep === steps.length ? (
+          <React.Fragment>
+            <Typography className={classes.instructions}>
+              All steps completed
+            </Typography>
+            <Button onClick={handleUpload}>Upload</Button>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Typography className={classes.instructions}>
+              {getStepContent(activeStep)}
+            </Typography>
+            <Typography className={classes.instructions}>
+              source tool : {activeStep > 0 && sourceTool}
+              <br />
+              data file :{' '}
+              {activeStep > 0 && droppedFile.length > 0 && droppedFile[0].name}
+              <br />
+              data sheet index :<br />
+              sla data sheet index :
+            </Typography>
+            <React.Fragment>
+              {activeStep !== 0 && (
+                <React.Fragment>
+                  <Button
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    className={classes.backButton}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={handleNext}
+                  >
+                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  </Button>
+                </React.Fragment>
+              )}
+            </React.Fragment>
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    </div>
+  );
+}
