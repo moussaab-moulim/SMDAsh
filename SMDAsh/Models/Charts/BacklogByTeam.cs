@@ -17,7 +17,6 @@ namespace SMDAsh.Models.Charts
     {
         public string key { get; set; }
         public int count { get; set; }
-
     }
 
    
