@@ -465,21 +465,5 @@ namespace SMDAsh.Controllers
 
             return Ok(result.AsQueryable());
         }
-
-        [HttpGet("[action]/{application}/")]
-        public ActionResult<IQueryable> BacklogByTeam(string application="all")
-        {
-
-            var result = (from t in _context.Tickets
-                         where t.Sharepoint == false
-                         && (t.DsFormattedStatus == "IN PROGRESS"
-                         || t.DsFormattedStatus == "PENDING")
-                         select t).ToList().Where(t=>application.Equals("all")?true: t.Application.In(application.Split(",")))
-                         .OrderBy(o => Int32.Parse(o.TicketID)).GroupBy(g => g.Team)
-                         .Select(t =>
-                         new
-                         {status=t.Key,backlog = t.GroupBy(g => g.DsFormattedStatus).Select(t => new { t.Key, count = t.Count() })});
-            return Ok(result.AsQueryable());
-        }
     }
 }
