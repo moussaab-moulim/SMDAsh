@@ -27,7 +27,7 @@ namespace SMDAsh.Controllers
 
         }
         [HttpPost("")]
-        public async Task<IActionResult> Upload([FromForm] SourceFile sf)
+        public IActionResult Upload([FromForm] SourceFile sf)
         {
             // Getting source tool
             string sourcetool = sf.SourceTool;
@@ -47,7 +47,7 @@ namespace SMDAsh.Controllers
             //Load excel stream
             using (var stream = new FileStream(filename, FileMode.Create))
             {
-                await excelFile.CopyToAsync(stream);
+                excelFile.CopyTo(stream);
                 //excelPack.Load(stream);
 
                 using (var excelPack = new ExcelPackage(stream))

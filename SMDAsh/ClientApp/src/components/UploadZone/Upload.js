@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import ImageButton from 'components/UploadZone/ImageButton';
 import SheetSettings from 'components/UploadZone/SheetSettings';
 import { DropzoneArea } from 'material-ui-dropzone';
-
+import axios from 'axios';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -50,7 +50,7 @@ export default function Upload() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const [sourceTool, setSourceTool] = useState('');
-  const [droppedFile, setDroppedFile] = useState([]);
+  const [droppedFile, setDroppedFile] = useState();
 
   const [dataSheet, setdataSheet] = useState(0);
   const [lastRowData, setlastRowData] = useState(0);
@@ -59,6 +59,7 @@ export default function Upload() {
   const [slaSheet, setslaSheet] = useState(0);
   const [lastRowSla, setlastRowSla] = useState(0);
   const [lastColumnSla, setlastColumnSla] = useState('A');
+  const [uploaded, setuploaded] = useState(false);
   const steps = getSteps();
 
   const handleNext = () => {
@@ -70,7 +71,18 @@ export default function Upload() {
   };
 
   const handleUpload = () => {
-    setActiveStep(0);
+    const data = new FormData();
+    data.set('SourceTool', sourceTool);
+    data.append('DataFile', droppedFile, droppedFile.name);
+    axios
+      .post('/api/Upload', data, {
+        // receive two    parameter endpoint url ,form data
+      })
+      .then((res) => {
+        // then print response status
+        console.log(res.statusText);
+        setuploaded(true);
+      });
   };
 
   const chooseSourceTool = (tool) => {
@@ -78,8 +90,8 @@ export default function Upload() {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
   const handleDropFile = (file) => {
-    console.log(file);
-    setDroppedFile(file);
+    console.log(file[0]);
+    setDroppedFile(file[0]);
   };
   const selectDataSheet = (params) => {
     console.log(params);
@@ -141,9 +153,11 @@ export default function Upload() {
         {activeStep === steps.length ? (
           <React.Fragment>
             <Typography className={classes.instructions}>
-              All steps completed
+              {!uploaded ? 'Ready to upload' : 'file upload is done'}
             </Typography>
-            <Button onClick={handleUpload}>Upload</Button>
+            <Button onClick={handleUpload} variant='contained' color='primary'>
+              Upload
+            </Button>
           </React.Fragment>
         ) : (
           <React.Fragment>
@@ -153,8 +167,7 @@ export default function Upload() {
             <Typography className={classes.instructions}>
               source tool : {activeStep > 0 && sourceTool}
               <br />
-              data file :{' '}
-              {activeStep > 0 && droppedFile.length > 0 && droppedFile[0].name}
+              data file : {activeStep > 0 && droppedFile && droppedFile.name}
               <br />
               data sheet index :<br />
               sla data sheet index :
@@ -170,6 +183,7 @@ export default function Upload() {
                     Back
                   </Button>
                   <Button
+                    disabled={activeStep === 1 && !droppedFile}
                     variant='contained'
                     color='primary'
                     onClick={handleNext}
