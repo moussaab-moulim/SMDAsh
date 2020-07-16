@@ -7,7 +7,7 @@ namespace SMDAsh.Models.Charts
 {
     public class BacklogByTeam
     {
-        
+
         public string status { get; set; }
         public List<TeamStats> backlog { get; set; }
 
@@ -19,6 +19,6 @@ namespace SMDAsh.Models.Charts
         public int count { get; set; }
     }
 
-   
+
 }
 
