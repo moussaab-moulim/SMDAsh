@@ -497,5 +497,49 @@ namespace SMDAsh.Controllers
             }
             return Ok(result.AsQueryable());
         }
+        [HttpGet("[action]")]
+        public ActionResult<IQueryable> BacklogByAge()
+        {
+            var query = (from t in _context.Tickets
+                         where t.Sharepoint == false && (t.DsFormattedStatus == "IN PROGRESS" || t.DsFormattedStatus == "PENDING")
+                         select t)
+                         .ToList()
+            .GroupBy(t => t.DsFormattedInDay).Select(g => new { g.Key, Age = g.GroupBy(t => t.DsAge).Select(t => new { t.Key, count = t.Count() }) }).OrderBy(t => DateTime.Parse(t.Key));
+            var result = new List<BacklogByAge>();
+            var ageCategory = new List<ageStats>();
+            ageCategory.Add(new ageStats() { ageCategory = "5 days or less", count = 0 });
+            ageCategory.Add(new ageStats() { ageCategory = "6 to 12 days", count = 0 });
+            ageCategory.Add(new ageStats() { ageCategory = "12 to 20 days", count = 0 });
+            ageCategory.Add(new ageStats() { ageCategory = "more than 20 days", count = 0 });
+            foreach (var q in query)
+            {
+                if (!result.Exists(t => t.date.Equals(q.Key)))
+                {
+                    result.Add(new BacklogByAge { date = q.Key, ageCategory = new List<ageStats>(ageCategory) });
+
+                }
+
+                foreach (var age in q.Age)
+                {
+                    if (age.Key <= 5)
+                    {
+                        result.Find(t => t.date.Equals(q.Key)).ageCategory[0].count += age.count;
+                    }
+                    else if (age.Key <= 12)
+                    {
+                        result.Find(t => t.date.Equals(q.Key)).ageCategory[1].count += age.count;
+                    }
+                    else if (age.Key <= 20)
+                    {
+                        result.Find(t => t.date.Equals(q.Key)).ageCategory[2].count += age.count;
+                    }
+                    else
+                    {
+                        result.Find(t => t.date.Equals(q.Key)).ageCategory[3].count += age.count;
+                    }
+                }
+            }
+            return Ok(result.AsQueryable());
+        }
     }
 }
