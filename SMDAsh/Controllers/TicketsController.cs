@@ -515,7 +515,6 @@ namespace SMDAsh.Controllers
             {
                 if (!result.Exists(t => t.date.Equals(q.Key)))
                 {
-                    //result.Find(t => t.date.Equals(q.Key));
                     result.Add(new BacklogByAge { date = q.Key, ageCategory = new List<ageStats>(ageCategory) });
 
                 }
