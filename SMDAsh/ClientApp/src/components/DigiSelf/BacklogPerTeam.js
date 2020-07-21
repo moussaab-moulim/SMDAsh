@@ -322,6 +322,7 @@ export default function BacklogPerTeamDigiSelf() {
                                             <TableCell>Teams</TableCell>
                                             <TableCell >In Progress</TableCell>
                                             <TableCell >Pending</TableCell>
+                                            <TableCell >Total</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -331,6 +332,9 @@ export default function BacklogPerTeamDigiSelf() {
                                                     <TableCell align="left">{row.status}</TableCell>
                                                     <TableCell align="left">{row.backlog[0].count}</TableCell>
                                                     <TableCell align="left">{row.backlog[1].count}</TableCell>
+                                                    <TableCell align="left" style={{color: '#008080'}}>
+                                                        <b>{row.backlog[0].count + row.backlog[1].count}</b>
+                                                    </TableCell>
                                                 </TableRow>
                                             ))
                                         }
@@ -344,6 +348,9 @@ export default function BacklogPerTeamDigiSelf() {
                                             <TableCell style={{
                                                 color: '#008080'
                                             }} align="left"><b>{totalPending}</b></TableCell>
+                                            <TableCell style={{
+                                                color: '#008080'
+                                            }} align="left"><b>{totalInProgress + totalPending}</b></TableCell>
                                         </TableRow>
 
                                     </TableBody>
