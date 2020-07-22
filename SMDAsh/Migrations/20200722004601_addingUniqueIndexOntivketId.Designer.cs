@@ -3,91 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200722004601_addingUniqueIndexOntivketId")]
+    partial class addingUniqueIndexOntivketId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("SMDAsh.Models.SlaTickets", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AssignedTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AssignedToService")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DateClosed")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DateResolved")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DateSent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("DsAge")
-                        .HasColumnType("float");
-
-                    b.Property<string>("P")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParentCategory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParentTicketId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Priority")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Sharepoint")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SlaID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SourceTool")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TargetType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Team")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Update")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentTicketId")
-                        .IsUnique()
-                        .HasFilter("[ParentTicketId] IS NOT NULL");
-
-                    b.ToTable("SlaTickets");
-                });
 
             modelBuilder.Entity("SMDAsh.Models.Tickets", b =>
                 {
@@ -175,7 +107,6 @@ namespace SMDAsh.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TicketID")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Update")
@@ -234,14 +165,6 @@ namespace SMDAsh.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("SMDAsh.Models.SlaTickets", b =>
-                {
-                    b.HasOne("SMDAsh.Models.Tickets", "ParentTicket")
-                        .WithOne("SlaTicket")
-                        .HasForeignKey("SMDAsh.Models.SlaTickets", "ParentTicketId")
-                        .HasPrincipalKey("SMDAsh.Models.Tickets", "TicketID");
                 });
 #pragma warning restore 612, 618
         }

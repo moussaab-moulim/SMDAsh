@@ -10,5 +10,8 @@ namespace SMDAsh.Models
     {
         public string SourceTool { get; set; }
         public IFormFile DataFile  { get; set; }
+
+        public int AllDataSheet { get; set; }
+        public int SlaDataSheet { get; set; }
     }
 }
