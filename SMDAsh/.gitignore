@@ -234,6 +234,3 @@ _Pvt_Extensions
 #excel files
 *.xls
 *.xlsx
-
-#appsettings
-appsettings.json
