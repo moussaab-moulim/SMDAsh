@@ -47,14 +47,13 @@ export default function Digiself() {
   const classes = useStyles();
   return (
     <div>
-      <SlaClosedCurrentMonth />
-      {/*
-       <BacklogEfficiencyDigiSelf />
+      
+      <BacklogEfficiencyDigiSelf />
       <BacklogPerTeamDigiSelf />
       <BacklogByAge />
       <BacklogEvolutionByAge />
-       */}
-     
+      <SlaClosedCurrentMonth />
+
     </div>
   );
 }

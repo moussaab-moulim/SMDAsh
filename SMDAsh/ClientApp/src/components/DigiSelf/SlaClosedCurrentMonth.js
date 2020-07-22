@@ -144,10 +144,11 @@ export default function SlaClosedCurrentMonth() {
 
     const [TRSI, setTRSI] = useState(true);
     const [TRSR, setTRSR] = useState(true);
-    const [TableDetails, setTableDetails] = useState(false);
+    const [TableDetails, setTableDetails] = useState(true);
 
     const [incidentToggle, setIncidentToggle] = useState(false);
     const [requestToggle, setRequestToggle] = useState(false);
+
     const toggleIncident = () => {
         setIncidentToggle(!incidentToggle);
     }

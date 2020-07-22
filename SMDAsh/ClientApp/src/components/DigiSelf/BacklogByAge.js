@@ -112,12 +112,9 @@ const initialChartState = {
 
 export default function BacklogByAge() {
 
-
     const [chartData, setChartData] = useState(initialChartState);
 
-
     const dispatch = useDispatch();
-
 
     const chartBacklogByAgeState = useSelector((state) => state.backlogByAgeDS, []) || [];
 
@@ -135,7 +132,6 @@ export default function BacklogByAge() {
         if (chartBacklogByAgeState.loading || reloardData) {
 
             dispatch(getBacklogByAgeDigiSelf());
-            orginizeData();
             setReloadData(false);
 
         }
@@ -168,24 +164,16 @@ export default function BacklogByAge() {
 
         const backgroundColor = [];
 
-
-        const data = [
-            { age: "12 to 20 days", count: 10 },
-            { age: "5 days or less", count: 79 },
-            { age: "6 to 12 days", count: 14 },
-            { age: "more than 20 days", count: 26 },
-        ];
+        const data = chartBacklogByAgeState.dataTable.slice(-1)[0].ageCategory;
 
         for (let i = 0; i < data.length; i++) {
 
-            labels.push(data[i].age)
+            labels.push(data[i].ageCategory)
             counts.push(data[i].count)
             dataTable.push(data[i])
 
             backgroundColor.push(dynamicColors());
         }
-
-
 
         for (let i = 0; i < dataTable.length; i++) {
             total += dataTable[i].count;
@@ -253,7 +241,7 @@ export default function BacklogByAge() {
 
                                                         <TableRow className={classes.paddingTable}>
 
-                                                            <TableCell align="left">{row.age}</TableCell>
+                                                            <TableCell align="left">{row.ageCategory}</TableCell>
                                                             <TableCell align="left">{row.count}</TableCell>
 
                                                         </TableRow>

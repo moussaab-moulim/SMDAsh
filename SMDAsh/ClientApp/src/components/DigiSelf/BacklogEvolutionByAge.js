@@ -108,11 +108,11 @@ const initialChartState = {
 const BacklogEvolutionByAge = () => {
   const [statecolumns, setStatecolumns] = useState({
     columns: [
-      { title: 'Date', field: 'day' },
-      { title: '12 to 20 days', field: 'in', type: 'numeric' },
-      { title: '5 days or less', field: 'out', type: 'numeric' },
-      { title: '6 days to 12 days', field: 'in', type: 'numeric' },
-      { title: 'more then 20 days', field: 'out', type: 'numeric' },
+      { title: 'Date', field: 'date' },
+      { title: '12 to 20 days', field: 'days12to20', type: 'numeric' },
+      { title: '5 days or less', field: 'days5orLess', type: 'numeric' },
+      { title: '6 days to 12 days', field: 'days6to12', type: 'numeric' },
+      { title: 'more then 20 days', field: 'morethen20days', type: 'numeric' },
     ],
   });
 
@@ -170,6 +170,8 @@ const BacklogEvolutionByAge = () => {
   const orginizeData = () => {
   
     let datatable = chartState.dataTable;
+    let datatableToShow = [];
+    
     const newChartArrays = {
       date: [],
       days12to20: [],
@@ -179,11 +181,19 @@ const BacklogEvolutionByAge = () => {
     };
 
     for (let i = 0; i < datatable.length; i++) {
-      newChartArrays.date.push(datatable[i].day);
-      newChartArrays.days12to20.push(datatable[i].in+10);
-      newChartArrays.days5orLess.push(datatable[i].out+10);
-      newChartArrays.days6to12.push(datatable[i].in+12);
-      newChartArrays.morethen20days.push(datatable[i].out+5);
+      newChartArrays.date.push(datatable[i].date);
+      newChartArrays.days12to20.push(datatable[i].ageCategory[0].count);
+      newChartArrays.days5orLess.push(datatable[i].ageCategory[1].count);
+      newChartArrays.days6to12.push(datatable[i].ageCategory[2].count);
+      newChartArrays.morethen20days.push(datatable[i].ageCategory[3].count);
+
+      datatableToShow.push({
+       "date": datatable[i].date,
+       "days12to20": datatable[i].ageCategory[0].count,
+       "days5orLess": datatable[i].ageCategory[1].count,
+       "days6to12": datatable[i].ageCategory[2].count,
+       "morethen20days": datatable[i].ageCategory[3].count,
+      });
     }
     const newChartData = {
       datasets: [
@@ -228,7 +238,7 @@ const BacklogEvolutionByAge = () => {
     };
    
     setChartData(newChartData);
-    setChartTable(datatable);
+    setChartTable(datatableToShow.reverse());
   };
 
 

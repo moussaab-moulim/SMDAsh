@@ -185,22 +185,21 @@ export const APIS = {
     getBacklogDigiSelfAll: '/api/GetBacklog/all/all/all',
 
     // DigiSelf Backlog Evolution
-    getBacklogDigiSelfByAgeOneWeek: '/api/GetBacklog/all/all/all?ByDay=true&take=5',
-    getBacklogDigiSelfByAgeOneMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=20',
-    getBacklogDigiSelfByAgeThreeMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=60',
-    getBacklogDigiSelfByAgeSixMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=120',
-    getBacklogDigiSelfByAgeOneYear: '/api/GetBacklog/all/all/all?ByDay=true&take=240',
-    getBacklogDigiSelfByAgeAll: '/api/GetBacklog/all/all/all',
+    getBacklogDigiSelfByAgeOneWeek: '/api/BacklogByAge?take=5',
+    getBacklogDigiSelfByAgeOneMonth: '/api/BacklogByAge?take=20',
+    getBacklogDigiSelfByAgeThreeMonth: '/api/BacklogByAge?take=60',
+    getBacklogDigiSelfByAgeSixMonth: '/api/BacklogByAge?take=120',
+    getBacklogDigiSelfByAgeOneYear: '/api/BacklogByAge?take=240',
+    getBacklogDigiSelfByAgeAll: '/api/BacklogByAge',
     
 
     // DigiSelf Backlog Per Team
     getBacklogDigiSelfPerTeam: '/api/BacklogByTeam/',
 
     // DigiSelf Backlog By Age
-    getBacklogDigiSelfByAge: '/api/GetBacklogByAge/',
+    getBacklogDigiSelfByAge: '/api/BacklogByAge/',
 
-    // DigiSelf Backlog Evolution By Age Category
-    getBacklogEvolutionDigiSelfByAge: '/api/GetBacklogEvolutionByAge/',
+    
    
 
     // SR Backlog
