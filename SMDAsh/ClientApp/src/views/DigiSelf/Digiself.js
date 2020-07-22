@@ -6,9 +6,9 @@ import BacklogEfficiencyDigiSelf from "components/DigiSelf/BacklogEfficiency";
 import BacklogPerTeamDigiSelf from "components/DigiSelf/BacklogPerTeam";
 import BacklogByAge from "components/DigiSelf/BacklogByAge";
 import BacklogEvolutionByAge from "components/DigiSelf/BacklogEvolutionByAge";
+import SlaClosedCurrentMonth from "components/DigiSelf/SlaClosedCurrentMonth";
 
 import 'chartjs-plugin-labels';
-
 
 const useStyles = makeStyles((theme) => ({
 
@@ -44,16 +44,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Digiself() {
 
-
   const classes = useStyles();
   return (
     <div>
-
-      <BacklogEfficiencyDigiSelf />
+      <SlaClosedCurrentMonth />
+      {/*
+       <BacklogEfficiencyDigiSelf />
       <BacklogPerTeamDigiSelf />
       <BacklogByAge />
       <BacklogEvolutionByAge />
-
+       */}
+     
     </div>
   );
 }
