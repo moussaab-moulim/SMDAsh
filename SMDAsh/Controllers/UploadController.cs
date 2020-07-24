@@ -33,6 +33,10 @@ namespace SMDAsh.Controllers
             string sourcetool = sf.SourceTool;
             // Getting file
             var excelFile = sf.DataFile;
+            //getting the sheet number of all data
+            var allDataSheet = sf.AllDataSheet;
+            //getting the sheet number of sla data
+            var slaDataSheet = sf.SlaDataSheet;
 
             if (excelFile == null || excelFile.Length == 0)
                 return NoContent();
@@ -55,13 +59,13 @@ namespace SMDAsh.Controllers
 
                     //Lets Deal with first worksheet.
                     //System.Diagnostics.Debug.WriteLine(excelPack.Workbook.Worksheets.Count);
-                    var ws = excelPack.Workbook.Worksheets[0];
+                    var ws = excelPack.Workbook.Worksheets[allDataSheet-1];
 
                     // list to save the data of excel as tickets
                     List<Tickets> tickets = new List<Tickets>();
                     //list to save the first row of data sheet as keys
                     List<string> keys = new List<string>();
-                    foreach (var firstRowCell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
+                    foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("all", sourcetool)])
                     {
                         //Get names from first row
                         if (!string.IsNullOrEmpty(firstRowCell.Text))
@@ -71,14 +75,14 @@ namespace SMDAsh.Controllers
                         }
                     }
                     var startRow = 2;
-                    var endRow = ws.Dimension.End.Row;
+                    var endRow = sf.AllDataLastRow;
                     //Get row details
                     for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                     {
                         var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
                         Dictionary<string, string> ligne = new Dictionary<string, string>();
                         int j = 0;
-                        var endCell = ws.Dimension.End.Column;
+                        var endCell = getLastData("all", sourcetool);
                         for (int cellNum = 1; cellNum <= endCell; cellNum++)
                         {
                             var cell = ws.Cells[rowNum, cellNum];
@@ -94,11 +98,99 @@ namespace SMDAsh.Controllers
                     }
                     // IMPORT TO DATABASE
                     _context.AddRange(tickets);
+
+                    if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ws = excelPack.Workbook.Worksheets[slaDataSheet - 1];
+                        // list to save the data of excel as tickets
+                        List<SlaTickets> slaTickets = new List<SlaTickets>();
+                        //list to save the first row of data sheet as keys
+                        List<string> slakeys = new List<string>();
+                        foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("sla",sourcetool)])
+                        {
+                            //Get names from first row
+                            if (!string.IsNullOrEmpty(firstRowCell.Text))
+                            {
+                                slakeys.Add(firstRowCell.Text);
+
+                            }
+                        }
+                         startRow = 2;
+                        endRow = sf.SlaDataLastRow;
+                        //Get row details
+                        for (int rowNum = startRow; rowNum <= endRow; rowNum++)
+                        {
+                            var wsRow = ws.Cells[rowNum, 1, rowNum, slakeys.Count];
+                            Dictionary<string, string> ligne = new Dictionary<string, string>();
+                            int j = 0;
+                            var endCell = getLastData("sla", sourcetool);
+                            for (int cellNum = 1; cellNum <= endCell; cellNum++)
+                            {
+                                var cell = ws.Cells[rowNum, cellNum];
+                                string currentcellvalue = cell.Text;
+                                ligne.Add(slakeys[j++], currentcellvalue);
+                            }
+
+
+                            slaTickets.Add(createSlaTicket(ligne, sourcetool));
+                            count++;
+
+
+                        }
+                        _context.AddRange(slaTickets);
+                    }
+                    
                     int created = _context.SaveChanges();
                     return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
                 }
 
             }
+        }
+
+        private SlaTickets createSlaTicket(Dictionary<string, string> ligne, string sourcetool)
+        {
+            if (sourcetool.Equals("digiself",StringComparison.OrdinalIgnoreCase))
+            {
+                System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
+                var newSla = new SlaTickets()
+                {
+                    SlaID = ligne["ID"],
+                    SourceTool = sourcetool,
+                    DateSent = ligne["Date/Heure de création"],
+                    DateClosed = ligne["Date d'accomplissement"],
+                    ParentTicketId = ligne["Parent"],
+                    Priority = integrateColumn(ligne["Priorité"], "Priority"),
+                    Status = ligne["État"],
+
+                    ParentCategory = integrateColumn(ligne["Type de parent"], "Category"),
+
+                    AssignedToService = AssignedToService.TEAL,
+                    TargetType = ligne["Type de cible"],
+                    Team = ligne["Groupe d'affectation.Nom"],
+                    DsAge = Double.Parse(ligne["Durée écoulée (Ouvrée)"], NumberStyles.Number)
+
+                };
+                System.Diagnostics.Debug.WriteLine(newSla.ToString());
+                return newSla;
+
+                
+
+            }
+            return null;
+        }
+
+        private int getLastData(string v, string sourcetool)
+        {
+            if (sourcetool.Equals("mantis", StringComparison.OrdinalIgnoreCase))
+            {
+                return 45;
+            }else if (sourcetool.Equals("sm9", StringComparison.OrdinalIgnoreCase))
+            {
+                return 29;
+            }else if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase)){
+                return v.Equals("sla")?14:28;
+            }
+            return -1;
         }
 
         private Tickets createNewTicket(Dictionary<string, string> ligne, string sourcetool)
@@ -134,7 +226,7 @@ namespace SMDAsh.Controllers
                     Application = ligne["Projet Court"] + ":" + ligne["Projet"],
                     AssignedToService = integrateColumn(ligne["Statut"], "AssignedToService"),
                     Update = ligne["Mis à jour"]
-                }); ;
+                }); 
 
 
             }
