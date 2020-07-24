@@ -15,7 +15,7 @@ using SMDAsh.Helpers;
 
 namespace SMDAsh.Controllers
 {
-   
+
     [Route("api")]
     [ApiController]
     public class TicketsController : ControllerBase
@@ -29,7 +29,7 @@ namespace SMDAsh.Controllers
         }
 
         [HttpGet("[action]/{Category}/{Year}/{Month}"), AutoQueryable]
-        public ActionResult<IQueryable> GetBacklog(string Category ,string Year,string Month, bool ByDay = false)
+        public ActionResult<IQueryable> GetBacklog(string Category, string Year, string Month, bool ByDay = false)
 
         {
 
@@ -73,7 +73,8 @@ namespace SMDAsh.Controllers
                             && !t.YearOut.Equals(string.Empty)
                             select t)
                             .ToList()
-                            .Select(t => new {
+                            .Select(t => new
+                            {
                                 t.Category,
                                 t.DateSent,
                                 t.DsFormattedOutDay,
@@ -141,7 +142,7 @@ namespace SMDAsh.Controllers
 
         [HttpGet("[action]/{Category}/{Service}")]
         [AutoQueryable]
-        public  ActionResult<IQueryable> TicketsAssigned(string Category,string Service)
+        public ActionResult<IQueryable> TicketsAssigned(string Category, string Service)
         {
             List<string> allStatus = StatusParams.GetForTicketsAssigned();
             List<string> allCategory = CategoryParams.GetAll();
@@ -155,16 +156,17 @@ namespace SMDAsh.Controllers
                 BadUrl obj = new BadUrl(Category);
                 lit.Add(obj);
                 return BadRequest(lit.AsQueryable());
-            } else if (!AssignedToService.GetAll().Contains(Service, StringComparer.OrdinalIgnoreCase) && !Service.Equals("all"))
+            }
+            else if (!AssignedToService.GetAll().Contains(Service, StringComparer.OrdinalIgnoreCase) && !Service.Equals("all"))
             {
                 BadUrl obj = new BadUrl(Service);
                 lit.Add(obj);
                 return BadRequest(lit.AsQueryable());
             }
-            
+
             var query =
                  (from t in _context.Tickets
-                  where t.Category.Contains((Category.Equals("all")?"":Category))
+                  where t.Category.Contains((Category.Equals("all") ? "" : Category))
                   && allStatus.Contains(t.Status)
                   && t.AssignedToService.Contains((Service.Equals("all") ? "" : Service))
                   select t);
@@ -177,8 +179,8 @@ namespace SMDAsh.Controllers
                                        count = t.Count()
                                    })
                                    .AsQueryable<TicketsAssigned>();
-            
-            
+
+
 
             return Ok(results);
 
@@ -203,22 +205,23 @@ namespace SMDAsh.Controllers
             }
 
             List<string> excludeApp = new List<string>();
-            if(exclude!=null && !exclude.Equals(String.Empty))
-            foreach(var item in exclude.Split(","))
-            {
-                excludeApp.Add(item.Trim());
-            }
-            
+            if (exclude != null && !exclude.Equals(String.Empty))
+                foreach (var item in exclude.Split(","))
+                {
+                    excludeApp.Add(item.Trim());
+                }
+
 
             var back = new List<BacklogByOwner>();
             var query = (from t in _context.Tickets
                          where t.YearWeekIn.Contains((Year.Equals("all") ? "" : Year))
-                         && t.Category.Contains((Category.Equals("all") ? "" : Category)) 
+                         && t.Category.Contains((Category.Equals("all") ? "" : Category))
                          && t.AssignedToService != "-"
                          && !excludeApp.Contains(t.Application)
                          select t)
                          .OrderByDescending(t => t.YearWeekIn)
-                         .Select(t => new {
+                         .Select(t => new
+                         {
                              category = t.Category,
                              assignedToService = t.AssignedToService,
                              status = t.Status,
@@ -227,10 +230,10 @@ namespace SMDAsh.Controllers
                              yearWeek = t.YearWeekIn
                          }).ToList();
             var services = query.GroupBy(t => t.assignedToService);
-            foreach ( var item in services)
+            foreach (var item in services)
             {
                 var service = item.GroupBy(g => g.status);
-                
+
                 foreach (var srv in service)
                 {
                     BacklogByOwner b = new BacklogByOwner()
@@ -242,9 +245,9 @@ namespace SMDAsh.Controllers
                     };
                     back.Add(b);
                 }
-                
-                
-                
+
+
+
             }
 
 
@@ -254,7 +257,7 @@ namespace SMDAsh.Controllers
 
         [HttpGet("[action]/{Category}/{Year}/{Week}")]
         [AutoQueryable]
-        public ActionResult<IQueryable> SlaByProject(string Category, string Year,string Week)
+        public ActionResult<IQueryable> SlaByProject(string Category, string Year, string Week)
         {
             List<string> allCategory = CategoryParams.GetAll();
             //bad request error;
@@ -276,18 +279,24 @@ namespace SMDAsh.Controllers
 
             var queryOK = query.Where(t => t.SLA == "OK").GroupBy(t => t.Application)
                                    .ToDictionary(g => g.Key.Split(":")[1],
-                                   g => new SlaCount() { category = g.First().Category,
+                                   g => new SlaCount()
+                                   {
+                                       category = g.First().Category,
                                        year = Year,
                                        application = g.Key.Split(":")[1],
                                        week = Week,
-                                       ok = g.Count() });
+                                       ok = g.Count()
+                                   });
             var queryKO = query.Where(t => t.SLA == "KO").GroupBy(t => t.Application)
                            .ToDictionary(g => g.Key.Split(":")[1]
-                           , g => new SlaCount() { category = g.First().Category, 
-                               year = Year, 
-                               application = g.Key.Split(":")[1], 
-                               week = Week, 
-                               ko = g.Count() });
+                           , g => new SlaCount()
+                           {
+                               category = g.First().Category,
+                               year = Year,
+                               application = g.Key.Split(":")[1],
+                               week = Week,
+                               ko = g.Count()
+                           });
             var okKeys = queryOK.Keys;
             var koKeys = queryKO.Keys;
             foreach (var key in koKeys)
@@ -302,7 +311,7 @@ namespace SMDAsh.Controllers
                 }
             }
 
-            
+
 
             return Ok(queryOK.Select(t => t.Value).ToList().OrderBy(t => t.application).AsQueryable());
         }
@@ -327,7 +336,7 @@ namespace SMDAsh.Controllers
                 .Contains(Year, StringComparer.OrdinalIgnoreCase) && !Year.Equals("all"))
             {
 
-                
+
                 BadUrl obj = new BadUrl(Year);
                 lit.Add(obj);
                 return BadRequest(lit.AsQueryable());
@@ -345,10 +354,11 @@ namespace SMDAsh.Controllers
                          where t.AssignedToService.Contains(Service.Equals("all") ? "" : Service) &&
                          allStatus.Contains(t.Status)
                          select t).ToList()
-                         .Where(t=> !excludeApp.Contains(t.Application.Split(":")[0]) &&
+                         .Where(t => !excludeApp.Contains(t.Application.Split(":")[0]) &&
                          DateTime.Parse(t.Update).ToString("yyyy").Contains(Year.Equals("all") ? "" : Year)
                          )
-                        .Select(t => new {
+                        .Select(t => new
+                        {
                             t.AssignedToService,
                             t.Category,
                             month = DateTime.Parse(t.Update).ToString("MMMM", CultureInfo.CreateSpecificCulture("en-US")),
@@ -420,11 +430,12 @@ namespace SMDAsh.Controllers
                     {
                         catCount.Add(c.Key, c.Count());
                     }
-                    foreach(var c in allCategory) {
+                    foreach (var c in allCategory)
+                    {
                         if (!catCount.ContainsKey(c)) catCount.Add(c, 0);
                     }
-                    
-                    mon.categories = catCount.OrderBy(t=>t.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                    mon.categories = catCount.OrderBy(t => t.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
                     months.Add(mon);
                 }
 
@@ -461,13 +472,13 @@ namespace SMDAsh.Controllers
                 result.Add(entry);
 
             }
-            
+
 
             return Ok(result.AsQueryable());
         }
 
         [HttpGet("[action]/{application}/")]
-        public ActionResult<IQueryable> BacklogByTeam(string application="all")
+        public ActionResult<IQueryable> BacklogByTeam(string application = "all")
         {
             var result = new List<BacklogByTeam>();
 
@@ -475,24 +486,24 @@ namespace SMDAsh.Controllers
                          where t.Sharepoint == false
                          && (t.DsFormattedStatus == "IN PROGRESS"
                          || t.DsFormattedStatus == "PENDING")
-                         select t).ToList().Where(t=>application.Equals("all")?true: t.Application.In(application.Split(",")))
+                         select t).ToList().Where(t => application.Equals("all") ? true : t.Application.In(application.Split(",")))
                          .OrderBy(o => Int32.Parse(o.TicketID)).GroupBy(g => g.Team)
                          .Select(t =>
                          new
-                         {status=t.Key,backlog = t.GroupBy(g => g.DsFormattedStatus).Select(t => new { t.Key, count = t.Count() })});
-            foreach(var t in query)
+                         { status = t.Key, backlog = t.GroupBy(g => g.DsFormattedStatus).Select(t => new { t.Key, count = t.Count() }) });
+            foreach (var t in query)
             {
-                var res = new BacklogByTeam() { status = t.status,backlog=new List<TeamStats>() };
+                var res = new BacklogByTeam() { status = t.status, backlog = new List<TeamStats>() };
                 var keys = new List<string>();
-                foreach(var g in t.backlog)
+                foreach (var g in t.backlog)
                 {
                     var ts = new TeamStats() { key = g.Key, count = g.count };
                     keys.Add(g.Key);
                     res.backlog.Add(ts);
                 }
-                if (!keys.Contains("IN PROGRESS")) res.backlog.Add(new TeamStats() { key= "IN PROGRESS", count=0 });
+                if (!keys.Contains("IN PROGRESS")) res.backlog.Add(new TeamStats() { key = "IN PROGRESS", count = 0 });
                 if (!keys.Contains("PENDING")) res.backlog.Add(new TeamStats() { key = "PENDING", count = 0 });
-               
+
                 result.Add(res);
             }
             return Ok(result.AsQueryable());
@@ -540,6 +551,67 @@ namespace SMDAsh.Controllers
                 }
             }
             return Ok(result.AsQueryable());
+        }
+
+        [HttpGet("[action]/{Sharepoint}/{Team}")]
+        public ActionResult<IQueryable> SlaByTeam(bool Sharepoint = false, string Team = "all")
+        {
+            List<BadUrl> lit = new List<BadUrl>();
+
+            if (!_context.SlaTickets
+                .Select(t => t.Team)
+                .Distinct().ToList()
+                .Contains(Team, StringComparer.OrdinalIgnoreCase) && !Team.Equals("all"))
+            {
+
+
+                BadUrl obj = new BadUrl(Team);
+                lit.Add(obj);
+                return BadRequest(lit.AsQueryable());
+            }
+
+            List<string> includTeam = new List<string>();
+            if (!Team.Equals("all"))
+            {
+                foreach (var item in Team.Split(","))
+                {
+                    includTeam.Add(item.Trim());
+                }
+            }
+            else
+            {
+                includTeam.Add("");
+            }
+
+            var query = (from s in _context.SlaTickets
+                         join t in _context.Tickets on s.ParentTicketId equals t.TicketID
+                         where t.Sharepoint== Sharepoint && includTeam.Contains(Team.Equals("all") ? "" : t.Team)
+                         select s).ToList().GroupBy(g => g.ParentCategory)
+                        .Select(s =>
+                            new SlaByTeamDigiself{
+                                sourceTool=s.First().SourceTool,
+                                category = s.Key,
+                                achieved = s.Where(s => s.Status == "Achieved").Count(),
+                                failed = s.Where(s => s.Status == "Failed").Count(),
+                                total = s.Count(),
+                                targetType = s.GroupBy(g => g.TargetType)
+                                .Select(s =>
+                                    new TargetType{
+                                        type = s.Key,
+                                        achieved = s.Where(s => s.Status == "Achieved").Count(),
+                                        failed = s.Where(s => s.Status == "Failed").Count(),
+                                        total = s.Count(),
+                                        team = s.GroupBy(g => g.Team)
+                                        .Select(s =>
+                                            new SlaByTeamNames{
+                                                name = s.Key,
+                                                achieved = s.Where(s => s.Status == "Achieved").Count(),
+                                                failed = s.Where(s => s.Status == "Failed").Count(),
+                                                total = s.Count()
+                                            }).ToList()
+                                    }).ToList()
+                            });
+            return Ok(query.AsQueryable());
         }
     }
 }
