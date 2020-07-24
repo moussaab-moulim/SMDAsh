@@ -75,7 +75,7 @@ namespace SMDAsh.Controllers
                         }
                     }
                     var startRow = 2;
-                    var endRow = ws.Dimension.End.Row;
+                    var endRow = sf.AllDataLastRow;
                     //Get row details
                     for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                     {
@@ -116,7 +116,7 @@ namespace SMDAsh.Controllers
                             }
                         }
                          startRow = 2;
-                        endRow = ws.Dimension.End.Row;
+                        endRow = sf.SlaDataLastRow;
                         //Get row details
                         for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                         {
@@ -151,8 +151,8 @@ namespace SMDAsh.Controllers
         {
             if (sourcetool.Equals("digiself",StringComparison.OrdinalIgnoreCase))
             {
-
-                return (new SlaTickets()
+                System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
+                var newSla = new SlaTickets()
                 {
                     SlaID = ligne["ID"],
                     SourceTool = sourcetool,
@@ -161,15 +161,19 @@ namespace SMDAsh.Controllers
                     ParentTicketId = ligne["Parent"],
                     Priority = integrateColumn(ligne["Priorité"], "Priority"),
                     Status = ligne["État"],
-                    
+
                     ParentCategory = integrateColumn(ligne["Type de parent"], "Category"),
-                    
+
                     AssignedToService = AssignedToService.TEAL,
                     TargetType = ligne["Type de cible"],
                     Team = ligne["Groupe d'affectation.Nom"],
-                    DsAge = Double.Parse(ligne["Durée écoulée (Ouvrée)"])
-                });
+                    DsAge = Double.Parse(ligne["Durée écoulée (Ouvrée)"], NumberStyles.Number)
 
+                };
+                System.Diagnostics.Debug.WriteLine(newSla.ToString());
+                return newSla;
+
+                
 
             }
             return null;

@@ -21,6 +21,7 @@ export default function SheetSettings(props) {
   };
   const selectLastRowSla = (n) => {
     props.selectDataSheets.selectLastRowSla(n);
+    console.log(n);
   };
   return (
     <Box
@@ -62,38 +63,39 @@ export default function SheetSettings(props) {
           onChange={(e) => selectLastColumnData(e.target.value)}
         />
       </Box>
-      {props.sourceTool==="Digiself" &&
-      <Box display='flex'>
-        <TextField
-          id='sla-sheet'
-          label='Sla sheet'
-          type='number'
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{ min: '0', max: '99', step: '1' }}
-          onChange={(e) => selectSlaSheet(e.target.value)}
-        />
-        <TextField
-          id='sla-last-row'
-          label='Sla last row'
-          type='number'
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{ min: '0', step: '1' }}
-          onChange={(e) => selectLastRowSla(e.target.value)}
-        />
-        <TextField
-          id='sla-last-column'
-          label='Sla last column'
-          type='text'
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={(e) => selectLastColumnSla(e.target.value)}
-        />
-      </Box>}
+      {props.sourceTool === 'Digiself' && (
+        <Box display='flex'>
+          <TextField
+            id='sla-sheet'
+            label='Sla sheet'
+            type='number'
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{ min: '0', max: '99', step: '1' }}
+            onChange={(e) => selectSlaSheet(e.target.value)}
+          />
+          <TextField
+            id='sla-last-row'
+            label='Sla last row'
+            type='number'
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{ min: '0', step: '1' }}
+            onChange={(e) => selectLastRowSla(e.target.value)}
+          />
+          <TextField
+            id='sla-last-column'
+            label='Sla last column'
+            type='text'
+            InputLabelProps={{
+              shrink: true,
+            }}
+            onChange={(e) => selectLastColumnSla(e.target.value)}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

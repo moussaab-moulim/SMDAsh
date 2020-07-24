@@ -74,6 +74,10 @@ export default function Upload() {
     const data = new FormData();
     data.set('SourceTool', sourceTool);
     data.append('DataFile', droppedFile, droppedFile.name);
+    data.append('AllDataSheet', dataSheet);
+    data.append('AllDataLastRow', lastRowData);
+    data.append('SlaDataSheet', slaSheet);
+    data.append('SlaDataLastRow', lastRowSla);
     axios
       .post('/api/Upload', data, {
         // receive two    parameter endpoint url ,form data
@@ -104,7 +108,7 @@ export default function Upload() {
     setlastRowData(params);
   };
   const selectLastRowSla = (params) => {
-    selectLastRowSla(params);
+    setlastRowSla(params);
   };
   const selectLastColumnData = (params) => {
     setlastColumnData(params);
@@ -169,8 +173,9 @@ export default function Upload() {
               <br />
               data file : {activeStep > 0 && droppedFile && droppedFile.name}
               <br />
-              data sheet index :<br />
-              sla data sheet index :
+              data sheet index : {activeStep > 1 && dataSheet}
+              <br />
+              sla data sheet index : {activeStep > 1 && slaSheet}
             </Typography>
             <React.Fragment>
               {activeStep !== 0 && (
