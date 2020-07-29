@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using SMDAsh.Models.Charts;
 
 namespace SMDAsh.Models
 {
@@ -17,6 +18,7 @@ namespace SMDAsh.Models
 
         public virtual DbSet<Tickets> Tickets { get; set; }
         public virtual DbSet<SlaTickets> SlaTickets { get; set; }
+        public virtual DbSet<Backlogs> Backlogs { get; set; }
         public DbSet<Users.User> Users { get; set; }
 
 

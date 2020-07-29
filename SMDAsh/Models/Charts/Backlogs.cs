@@ -8,6 +8,7 @@ namespace SMDAsh.Models.Charts
 {
     public class Backlogs
     {
+        public string Id { get; set; } 
         public string SourceTool { get; set; }
         public string YearWeek { get; set; }
         public string Day { get; set; }

@@ -10,7 +10,7 @@ using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Helpers.Params;
 using SMDAsh.Helpers.Params.digiself;
 using SMDAsh.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace SMDAsh.Controllers
 {
     [ApiController]
@@ -37,6 +37,9 @@ namespace SMDAsh.Controllers
             var allDataSheet = sf.AllDataSheet;
             //getting the sheet number of sla data
             var slaDataSheet = sf.SlaDataSheet;
+
+            int created = 0;
+            int slaCreated = 0;
 
             if (excelFile == null || excelFile.Length == 0)
                 return NoContent();
@@ -97,7 +100,9 @@ namespace SMDAsh.Controllers
 
                     }
                     // IMPORT TO DATABASE
-                    _context.AddRange(tickets);
+                   var upsertData = _context.Tickets.UpsertRange(tickets).On(t=>new { t.TicketID,t.SourceTool });
+                     created = upsertData.Run();
+                    //_context.AddRange(tickets);
 
                     if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
                     {
@@ -137,13 +142,33 @@ namespace SMDAsh.Controllers
 
 
                         }
-                        _context.AddRange(slaTickets);
+                        
+                        //_context.AddRange(slaTickets);
+                        var upsertSla = _context.SlaTickets.UpsertRange(slaTickets).On(t => new { t.SlaID, t.SourceTool });
+                        slaCreated = upsertSla.Run();
                     }
+
+                     
                     
-                    int created = _context.SaveChanges();
-                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
+                    //int created = _context.SaveChanges();
+                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool,
+                        RowsInsertedOrUpdated = created, SlaInsertedOrUpdated=slaCreated });
                 }
 
+            }
+        }
+
+        private void addOrUpdateTicket(Tickets ticket)
+        {
+            var id = ticket.TicketID;
+            if (_context.Tickets==null)
+            {
+                //_context.MyEntities.Attach(myEntity);
+                //_context.ObjectStateManager.ChangeObjectState(myEntity, EntityState.Modified);
+            }
+            else
+            {
+                //_context.MyEntities.AddObject(myEntity);
             }
         }
 
