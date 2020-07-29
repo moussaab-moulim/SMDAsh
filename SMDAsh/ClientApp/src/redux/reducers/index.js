@@ -24,6 +24,7 @@ import backlogInOutDaysDSReducer from './DigiSelf/backlogInOutDaysDSReducer';
 import backlogPerTeamDSReducer from './DigiSelf/backlogPerTeamDSReducer';
 import backlogByAgeDSReducer from './DigiSelf/backlogByAgeDSReducer';
 import backlogEvolutionByAgeDSReducer from './DigiSelf/backlogEvolutionByAgeDSReducer';
+import slaClosedCurrentMonthReducer from './DigiSelf/slaClosedCurrentMonthReducer';
 
 // Params
 import { yearsInReducer, yearsOutReducer } from './Params/yearReducer';
@@ -50,6 +51,7 @@ import loading from './loadingReducer';
 
 
 
+
 const rootReducer = combineReducers({
   user,
   loading,
@@ -61,11 +63,13 @@ const rootReducer = combineReducers({
   pieBacklogByOwnerAno: pieBacklogByOwnerAnoReducer,
   pieBacklogByOwnerSr: pieBacklogByOwnerSrReducer,
   pieBacklogByOwnerEvolution: pieBacklogByOwnerEvolutionReducer,
+
   /* DigiSelf */
   backlogInOutDaysDS:backlogInOutDaysDSReducer,
   backlogPerTeamDS:backlogPerTeamDSReducer,
   backlogByAgeDS:backlogByAgeDSReducer,
   backlogEvolutionByAgeDS:backlogEvolutionByAgeDSReducer,
+  slaClosedCurrentMonth:slaClosedCurrentMonthReducer,
 
   /* Anomaly */
   ticketAssignedOcpAno: ticketAssignedOcpAnoReducer,

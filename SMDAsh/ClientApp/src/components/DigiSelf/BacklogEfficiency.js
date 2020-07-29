@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 //import '../App.css';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 
   import {
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE, COLOR_YELLOW, COLOR_RED} from '../../redux/constants';
 import { connect } from 'react-redux';
 // core components
-import GridItem from 'components/Grid/GridItem.js';
+
 import GridContainer from 'components/Grid/GridContainer.js';
 import Table from 'components/Table/Table.js';
 import Card from 'components/Card/Card.js';
@@ -32,7 +32,7 @@ import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 
 import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
-import { formatDiagnostic } from 'typescript';
+
 
 const useStyles = makeStyles((theme) => ({
   buttonicon: {

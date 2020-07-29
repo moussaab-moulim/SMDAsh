@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 //import '../App.css';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Table from '@material-ui/core/Table';
@@ -14,21 +14,12 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import {
-    getBacklogDigiSelfOneWeek,
-    getBacklogDigiSelfOneMonth,
-    getBacklogDigiSelfThreeMonth,
-    getBacklogDigiSelfOneYear,
-    getBacklogDigiSelfAll
-} from '../../redux/actions/DigiSelf/backlogInOutDaysDSAction';
-
-import {
-    getBacklogPerTeamDigiSelf
-} from '../../redux/actions/DigiSelf/backlogPerteamAction'
-
+    getSlaClosed
+} from '../../redux/actions/DigiSelf/slaClosedCurrentMonthAction';
 
 import { COLOR_TEAL, COLOR_ORANGE, COLOR_BLUE } from '../../redux/constants';
 // core components
-import GridItem from 'components/Grid/GridItem.js';
+
 import GridContainer from 'components/Grid/GridContainer.js';
 
 import Card from 'components/Card/Card.js';
@@ -39,7 +30,7 @@ import { IconButton, Button } from '@material-ui/core';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import Grid from '@material-ui/core/Grid';
-import MaterialTable from 'material-table';
+
 
 import SpinnerChart from './../spinner/SpinnerChart/spinnerChart.component';
 import { formatDiagnostic } from 'typescript';
@@ -123,121 +114,251 @@ const initialChartState = {
     labels: [],
 };
 export default function SlaClosedCurrentMonth() {
-    const [statecolumns, setStatecolumns] = useState({
-        columns: [
-            { title: 'Days', field: 'day' },
-            { title: 'Incoming', field: 'in', type: 'numeric' },
-            { title: 'Resolved', field: 'out', type: 'numeric' },
-            { title: 'Backlog', field: 'backlog', type: 'numeric' },
-        ],
-    });
 
-    const [chartData, setChartData] = useState(initialChartState);
     const dispatch = useDispatch();
-    const chartState = useSelector((state) => state.backlogPerTeamDS, []) || [];
-    const [chartTable, setChartTable] = useState(chartState.dataTable);
+    const chartState = useSelector((state) => state.slaClosedCurrentMonth, []) || [];
+
 
     const classes = useStyles();
     const [reloardData, setReloadData] = useState(false);
-    const [totalPending, setTotalPending] = useState([]);
-    const [totalInProgress, setTotalInProgress] = useState([]);
+
+
+    // Start - Data For Table Declaration
+
+    const [dataAnomaly, setDataAnomaly] = useState([]);
+    const [dataSr, setDataSr] = useState([]);
+
+    const [dataAnomalyInitialReview, setDataAnomalyInitialReview] = useState([]);
+    const [dataAnomalyResolution, setDataAnomalyResolution] = useState([]);
+    const [dataSrFulfillment, setDataSrFulfillment] = useState([]);
+    const [dataSrApproval, setDataSrApproval] = useState([]);
+
+    const [dataAnomalyInitialReviewTeams, setDataAnomalyInitialReviewTeams] = useState([]);
+    const [dataAnomalyResolutionTeams, setDataAnomalyResolutionTeams] = useState([]);
+    const [dataSrFulfillmentTeams, setDataSrFulfillmentTeams] = useState([]);
+    const [dataSrApprovalTeams, setDataSrApprovalTeams] = useState([]);
+
+    // End - Data For Table Declaration
+
+    // Start - Data Chart Declaration
+    const [dataChartAnomaly, setDataChartAnomaly] = useState(initialChartState);
+    const [dataChartSr, setDataChartSr] = useState(initialChartState);
+    // End - Data Chart Declaration
 
     const [TRSI, setTRSI] = useState(true);
     const [TRSR, setTRSR] = useState(true);
-    const [TableDetails, setTableDetails] = useState(true);
 
-    const [incidentToggle, setIncidentToggle] = useState(false);
-    const [requestToggle, setRequestToggle] = useState(false);
+    // Start Toggle 1
+    const [incidentToggleSmall, setIncidentToggleSmall] = useState(true);
+    const [requestToggleSmall, setRequestToggleSmall] = useState(true);
 
-    const toggleIncident = () => {
-        setIncidentToggle(!incidentToggle);
+    const [incidentToggleBig, setIncidentToggleBig] = useState(false);
+    const [requestToggleBig, setRequestToggleBig] = useState(false);
+
+    const toggleIncidentSmall = () => {
+        setIncidentToggleSmall(!incidentToggleSmall);
     }
-    const toggleRequest = () => {
-        setRequestToggle(!requestToggle);
+    const toggleRequestSmall = () => {
+        setRequestToggleSmall(!requestToggleSmall);
     }
-    const toggleTableDetails = () => {
-        setTableDetails(!TableDetails);
+    const toggleIncidentBig = () => {
+        setInitialReviewToggle(false);
+        setResolutionToggle(false);
+        setIncidentToggleBig(!incidentToggleBig);
     }
+    const toggleRequestBig = () => {
+        setFulfillmentToggle(false);
+        setApprovalToggle(false);
+        setRequestToggleBig(!requestToggleBig);
+    }
+    //End Toggle 1
+
+    // Start Toggle 2
+    const [initialReviewToggle, setInitialReviewToggle] = useState(false);
+    const [resolutionToggle, setResolutionToggle] = useState(false);
+    const [fulfillmentToggle, setFulfillmentToggle] = useState(false);
+    const [approvalToggle, setApprovalToggle] = useState(false);
+
+    const toggleInitialReview = () => {
+        setInitialReviewToggle(!initialReviewToggle);
+    }
+    const toggleResolution = () => {
+        setResolutionToggle(!resolutionToggle);
+    }
+    const toggleFulfillment = () => {
+        setFulfillmentToggle(!fulfillmentToggle);
+    }
+    const toggleApproval = () => {
+        setApprovalToggle(!approvalToggle);
+    }
+    // End Toggle 2
+
+
+    const percentageCalc = (achieved, total) => {
+        let percentage = 0;
+        percentage = ((achieved * 100) / total).toFixed(0);
+
+        if (percentage <= 80) {
+            return (<TableCell align="center" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}> {percentage}% </TableCell>);
+        } else if (percentage <= 90) {
+            return (<TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}> {percentage}% </TableCell>);
+        } else if (percentage <= 95) {
+            return (<TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>{percentage}%</TableCell>)
+        } else if (percentage <= 97) {
+            return (<TableCell align="center" style={{ backgroundColor: '#ffe29d', color: '#896305' }}>{percentage}%</TableCell>)
+        } else if (percentage <= 100) {
+            return (<TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>{percentage}%</TableCell>)
+        }
+
+    }
+
+
 
     useEffect(() => {
+        if (chartState.loading || reloardData) {
 
+            dispatch(getSlaClosed());
+            setReloadData(false);
+        }
+
+        if (!chartState.loading && chartState.dataTable.length > 0) {
+            orginizeData()
+        }
 
     }, [chartState.loading]);
 
-    /*
-        useEffect(() => {
-            if (chartState.loading || reloardData) {
-    
-                dispatch(getBacklogPerTeamDigiSelf());
-                setReloadData(false);
+
+    const orginizeData = () => {
+
+        let datatable = chartState.dataTable;
+
+        let dataAnomaly = [];
+        let dataSr = [];
+
+        datatable.map((row) => {
+            if (row.category === "Anomalie") {
+                dataAnomaly = row;
+            } else if (row.category === "SR") {
+                dataSr = row;
             }
-    
-            if (!chartState.loading && chartState.dataTable.length > 0) {
-                orginizeData()
+        });
+
+
+        let dataAnomalyInitialReview = [];
+        let dataAnomalyResolution = [];
+
+        dataAnomaly.targetType.map((row) => {
+            if (row.type === "InitialReview") {
+                dataAnomalyInitialReview = row;
+            } else if (row.type === "Resolution") {
+                dataAnomalyResolution = row;
             }
-    
-        }, [chartState.loading]);
-    */
-    /*
-    
-        const orginizeData = () => {
-    
-            let datatable = chartState.dataTable;
-            
-            const arbitraryStackKey = "stack1";
-            let totalPending = 0;
-            let totalInProgress = 0;
-    
-            const newChartArrays = {
-                team: [],
-                pending: [],
-                inprogress: [],
-            };
-    
-            for (let i = 0; i < datatable.length; i++) {
-                newChartArrays.team.push(datatable[i].status.split(" "));
-                let sortBacklog = datatable[i].backlog.sort(function(a, b) {
-                    if (a.key < b.key) {
-                      return -1;
-                    }
-                    if (a.key> b.key) {
-                      return 1;
-                    }
-                    return 0;
-                  });
-                  console.log(sortBacklog);
-                newChartArrays.inprogress.push(sortBacklog[0].count);
-                newChartArrays.pending.push(sortBacklog[1].count);
+        });
+
+        let dataSrFulfillment = [];
+        let dataSrApproval = [];
+
+        dataSr.targetType.map((row) => {
+            if (row.type === "Fulfillment") {
+                dataSrFulfillment = row;
+            } else if (row.type === "Approval") {
+                dataSrApproval = row;
             }
-    
-            totalPending = newChartArrays.pending.reduce((a, b) => a + b, 0);
-            totalInProgress = newChartArrays.inprogress.reduce((a, b) => a + b, 0);
-    
-            const newChartData = {
-                datasets: [
-                    {
-                        stack: arbitraryStackKey,
-                        label: 'In Progress',
-                        data: newChartArrays.inprogress,
-                        backgroundColor: COLOR_TEAL,
-                    },
-                    {
-                        stack: arbitraryStackKey,
-                        label: 'Pending',
-                        data: newChartArrays.pending,
-                        backgroundColor: COLOR_ORANGE,
-                    }
-    
-                ],
-                labels: newChartArrays.team,
-            };
-    
-            setChartData(newChartData);
-            setChartTable(datatable);
-            setTotalPending(totalPending);
-            setTotalInProgress(totalInProgress);
+        });
+
+        // Start get Teams
+        let dataAnomalyInitialReviewTeams = dataAnomalyInitialReview.team;
+        let dataAnomalyResolutionTeams = dataAnomalyResolution.team;
+
+        let dataSrFulfillmentTeams = dataSrFulfillment.team;
+        let dataSrApprovalTeams = dataSrApproval.team;
+        // End get Teams
+
+
+        // Start Chart Data
+        const arbitraryStackKey = "stack1";
+        const newChartArrays = {
+            AnomalyAchieved: [],
+            AnomalyFailed: [],
+            SrAchieved: [],
+            SrFailed: [],
         };
-    */
+
+       newChartArrays.AnomalyAchieved.push(dataAnomalyInitialReview.achieved);
+       newChartArrays.AnomalyAchieved.push(dataAnomalyResolution.achieved);
+       newChartArrays.AnomalyFailed.push(dataAnomalyInitialReview.failed);
+       newChartArrays.AnomalyFailed.push(dataAnomalyResolution.failed);
+
+       newChartArrays.SrAchieved.push(dataSrFulfillment.achieved);
+       newChartArrays.SrAchieved.push(dataSrApproval.achieved);
+       newChartArrays.SrFailed.push(dataSrFulfillment.failed);
+       newChartArrays.SrFailed.push(dataSrApproval.failed);
+           
+   
+       const dataAnomalyChart = {
+           labels: [
+               ['InitialReview'],
+               ['Resolution'],
+           ],
+           datasets: [
+               // These two will be in the same stack.
+               {
+                   stack: arbitraryStackKey,
+                   label: 'Achived',
+                   data: newChartArrays.AnomalyAchieved,
+                   backgroundColor: COLOR_TEAL,
+               },
+               {
+                   stack: arbitraryStackKey,
+                   label: 'Failed',
+                   data: newChartArrays.AnomalyFailed,
+                   backgroundColor: COLOR_ORANGE,
+               }
+   
+           ]
+       }
+       const dataSrChart = {
+           labels: [
+               ['Fulfillment'],
+               ['Approval'],
+           ],
+           datasets: [
+               // These two will be in the same stack.
+               {
+                   stack: arbitraryStackKey,
+                   label: 'Achived',
+                   data: newChartArrays.SrAchieved,
+                   backgroundColor: COLOR_TEAL,
+               },
+               {
+                   stack: arbitraryStackKey,
+                   label: 'Failed',
+                   data: newChartArrays.SrFailed,
+                   backgroundColor: COLOR_ORANGE,
+               }
+   
+           ]
+       }
+       // End Chart Data
+
+        setDataAnomaly(dataAnomaly);
+        setDataSr(dataSr);
+
+        setDataAnomalyInitialReview(dataAnomalyInitialReview);
+        setDataAnomalyResolution(dataAnomalyResolution);
+        setDataSrFulfillment(dataSrFulfillment);
+        setDataSrApproval(dataSrApproval);
+
+        setDataAnomalyInitialReviewTeams(dataAnomalyInitialReviewTeams);
+        setDataAnomalyResolutionTeams(dataAnomalyResolutionTeams);
+        setDataSrFulfillmentTeams(dataSrFulfillmentTeams);
+        setDataSrApprovalTeams(dataSrApprovalTeams);
+
+        setDataChartAnomaly(dataAnomalyChart);
+        setDataChartSr(dataSrChart);
+
+    };
+
     const options = {
         title: {
             display: true,
@@ -325,52 +446,8 @@ export default function SlaClosedCurrentMonth() {
         }
     }
 
-    const arbitraryStackKey = "stack1";
 
-    let data = {
-        labels: [
-            ['InitialReview'],
-            ['Resolution'],
-        ],
-        datasets: [
-            // These two will be in the same stack.
-            {
-                stack: arbitraryStackKey,
-                label: 'Achived',
-                data: [103, 103],
-                backgroundColor: COLOR_TEAL,
-            },
-            {
-                stack: arbitraryStackKey,
-                label: 'Failed',
-                data: [9, 9],
-                backgroundColor: COLOR_ORANGE,
-            }
 
-        ]
-    }
-    let data2 = {
-        labels: [
-            ['Fulfillment'],
-            ['Approval'],
-        ],
-        datasets: [
-            // These two will be in the same stack.
-            {
-                stack: arbitraryStackKey,
-                label: 'Achived',
-                data: [205, 180],
-                backgroundColor: COLOR_TEAL,
-            },
-            {
-                stack: arbitraryStackKey,
-                label: 'Failed',
-                data: [4, 0],
-                backgroundColor: COLOR_ORANGE,
-            }
-
-        ]
-    }
 
 
 
@@ -379,9 +456,10 @@ export default function SlaClosedCurrentMonth() {
         <div id="tablecsspaddingtd">
 
             <GridContainer>
+               
                 <Grid item xs={12} sm={12} md={5} >
                     <Card className={classes.card}>
-
+                    {chartState.loading ? <SpinnerChart />: null}
                         <CardBody>
                             <Grid item
                                 xs={12}
@@ -410,40 +488,27 @@ export default function SlaClosedCurrentMonth() {
                                             <TableCell >Achieved</TableCell>
                                             <TableCell >Failed</TableCell>
                                             <TableCell >Total général</TableCell>
-                                            <TableCell >%</TableCell>
+                                            <TableCell > </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
 
-                                        {/*
-                                         <TableCell align="left" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                0%
-                                            </TableCell>
-                                            
-                                                <TableCell align="left" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                            90%
-                                            </TableCell>
-                                           
-                                           <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                100%
-                                            </TableCell>
-                                        */}
                                         <TableRow style={{
                                             backgroundColor: '#cecece',
                                         }}
                                         >
                                             <TableCell align="left" ><b>TEAL RUN SERVICES Incident</b></TableCell>
-                                            <TableCell align="left"><b>206</b></TableCell>
-                                            <TableCell align="left"><b>18</b></TableCell>
-                                            <TableCell align="left"><b>224</b></TableCell>
+                                            <TableCell align="left"><b>{dataAnomaly.achieved}</b></TableCell>
+                                            <TableCell align="left"><b>{dataAnomaly.failed}</b></TableCell>
+                                            <TableCell align="left"><b>{dataAnomaly.total}</b></TableCell>
                                             <TableCell align="right">
 
-                                                {incidentToggle ? (
-                                                    <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                {incidentToggleSmall ? (
+                                                    <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncidentSmall() }} color="primary" aria-label="add to shopping cart">
                                                         <RemoveIcon fontSize="small" />
                                                     </IconButton>
                                                 ) : (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncidentSmall() }} color="primary" aria-label="add to shopping cart">
                                                             <AddIcon fontSize="small" />
                                                         </IconButton>
                                                     )
@@ -451,32 +516,28 @@ export default function SlaClosedCurrentMonth() {
 
                                             </TableCell>
                                         </TableRow>
-                                        {incidentToggle ? (
+                                        {incidentToggleSmall ? (
                                             <TableRow>
-                                                <TableCell align="left">InitialReview</TableCell>
-                                                <TableCell align="left">103</TableCell>
-                                                <TableCell align="left">9</TableCell>
+                                                <TableCell align="left">{dataAnomalyInitialReview.type}</TableCell>
+                                                <TableCell align="left">{dataAnomalyInitialReview.achieved}</TableCell>
+                                                <TableCell align="left">{dataAnomalyInitialReview.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    112
-                                                   </TableCell>
+                                                    {dataAnomalyInitialReview.total}
+                                                </TableCell>
 
-                                                <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    92%
-                                            </TableCell>
+                                                {percentageCalc(dataAnomalyInitialReview.achieved, dataAnomalyInitialReview.total)}
                                             </TableRow>
                                         ) : null}
-                                        {incidentToggle ? (
+                                        {incidentToggleSmall ? (
                                             <TableRow>
-                                                <TableCell align="left">Resolution</TableCell>
-                                                <TableCell align="left">103</TableCell>
-                                                <TableCell align="left">9</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.type}</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.achieved}</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    112
-                                            </TableCell>
+                                                    {dataAnomalyResolution.total}
+                                                </TableCell>
 
-                                                <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    92%
-                                            </TableCell>
+                                                {percentageCalc(dataAnomalyResolution.achieved, dataAnomalyResolution.total)}
                                             </TableRow>
                                         ) : null}
 
@@ -485,17 +546,17 @@ export default function SlaClosedCurrentMonth() {
                                         }}
                                         >
                                             <TableCell align="left"><b>TEAL RUN Service Request</b></TableCell>
-                                            <TableCell align="left"><b>385</b></TableCell>
-                                            <TableCell align="left"><b>4</b></TableCell>
-                                            <TableCell align="left"><b>389</b></TableCell>
+                                            <TableCell align="left"><b>{dataSr.achieved}</b></TableCell>
+                                            <TableCell align="left"><b>{dataSr.failed}</b></TableCell>
+                                            <TableCell align="left"><b>{dataSr.total}</b></TableCell>
                                             <TableCell align="right">
 
-                                                {requestToggle ? (
-                                                    <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequest() }} color="primary" aria-label="add to shopping cart">
+                                                {requestToggleSmall ? (
+                                                    <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequestSmall() }} color="primary" aria-label="add to shopping cart">
                                                         <RemoveIcon fontSize="small" />
                                                     </IconButton>
                                                 ) : (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequest() }} color="primary" aria-label="add to shopping cart">
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequestSmall() }} color="primary" aria-label="add to shopping cart">
                                                             <AddIcon fontSize="small" />
                                                         </IconButton>
                                                     )
@@ -503,32 +564,26 @@ export default function SlaClosedCurrentMonth() {
 
                                             </TableCell>
                                         </TableRow>
-                                        {requestToggle ? (
+                                        {requestToggleSmall ? (
                                             <TableRow>
-                                                <TableCell align="left">Fulfillment</TableCell>
-                                                <TableCell align="left">205</TableCell>
-                                                <TableCell align="left">4</TableCell>
+                                                <TableCell align="left">{dataSrFulfillment.type}</TableCell>
+                                                <TableCell align="left">{dataSrFulfillment.achieved}</TableCell>
+                                                <TableCell align="left">{dataSrFulfillment.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    209
-                                            </TableCell>
-
-                                                <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    98.1%
-                                            </TableCell>
+                                                    {dataSrFulfillment.total}
+                                                </TableCell>
+                                                {percentageCalc(dataSrFulfillment.achieved, dataSrFulfillment.total)}
                                             </TableRow>
                                         ) : null}
-                                        {requestToggle ? (
+                                       {requestToggleSmall ? (
                                             <TableRow>
-                                                <TableCell align="left">Approval</TableCell>
-                                                <TableCell align="left">180</TableCell>
-                                                <TableCell align="left">0</TableCell>
+                                                <TableCell align="left">{dataSrApproval.type}</TableCell>
+                                                <TableCell align="left">{dataSrApproval.achieved}</TableCell>
+                                                <TableCell align="left">{dataSrApproval.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    180
-                                            </TableCell>
-
-                                                <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
+                                                    {dataSrApproval.total}
+                                                </TableCell>
+                                                {percentageCalc(dataSrApproval.achieved, dataSrApproval.total)}
                                             </TableRow>
                                         ) : null}
 
@@ -536,60 +591,45 @@ export default function SlaClosedCurrentMonth() {
                                             <TableCell align="left"><b>Total :</b></TableCell>
                                             <TableCell style={{
                                                 color: '#008080'
-                                            }} align="left"><b>{591}</b></TableCell>
+                                            }} align="left"><b>{dataAnomaly.achieved + dataSr.achieved}</b></TableCell>
                                             <TableCell style={{
                                                 color: '#008080'
-                                            }} align="left"><b>{22}</b></TableCell>
+                                            }} align="left"><b>{dataAnomaly.failed + dataSr.failed}</b></TableCell>
                                             <TableCell style={{
                                                 color: '#008080'
-                                            }} align="left"><b>{613}</b></TableCell>
+                                            }} align="left"><b>{dataAnomaly.total + dataSr.total}</b></TableCell>
                                         </TableRow>
 
                                     </TableBody>
                                 </Table>
                             </TableContainer>
 
-                            <Grid item style={{ marginTop: "10px" }}
-                                xs={12}
-                                sm={12}
-                                md={12}
-                                container
-                                direction='row'
-                                justify='center'
-                                alignItems='center'
-                            >
 
-                                <Button
-                                    variant='contained' style={{ fontSize: "13px" }}
-                                    className={classes.buttonTealColor + ' ' + classes.btn}
-                                    onClick={() => { toggleTableDetails() }}
+
+                            <div>
+                                <Grid item
+                                    xs={12}
+                                    sm={12}
+                                    md={12}
+                                    container
+                                    direction='row'
+                                    justify='space-between'
+                                    alignItems='center'
+                                    style={{ marginTop: 10 }}
                                 >
-
-                                    {TableDetails ? "Hide" : "Show"} Detailed Table SLA Inc Closed Current Month
-                                </Button>
-
-                            </Grid>
-
-                            {TableDetails ?<div>
-                            <Grid item
-                                xs={12}
-                                sm={12}
-                                md={12}
-                                container
-                                direction='row'
-                                justify='space-between'
-                                alignItems='center'
-                            >
-                                <Button
-                                    variant='contained'
-                                    className={classes.buttonTealColor + ' ' + classes.btn}
-                                >
-                                    <TableChartIcon className={classes.buttonicon} />
+                                    <Button
+                                        variant='contained'
+                                        className={classes.buttonTealColor + ' ' + classes.btn}
+                                    >
+                                        <TableChartIcon className={classes.buttonicon} />
                                  Table PNG
                                 </Button>
+                                
+                                <h5><i>Detailed Table</i></h5>
 
-                            </Grid>
-                         
+                                </Grid>
+                               
+
                                 <TableContainer component={Paper}>
                                     <Table className={classes.table} aria-label="simple table">
                                         <TableHead>
@@ -603,68 +643,52 @@ export default function SlaClosedCurrentMonth() {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-
-                                            {/*
-                                         <TableCell align="left" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                0%
-                                            </TableCell>
-                                            
-                                                <TableCell align="left" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                            90%
-                                            </TableCell>
-                                           
-                                           <TableCell align="left" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                100%
-                                            </TableCell>
-                                        */}
                                             <TableRow style={{
                                                 backgroundColor: '#cecece',
                                             }}
                                             >
-
                                                 <TableCell align="left"><b>TEAL RUN SERVICES Incident</b></TableCell>
-                                                <TableCell align="left"><b>206</b></TableCell>
-                                                <TableCell align="left"><b>18</b></TableCell>
-                                                <TableCell align="left"><b>224</b></TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}><b>92%</b></TableCell>
-                                                <TableCell align="right">
+                                                <TableCell align="left"><b>{dataAnomaly.achieved}</b></TableCell>
+                                                <TableCell align="left"><b>{dataAnomaly.failed}</b></TableCell>
+                                                <TableCell align="left"><b>{dataAnomaly.total}</b></TableCell>
+                                                {percentageCalc(dataAnomaly.achieved, dataAnomaly.total)}
 
-                                                    {incidentToggle ? (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                <TableCell align="right">
+                                                    {incidentToggleBig ? (
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncidentBig() }} color="primary" aria-label="add to shopping cart">
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
                                                     ) : (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncidentBig() }} color="primary" aria-label="add to shopping cart">
                                                                 <AddIcon fontSize="small" />
                                                             </IconButton>
                                                         )
                                                     }
-
                                                 </TableCell>
                                             </TableRow>
-                                            {incidentToggle ?
+
+                                            {incidentToggleBig ?
                                                 <TableRow style={{
                                                     backgroundColor: '#cecece',
                                                 }}
                                                 >
-                                                    <TableCell align="left">InitialReview</TableCell>
-                                                    <TableCell align="left">103</TableCell>
-                                                    <TableCell align="left">9</TableCell>
+                                                    <TableCell align="left">{dataAnomalyInitialReview.type}</TableCell>
+                                                    <TableCell align="left">{dataAnomalyInitialReview.achieved}</TableCell>
+                                                    <TableCell align="left">{dataAnomalyInitialReview.failed}</TableCell>
                                                     <TableCell align="left" style={{ color: '#008080' }}>
-                                                        112
-                                                   </TableCell>
+                                                        {dataAnomalyInitialReview.total}
+                                                    </TableCell>
 
-                                                    <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                        92%
-                                            </TableCell>
+                                                    {percentageCalc(dataAnomalyInitialReview.achieved, dataAnomalyInitialReview.total)}
+
                                                     <TableCell align="right">
 
-                                                        {incidentToggle ? (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                        {initialReviewToggle ? (
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleInitialReview() }} color="primary" >
                                                                 <RemoveIcon fontSize="small" />
                                                             </IconButton>
                                                         ) : (
-                                                                <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                                <IconButton style={{ padding: '0px' }} onClick={() => { toggleInitialReview() }} color="primary">
                                                                     <AddIcon fontSize="small" />
                                                                 </IconButton>
                                                             )
@@ -674,82 +698,44 @@ export default function SlaClosedCurrentMonth() {
                                                 </TableRow>
                                                 : null}
 
-                                            {incidentToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 CustomBuild Apps</TableCell>
-                                                <TableCell align="left">9</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    9
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
 
-                                            </TableRow>
-                                                : null}
-                                            {incidentToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Industrial Apps</TableCell>
-                                                <TableCell align="left">16</TableCell>
-                                                <TableCell align="left">4</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    20
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                    80%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {incidentToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Middelware</TableCell>
-                                                <TableCell align="left">78</TableCell>
-                                                <TableCell align="left">6</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    84
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                    93%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {incidentToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Oracle EBS</TableCell>
-                                                <TableCell align="left">1</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    1
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
+                                            {initialReviewToggle ?
+                                                dataAnomalyInitialReviewTeams.map((row) => (
+                                                    <TableRow>
+                                                        <TableCell align="left">{row.name}</TableCell>
+                                                        <TableCell align="left">{row.achieved}</TableCell>
+                                                        <TableCell align="left">{row.failed}</TableCell>
+                                                        <TableCell align="left" style={{ color: '#008080' }}>
+                                                            {row.total}
+                                                        </TableCell>
+                                                        {percentageCalc(row.achieved, row.total)}
+                                                    </TableRow>
+                                                ))
+                                                : null
+                                            }
 
 
-                                            {incidentToggle ? <TableRow style={{
+                                            {incidentToggleBig ? <TableRow style={{
                                                 backgroundColor: '#cecece',
                                             }}
                                             >
-                                                <TableCell align="left">Resolution</TableCell>
-                                                <TableCell align="left">103</TableCell>
-                                                <TableCell align="left">9</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.type}</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.achieved}</TableCell>
+                                                <TableCell align="left">{dataAnomalyResolution.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    112
-                                            </TableCell>
+                                                    {dataAnomalyResolution.total}
+                                                </TableCell>
 
-                                                <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                    92%
-                                            </TableCell>
+                                                {percentageCalc(dataAnomalyResolution.achieved, dataAnomalyResolution.total)}
+
                                                 <TableCell align="right">
 
-                                                    {incidentToggle ? (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                    {resolutionToggle ? (
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleResolution() }} color="primary" aria-label="add to shopping cart">
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
                                                     ) : (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleResolution() }} color="primary" aria-label="add to shopping cart">
                                                                 <AddIcon fontSize="small" />
                                                             </IconButton>
                                                         )
@@ -759,55 +745,20 @@ export default function SlaClosedCurrentMonth() {
                                             </TableRow>
                                                 : null}
 
-                                            {incidentToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 CustomBuild Apps</TableCell>
-                                                <TableCell align="left">9</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    9
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}{incidentToggle ? <TableRow>
-                                                    <TableCell align="left">TEAL_Run_L2 Industrial Apps</TableCell>
-                                                    <TableCell align="left">16</TableCell>
-                                                    <TableCell align="left">4</TableCell>
-                                                    <TableCell align="left" style={{ color: '#008080' }}>
-                                                        20
-                                            </TableCell>
-                                                    <TableCell align="center" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                        80%
-                                            </TableCell>
-
-                                                </TableRow>
-                                                    : null}{incidentToggle ? <TableRow>
-                                                        <TableCell align="left">TEAL_Run_L2 Middelware</TableCell>
-                                                        <TableCell align="left">78</TableCell>
-                                                        <TableCell align="left">6</TableCell>
+                                            {resolutionToggle ?
+                                                dataAnomalyResolutionTeams.map((row) => (
+                                                    <TableRow>
+                                                        <TableCell align="left">{row.name}</TableCell>
+                                                        <TableCell align="left">{row.achieved}</TableCell>
+                                                        <TableCell align="left">{row.failed}</TableCell>
                                                         <TableCell align="left" style={{ color: '#008080' }}>
-                                                            84
-                                            </TableCell>
-                                                        <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                            93%
-                                            </TableCell>
-
+                                                            {row.total}
+                                                        </TableCell>
+                                                        {percentageCalc(row.achieved, row.total)}
                                                     </TableRow>
-                                                        : null}{incidentToggle ? <TableRow>
-                                                            <TableCell align="left">TEAL_Run_L2 Oracle EBS</TableCell>
-                                                            <TableCell align="left">1</TableCell>
-                                                            <TableCell align="left">0</TableCell>
-                                                            <TableCell align="left" style={{ color: '#008080' }}>
-                                                                1
-                                            </TableCell>
-                                                            <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                                100%
-                                            </TableCell>
-
-                                                        </TableRow>
-                                                            : null}
+                                                ))
+                                                : null
+                                            }
 
 
 
@@ -816,20 +767,20 @@ export default function SlaClosedCurrentMonth() {
                                             }}
                                             >
                                                 <TableCell align="left"><b>TEAL RUN Service Request</b></TableCell>
-                                                <TableCell align="left"><b>385</b></TableCell>
-                                                <TableCell align="left"><b>4</b></TableCell>
-                                                <TableCell align="left"><b>389</b></TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    99%
-                                            </TableCell>
+                                                <TableCell align="left"><b>{dataSr.achieved}</b></TableCell>
+                                                <TableCell align="left"><b>{dataSr.failed}</b></TableCell>
+                                                <TableCell align="left"><b>{dataSr.total}</b></TableCell>
+
+                                                {percentageCalc(dataSr.achieved, dataSr.total)}
+
                                                 <TableCell align="right">
 
-                                                    {requestToggle ? (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequest() }} color="primary" aria-label="add to shopping cart">
+                                                    {requestToggleBig ? (
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequestBig() }} color="primary" aria-label="add to shopping cart">
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
                                                     ) : (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequest() }} color="primary" aria-label="add to shopping cart">
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleRequestBig() }} color="primary" aria-label="add to shopping cart">
                                                                 <AddIcon fontSize="small" />
                                                             </IconButton>
                                                         )
@@ -837,28 +788,26 @@ export default function SlaClosedCurrentMonth() {
 
                                                 </TableCell>
                                             </TableRow>
-                                            {requestToggle ?
+                                            {requestToggleBig ?
                                                 <TableRow style={{
                                                     backgroundColor: '#cecece',
                                                 }}>
-                                                    <TableCell align="left">Fulfillment</TableCell>
-                                                    <TableCell align="left">205</TableCell>
-                                                    <TableCell align="left">4</TableCell>
+                                                    <TableCell align="left">{dataSrFulfillment.type}</TableCell>
+                                                    <TableCell align="left">{dataSrFulfillment.achieved}</TableCell>
+                                                    <TableCell align="left">{dataSrFulfillment.failed}</TableCell>
                                                     <TableCell align="left" style={{ color: '#008080' }}>
-                                                        209
-                                            </TableCell>
+                                                        {dataSrFulfillment.total}
+                                                    </TableCell>
+                                                    {percentageCalc(dataSrFulfillment.achieved, dataSrFulfillment.total)}
 
-                                                    <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                        98.1%
-                                            </TableCell>
                                                     <TableCell align="right">
 
-                                                        {incidentToggle ? (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                        {fulfillmentToggle ? (
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleFulfillment() }} color="primary" aria-label="add to shopping cart">
                                                                 <RemoveIcon fontSize="small" />
                                                             </IconButton>
                                                         ) : (
-                                                                <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                                <IconButton style={{ padding: '0px' }} onClick={() => { toggleFulfillment() }} color="primary" aria-label="add to shopping cart">
                                                                     <AddIcon fontSize="small" />
                                                                 </IconButton>
                                                             )
@@ -868,176 +817,93 @@ export default function SlaClosedCurrentMonth() {
                                                 </TableRow>
                                                 : null}
                                             {/* Start Teams */}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 CustomBuild Apps</TableCell>
-                                                <TableCell align="left">9</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    9
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Industrial Apps</TableCell>
-                                                <TableCell align="left">16</TableCell>
-                                                <TableCell align="left">4</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    20
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                    80%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Middelware</TableCell>
-                                                <TableCell align="left">78</TableCell>
-                                                <TableCell align="left">6</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    84
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                    93%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Oracle EBS</TableCell>
-                                                <TableCell align="left">1</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    1
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
+                                            {fulfillmentToggle ?
+                                                dataSrFulfillmentTeams.map((row) => (
+                                                    <TableRow>
+                                                        <TableCell align="left">{row.name}</TableCell>
+                                                        <TableCell align="left">{row.achieved}</TableCell>
+                                                        <TableCell align="left">{row.failed}</TableCell>
+                                                        <TableCell align="left" style={{ color: '#008080' }}>
+                                                            {row.total}
+                                                        </TableCell>
+                                                        {percentageCalc(row.achieved, row.total)}
+                                                    </TableRow>
+                                                ))
+                                                : null
+                                            }
                                             {/* End Teams */}
-                                            {requestToggle ? <TableRow style={{
+                                            {requestToggleBig ? <TableRow style={{
                                                 backgroundColor: '#cecece',
                                             }}>
-                                                <TableCell align="left">Approval</TableCell>
-                                                <TableCell align="left">180</TableCell>
-                                                <TableCell align="left">0</TableCell>
+                                                <TableCell align="left">{dataSrApproval.type}</TableCell>
+                                                <TableCell align="left">{dataSrApproval.achieved}</TableCell>
+                                                <TableCell align="left">{dataSrApproval.failed}</TableCell>
                                                 <TableCell align="left" style={{ color: '#008080' }}>
-                                                    180
-                                            </TableCell>
+                                                    {dataSrApproval.total}
+                                                </TableCell>
+                                                {percentageCalc(dataSrApproval.achieved, dataSrApproval.total)}
 
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
                                                 <TableCell align="right">
 
-                                                    {incidentToggle ? (
-                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                    {approvalToggle ? (
+                                                        <IconButton style={{ padding: '0px' }} onClick={() => { toggleApproval() }} color="primary">
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
                                                     ) : (
-                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleIncident() }} color="primary" aria-label="add to shopping cart">
+                                                            <IconButton style={{ padding: '0px' }} onClick={() => { toggleApproval() }} color="primary">
                                                                 <AddIcon fontSize="small" />
                                                             </IconButton>
                                                         )
                                                     }
-
                                                 </TableCell>
                                             </TableRow>
                                                 : null}
 
                                             {/* Start Teams */}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 CustomBuild Apps</TableCell>
-                                                <TableCell align="left">9</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    9
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Industrial Apps</TableCell>
-                                                <TableCell align="left">16</TableCell>
-                                                <TableCell align="left">4</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    20
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ff9c9c', color: '#df0000' }}>
-                                                    80%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Middelware</TableCell>
-                                                <TableCell align="left">78</TableCell>
-                                                <TableCell align="left">6</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    84
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ffa887', color: '#b53100' }}>
-                                                    93%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
-                                            {requestToggle ? <TableRow>
-                                                <TableCell align="left">TEAL_Run_L2 Oracle EBS</TableCell>
-                                                <TableCell align="left">1</TableCell>
-                                                <TableCell align="left">0</TableCell>
-                                                <TableCell align="left" style={{ color: '#008080' }}>
-                                                    1
-                                            </TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#a0ffa0', color: '#006400' }}>
-                                                    100%
-                                            </TableCell>
-
-                                            </TableRow>
-                                                : null}
+                                            {approvalToggle ?
+                                                dataSrApprovalTeams.map((row) => (
+                                                    <TableRow>
+                                                        <TableCell align="left">{row.name}</TableCell>
+                                                        <TableCell align="left">{row.achieved}</TableCell>
+                                                        <TableCell align="left">{row.failed}</TableCell>
+                                                        <TableCell align="left" style={{ color: '#008080' }}>
+                                                            {row.total}
+                                                        </TableCell>
+                                                        {percentageCalc(row.achieved, row.total)}
+                                                    </TableRow>
+                                                ))
+                                                : null
+                                            }
                                             {/* End Teams */}
 
                                             <TableRow >
                                                 <TableCell align="left"><b>Total :</b></TableCell>
                                                 <TableCell style={{
                                                     color: '#008080'
-                                                }} align="left"><b>{591}</b></TableCell>
+                                                }} align="left"><b>{dataAnomaly.achieved + dataSr.achieved}</b></TableCell>
                                                 <TableCell style={{
                                                     color: '#008080'
-                                                }} align="left"><b>{22}</b></TableCell>
+                                                }} align="left"><b>{dataAnomaly.failed + dataSr.failed}</b></TableCell>
                                                 <TableCell style={{
                                                     color: '#008080'
-                                                }} align="left"><b>{613}</b></TableCell>
-                                                <TableCell align="center" style={{ backgroundColor: '#ffe29d', color: '#896305' }}>
-                                                    96%
-                                            </TableCell>
+                                                }} align="left"><b>{dataAnomaly.total + dataSr.total}</b></TableCell>
+
+                                                {percentageCalc((dataAnomaly.achieved + dataSr.achieved), (dataAnomaly.total + dataSr.total))}
                                             </TableRow>
 
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                               
-                            </div> : null
-                        }
-                            
+
+                            </div>
+
 
                         </CardBody>
-
                     </Card>
-
                 </Grid>
                 <Grid item xs={12} sm={12} md={7} >
                     <Card className={classes.card} style={{ marginBottom: "2px" }}>
-
+                    {chartState.loading ? <SpinnerChart />: null}
                         <CardBody>
                             <Grid
                                 xs={12}
@@ -1056,12 +922,12 @@ export default function SlaClosedCurrentMonth() {
                                      Chart PNG
                                      </Button>
                             </Grid>
-                            <Bar data={data} options={options} />
+                            <Bar data={dataChartAnomaly} options={options} />
                         </CardBody>
 
                     </Card>
                     <Card className={classes.card}>
-
+                    {chartState.loading ? <SpinnerChart />: null}
                         <CardBody>
                             <Grid
                                 xs={12}
@@ -1080,7 +946,7 @@ export default function SlaClosedCurrentMonth() {
                                 Chart PNG
                                 </Button>
                             </Grid>
-                            <Bar data={data2} options={options2} />
+                            <Bar data={dataChartSr} options={options2} />
                         </CardBody>
 
                     </Card>

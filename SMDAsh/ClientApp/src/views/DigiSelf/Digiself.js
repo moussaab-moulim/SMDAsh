@@ -47,7 +47,6 @@ export default function Digiself() {
   const classes = useStyles();
   return (
     <div>
-      
       <BacklogEfficiencyDigiSelf />
       <BacklogPerTeamDigiSelf />
       <BacklogByAge />

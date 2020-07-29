@@ -179,7 +179,7 @@ export default function BacklogPerTeamDigiSelf() {
                 }
                 return 0;
               });
-              console.log(sortBacklog);
+             
             newChartArrays.inprogress.push(sortBacklog[0].count);
             newChartArrays.pending.push(sortBacklog[1].count);
         }
@@ -256,33 +256,6 @@ export default function BacklogPerTeamDigiSelf() {
         }
     }
     const arbitraryStackKey = "stack1";
-    /*
-    let data = {
-        labels: [
-            ['TEAL_Run_L2', ' CustomBuild', ' Apps'],
-            ['TEAL_Run_L2','Data'],
-            ['TEAL_Run_L2','Industrial Apps'],
-            ['TEAL_Run_L2', 'Middelware'],
-            ['TEAL_Run_L2','Oracle EBS'],
-        ],
-        datasets: [
-            // These two will be in the same stack.
-            {
-                stack: arbitraryStackKey,
-                label: 'In Progress',
-                data: [5, 4, 3, 2, 1],
-                backgroundColor: COLOR_TEAL,
-            },
-            {
-                stack: arbitraryStackKey,
-                label: 'Pending',
-                data: [1, 2, 3, 4, 10],
-                backgroundColor:  COLOR_ORANGE,
-            }
-            
-        ]
-    }
-    */
 
 
     return (
@@ -291,7 +264,7 @@ export default function BacklogPerTeamDigiSelf() {
             <GridContainer>
                 <Grid item xs={12} sm={12} md={4} >
                     <Card className={classes.card}>
-
+                    {chartState.loading ? <SpinnerChart />: null}
                         <CardBody>
                             <Grid item
                                 xs={12}
@@ -364,7 +337,7 @@ export default function BacklogPerTeamDigiSelf() {
                 </Grid>
                 <Grid item xs={12} sm={12} md={8} >
                     <Card className={classes.card}>
-
+                    {chartState.loading ? <SpinnerChart />: null}
                         <CardBody>
                             <Grid
                                 xs={12}
