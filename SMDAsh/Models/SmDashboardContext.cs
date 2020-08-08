@@ -25,14 +25,16 @@ namespace SMDAsh.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tickets>().ToTable("Tickets")
-                .HasIndex(t => new {t.TicketID,t.SourceTool })
+                .HasIndex(t => new { t.TicketID, t.SourceTool })
                 .IsUnique()
-                .HasName("Index_by_TicketId_source_tool");
-
+                .HasName("Index_by_TicketId_Source_tool");
+            modelBuilder.Entity<SlaTickets>().ToTable("SlaTickets")
+                .HasIndex(t => new { t.SlaID, t.SourceTool })
+                .IsUnique()
+                .HasName("Index_by_SlaId_Source_tool");
             modelBuilder.Entity<Tickets>()
-            .HasOne(s => s.SlaTicket)
-            .WithOne(t => t.ParentTicket)
-            .HasForeignKey<SlaTickets>(s => s.ParentTicketId).HasPrincipalKey<Tickets>(t=>t.TicketID);
+            .HasMany(s => s.SlaTickets)
+            .WithOne(t => t.ParentTicket);
             
         }
     }

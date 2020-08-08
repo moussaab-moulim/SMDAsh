@@ -127,7 +127,6 @@ namespace SMDAsh.Controllers
                     In = bIn,
                     Out = bOut,
                     backlog = bBacklog,
-
                 };
                 back.Add(b);
                 i++;

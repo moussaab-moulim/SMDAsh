@@ -11,16 +11,16 @@ using SMDAsh.Helpers.Params;
 using SMDAsh.Helpers.Params.digiself;
 using SMDAsh.Models;
 using Microsoft.EntityFrameworkCore;
+using SMDAsh.Models.Charts;
+using System.Linq;
+
 namespace SMDAsh.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class UploadController : ControllerBase
     {
-
         private readonly SmDashboardContext _context;
-
-
         public UploadController(SmDashboardContext context)
         {
             _context = context;
@@ -68,6 +68,7 @@ namespace SMDAsh.Controllers
                     List<Tickets> tickets = new List<Tickets>();
                     //list to save the first row of data sheet as keys
                     List<string> keys = new List<string>();
+                    //var lastRow = 
                     foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("all", sourcetool)])
                     {
                         //Get names from first row
@@ -99,6 +100,10 @@ namespace SMDAsh.Controllers
 
 
                     }
+
+
+
+
                     // IMPORT TO DATABASE
                    var upsertData = _context.Tickets.UpsertRange(tickets).On(t=>new { t.TicketID,t.SourceTool });
                      created = upsertData.Run();
@@ -146,6 +151,44 @@ namespace SMDAsh.Controllers
                         //_context.AddRange(slaTickets);
                         var upsertSla = _context.SlaTickets.UpsertRange(slaTickets).On(t => new { t.SlaID, t.SourceTool });
                         slaCreated = upsertSla.Run();
+
+
+                        //Calcualte Backlog
+
+                        var extractedName = excelFile.FileName.Replace(fileExtension, "").Split("-");
+                        var extractedDate = extractedName[4] + "/" + extractedName[3] + "/" + extractedName[2];
+
+                        var queryBacklog = (from t in _context.Tickets
+                                            where t.SourceTool == "digiself" &&
+                                            t.Sharepoint == false
+                                            select t).ToList();
+                        var queryOut = queryBacklog.Where(t => t.DsFormattedOutDay == extractedDate)
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+                        var queryIn = queryBacklog.Where(t => t.DateSent == extractedDate)
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+                        var queryB = queryBacklog
+                            .Where(t => t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING"))
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+                        var tableBacklog = new Backlogs()
+                        {
+                            SourceTool = sourcetool,
+                            Day = extractedDate,
+                            In = queryIn.First().count,
+                            Out = queryOut.First().count,
+                            backlog = queryB.First().count
+                        };
+                        var upsertBacklog = _context.Backlogs.Upsert(tableBacklog).On(t => new { t.SourceTool, t.Day });
+
+                        upsertBacklog.Run();
+
                     }
 
                      
@@ -158,19 +201,7 @@ namespace SMDAsh.Controllers
             }
         }
 
-        private void addOrUpdateTicket(Tickets ticket)
-        {
-            var id = ticket.TicketID;
-            if (_context.Tickets==null)
-            {
-                //_context.MyEntities.Attach(myEntity);
-                //_context.ObjectStateManager.ChangeObjectState(myEntity, EntityState.Modified);
-            }
-            else
-            {
-                //_context.MyEntities.AddObject(myEntity);
-            }
-        }
+        
 
         private SlaTickets createSlaTicket(Dictionary<string, string> ligne, string sourcetool)
         {

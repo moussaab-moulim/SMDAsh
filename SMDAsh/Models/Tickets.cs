@@ -41,7 +41,7 @@ namespace SMDAsh.Models
         public string DsFormattedOutDay { get; set; }
         public double DsAge { get; set; }
 
-        public virtual SlaTickets SlaTicket { get; set; }
+        public virtual ICollection<SlaTickets> SlaTickets { get; set; }
 
     }
 }

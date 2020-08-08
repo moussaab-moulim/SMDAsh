@@ -50,6 +50,14 @@
     <Compile Remove="Migrations\20200518213018_test-backlog-2.Designer.cs" />
     <Compile Remove="Migrations\20200604135616_test.cs" />
     <Compile Remove="Migrations\20200604135616_test.Designer.cs" />
+    <Compile Remove="Migrations\20200805160344_indexingSlaTable.cs" />
+    <Compile Remove="Migrations\20200805160344_indexingSlaTable.Designer.cs" />
+    <Compile Remove="Migrations\20200805163813_indexingSlaTable.cs" />
+    <Compile Remove="Migrations\20200805163813_indexingSlaTable.Designer.cs" />
+    <Compile Remove="Migrations\20200807173432_changeIdOfBacklog.cs" />
+    <Compile Remove="Migrations\20200807173432_changeIdOfBacklog.Designer.cs" />
+    <Compile Remove="Migrations\20200807173642_changeIdOfBacklog.cs" />
+    <Compile Remove="Migrations\20200807173642_changeIdOfBacklog.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

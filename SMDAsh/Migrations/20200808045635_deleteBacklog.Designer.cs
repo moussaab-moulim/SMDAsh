@@ -3,57 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200808045635_deleteBacklog")]
+    partial class deleteBacklog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("SMDAsh.Models.Charts.Backlogs", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Day")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("In")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Out")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceTool")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Week")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.Property<string>("YearWeek")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("backlog")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Backlogs");
-                });
 
             modelBuilder.Entity("SMDAsh.Models.SlaTickets", b =>
                 {
