@@ -10,6 +10,9 @@ using SMDAsh.Helpers.Exceptions;
 using SMDAsh.Helpers.Params;
 using SMDAsh.Helpers.Params.digiself;
 using SMDAsh.Models;
+using Microsoft.EntityFrameworkCore;
+using SMDAsh.Models.Charts;
+using System.Linq;
 
 namespace SMDAsh.Controllers
 {
@@ -17,10 +20,7 @@ namespace SMDAsh.Controllers
     [Route("api/[controller]")]
     public class UploadController : ControllerBase
     {
-
         private readonly SmDashboardContext _context;
-
-
         public UploadController(SmDashboardContext context)
         {
             _context = context;
@@ -37,6 +37,9 @@ namespace SMDAsh.Controllers
             var allDataSheet = sf.AllDataSheet;
             //getting the sheet number of sla data
             var slaDataSheet = sf.SlaDataSheet;
+
+            int created = 0;
+            int slaCreated = 0;
 
             if (excelFile == null || excelFile.Length == 0)
                 return NoContent();
@@ -65,7 +68,8 @@ namespace SMDAsh.Controllers
                     List<Tickets> tickets = new List<Tickets>();
                     //list to save the first row of data sheet as keys
                     List<string> keys = new List<string>();
-                    foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("all", sourcetool)])
+                    var lastColumn = ws.Dimension.End.Column;
+                    foreach (var firstRowCell in ws.Cells[1, 1, 1, lastColumn])
                     {
                         //Get names from first row
                         if (!string.IsNullOrEmpty(firstRowCell.Text))
@@ -73,20 +77,28 @@ namespace SMDAsh.Controllers
                             keys.Add(firstRowCell.Text);
 
                         }
+                        else { break; }
                     }
                     var startRow = 2;
-                    var endRow = sf.AllDataLastRow;
+                    var endRow = ws.Dimension.End.Row;
                     //Get row details
                     for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                     {
                         var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
                         Dictionary<string, string> ligne = new Dictionary<string, string>();
                         int j = 0;
-                        var endCell = getLastData("all", sourcetool);
+                        var endCell = keys.Count;
+                        if (string.IsNullOrEmpty(ws.Cells[rowNum, 1].Text))
+                        {
+                            break;
+
+                        }
                         for (int cellNum = 1; cellNum <= endCell; cellNum++)
                         {
+                            
                             var cell = ws.Cells[rowNum, cellNum];
                             string currentcellvalue = cell.Text;
+                            
                             ligne.Add(keys[j++], currentcellvalue);
                         }
 
@@ -96,8 +108,14 @@ namespace SMDAsh.Controllers
 
 
                     }
+
+
+
+
                     // IMPORT TO DATABASE
-                    _context.AddRange(tickets);
+                   var upsertData = _context.Tickets.UpsertRange(tickets).On(t=>new { t.TicketID,t.SourceTool });
+                     created = upsertData.Run();
+                    //_context.AddRange(tickets);
 
                     if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
                     {
@@ -106,7 +124,8 @@ namespace SMDAsh.Controllers
                         List<SlaTickets> slaTickets = new List<SlaTickets>();
                         //list to save the first row of data sheet as keys
                         List<string> slakeys = new List<string>();
-                        foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("sla",sourcetool)])
+                        var endCell = ws.Dimension.End.Column;
+                        foreach (var firstRowCell in ws.Cells[1, 1, 1, endCell])
                         {
                             //Get names from first row
                             if (!string.IsNullOrEmpty(firstRowCell.Text))
@@ -114,16 +133,23 @@ namespace SMDAsh.Controllers
                                 slakeys.Add(firstRowCell.Text);
 
                             }
+                            else { 
+                                break; }
                         }
                          startRow = 2;
-                        endRow = sf.SlaDataLastRow;
+                        endRow = ws.Dimension.End.Row;
+                        endCell = slakeys.Count;
                         //Get row details
                         for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                         {
                             var wsRow = ws.Cells[rowNum, 1, rowNum, slakeys.Count];
                             Dictionary<string, string> ligne = new Dictionary<string, string>();
                             int j = 0;
-                            var endCell = getLastData("sla", sourcetool);
+                            if (string.IsNullOrEmpty(ws.Cells[rowNum, 1].Text))
+                            {
+                                break;
+
+                            }
                             for (int cellNum = 1; cellNum <= endCell; cellNum++)
                             {
                                 var cell = ws.Cells[rowNum, cellNum];
@@ -137,21 +163,72 @@ namespace SMDAsh.Controllers
 
 
                         }
-                        _context.AddRange(slaTickets);
+                        
+                        //_context.AddRange(slaTickets);
+                        var upsertSla = _context.SlaTickets.UpsertRange(slaTickets).On(t => new { t.SlaID, t.SourceTool });
+                        slaCreated = upsertSla.Run();
+
+
+                        //Calcualte Backlog
+
+                        var extractedName = excelFile.FileName.Replace(fileExtension, "").Split("-");
+                        var extractedDate = extractedName[4] + "/" + extractedName[3] + "/" + extractedName[2];
+
+                        var queryBacklog = (from t in _context.Tickets
+                                            where t.SourceTool == "digiself" &&
+                                            t.Sharepoint == false
+                                            select t).ToList();
+                        var queryOut = queryBacklog.Where(t => t.DsFormattedOutDay == extractedDate)
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+                        var queryIn = queryBacklog.Where(t => t.DateSent == extractedDate)
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+                        var queryB = queryBacklog
+                            .Where(t => t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING"))
+                            .GroupBy(t => t.SourceTool)
+                           .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+                        var tableBacklog = new Backlogs()
+                        {
+                            SourceTool = sourcetool,
+                            Day = extractedDate,
+                            Year = Int32.Parse( DateTime.Parse(extractedDate).ToString("yyyy")),
+                            Week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(extractedDate),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday),
+                            In = queryIn.First().count,
+                            Out = queryOut.First().count,
+                            backlog = queryB.First().count
+                        };
+                        var upsertBacklog = _context.Backlogs.Upsert(tableBacklog).On(t => new { t.SourceTool, t.Day });
+
+                        upsertBacklog.Run();
+
                     }
+
+                     
                     
-                    int created = _context.SaveChanges();
-                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool, RowsInserted = created });
+                    //int created = _context.SaveChanges();
+                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool,
+                        RowsInsertedOrUpdated = created, SlaInsertedOrUpdated=slaCreated });
                 }
 
             }
         }
 
+        
+
         private SlaTickets createSlaTicket(Dictionary<string, string> ligne, string sourcetool)
         {
             if (sourcetool.Equals("digiself",StringComparison.OrdinalIgnoreCase))
             {
-                System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
+                //System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
                 var newSla = new SlaTickets()
                 {
                     SlaID = ligne["ID"],
@@ -170,7 +247,7 @@ namespace SMDAsh.Controllers
                     DsAge = Double.Parse(ligne["Durée écoulée (Ouvrée)"], NumberStyles.Number)
 
                 };
-                System.Diagnostics.Debug.WriteLine(newSla.ToString());
+                //System.Diagnostics.Debug.WriteLine(newSla.ToString());
                 return newSla;
 
                 

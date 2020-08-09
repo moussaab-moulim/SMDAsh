@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200729010311_backlogtable")]
+    partial class backlogtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,10 +23,8 @@ namespace SMDAsh.Migrations
 
             modelBuilder.Entity("SMDAsh.Models.Charts.Backlogs", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Day")
                         .HasColumnType("nvarchar(max)");
@@ -90,10 +90,7 @@ namespace SMDAsh.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentTicketId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParentTicketId1")
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Priority")
                         .HasColumnType("nvarchar(max)");
@@ -102,10 +99,10 @@ namespace SMDAsh.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SlaID")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SourceTool")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -121,12 +118,9 @@ namespace SMDAsh.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentTicketId1");
-
-                    b.HasIndex("SlaID", "SourceTool")
+                    b.HasIndex("ParentTicketId")
                         .IsUnique()
-                        .HasName("Index_by_SlaId_Source_tool")
-                        .HasFilter("[SlaID] IS NOT NULL AND [SourceTool] IS NOT NULL");
+                        .HasFilter("[ParentTicketId] IS NOT NULL");
 
                     b.ToTable("SlaTickets");
                 });
@@ -217,6 +211,7 @@ namespace SMDAsh.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TicketID")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Update")
@@ -244,7 +239,7 @@ namespace SMDAsh.Migrations
 
                     b.HasIndex("TicketID", "SourceTool")
                         .IsUnique()
-                        .HasName("Index_by_TicketId_Source_tool")
+                        .HasName("Index_by_TicketId_source_tool")
                         .HasFilter("[TicketID] IS NOT NULL AND [SourceTool] IS NOT NULL");
 
                     b.ToTable("Tickets");
@@ -280,8 +275,9 @@ namespace SMDAsh.Migrations
             modelBuilder.Entity("SMDAsh.Models.SlaTickets", b =>
                 {
                     b.HasOne("SMDAsh.Models.Tickets", "ParentTicket")
-                        .WithMany("SlaTickets")
-                        .HasForeignKey("ParentTicketId1");
+                        .WithOne("SlaTicket")
+                        .HasForeignKey("SMDAsh.Models.SlaTickets", "ParentTicketId")
+                        .HasPrincipalKey("SMDAsh.Models.Tickets", "TicketID");
                 });
 #pragma warning restore 612, 618
         }

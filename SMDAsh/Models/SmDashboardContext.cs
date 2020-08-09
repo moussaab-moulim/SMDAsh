@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using SMDAsh.Models.Charts;
 
 namespace SMDAsh.Models
 {
@@ -17,20 +18,23 @@ namespace SMDAsh.Models
 
         public virtual DbSet<Tickets> Tickets { get; set; }
         public virtual DbSet<SlaTickets> SlaTickets { get; set; }
+        public virtual DbSet<Backlogs> Backlogs { get; set; }
         public DbSet<Users.User> Users { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Tickets>().ToTable("Tickets")
-                .HasIndex(t => new {t.TicketID,t.SourceTool })
+                .HasIndex(t => new { t.TicketID, t.SourceTool })
                 .IsUnique()
-                .HasName("Index_by_TicketId_source_tool");
-
+                .HasName("Index_by_TicketId_Source_tool");
+            modelBuilder.Entity<SlaTickets>().ToTable("SlaTickets")
+                .HasIndex(t => new { t.SlaID, t.SourceTool })
+                .IsUnique()
+                .HasName("Index_by_SlaId_Source_tool");
             modelBuilder.Entity<Tickets>()
-            .HasOne(s => s.SlaTicket)
-            .WithOne(t => t.ParentTicket)
-            .HasForeignKey<SlaTickets>(s => s.ParentTicketId).HasPrincipalKey<Tickets>(t=>t.TicketID);
+            .HasMany(s => s.SlaTickets)
+            .WithOne(t => t.ParentTicket);
             
         }
     }

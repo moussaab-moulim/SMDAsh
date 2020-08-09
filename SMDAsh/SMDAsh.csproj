@@ -17,6 +17,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.1" />
     <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
@@ -49,6 +50,18 @@
     <Compile Remove="Migrations\20200518213018_test-backlog-2.Designer.cs" />
     <Compile Remove="Migrations\20200604135616_test.cs" />
     <Compile Remove="Migrations\20200604135616_test.Designer.cs" />
+    <Compile Remove="Migrations\20200805160344_indexingSlaTable.cs" />
+    <Compile Remove="Migrations\20200805160344_indexingSlaTable.Designer.cs" />
+    <Compile Remove="Migrations\20200805163813_indexingSlaTable.cs" />
+    <Compile Remove="Migrations\20200805163813_indexingSlaTable.Designer.cs" />
+    <Compile Remove="Migrations\20200807173432_changeIdOfBacklog.cs" />
+    <Compile Remove="Migrations\20200807173432_changeIdOfBacklog.Designer.cs" />
+    <Compile Remove="Migrations\20200807173642_changeIdOfBacklog.cs" />
+    <Compile Remove="Migrations\20200807173642_changeIdOfBacklog.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

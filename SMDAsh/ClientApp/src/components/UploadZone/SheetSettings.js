@@ -43,6 +43,7 @@ export default function SheetSettings(props) {
           inputProps={{ min: '0', max: '99', step: '1' }}
           onChange={(e) => selectDataSheet(e.target.value)}
         />
+        {/*
         <TextField
           id='data-last-row'
           label='Data last row'
@@ -62,6 +63,7 @@ export default function SheetSettings(props) {
           }}
           onChange={(e) => selectLastColumnData(e.target.value)}
         />
+        */}
       </Box>
       {props.sourceTool === 'Digiself' && (
         <Box display='flex'>
@@ -75,6 +77,7 @@ export default function SheetSettings(props) {
             inputProps={{ min: '0', max: '99', step: '1' }}
             onChange={(e) => selectSlaSheet(e.target.value)}
           />
+          {/*
           <TextField
             id='sla-last-row'
             label='Sla last row'
@@ -94,6 +97,7 @@ export default function SheetSettings(props) {
             }}
             onChange={(e) => selectLastColumnSla(e.target.value)}
           />
+        */}
         </Box>
       )}
     </Box>

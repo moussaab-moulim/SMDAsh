@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200805164206_indexingTicketsTable")]
+    partial class indexingTicketsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,10 +23,8 @@ namespace SMDAsh.Migrations
 
             modelBuilder.Entity("SMDAsh.Models.Charts.Backlogs", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Day")
                         .HasColumnType("nvarchar(max)");
