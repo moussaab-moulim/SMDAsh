@@ -19,12 +19,30 @@ namespace SMDAsh.Models
         public string Status { get; set; }
         public string Description { get; set; }
         public string Category { get; set; }
-        public string WeekIn { get; set; }
-        public string WeekOut { get; set; }
-        public string YearIn { get; set; }
-        public string YearOut { get; set; }
-        public string YearWeekIn { get; set; }
-        public string YearWeekOut { get; set; }
+        private string _WeekIn { get; set; }
+        private string _WeekOut { get; set; }
+        private string _YearIn { get; set; }
+        private string _YearOut { get; set; }
+        private string _YearWeekIn { get; set; } = "0000W00";
+        private string _YearWeekOut { get; set; } = "0000W00";
+
+        public string WeekIn { get { return _WeekIn; } set { _WeekIn = value;
+                _YearWeekIn = value.Equals("") ?"" : _YearWeekIn.Remove(5, 2).Insert(5, value.Length == 1 ? value.Insert(0, "0") : value); } }
+        public string WeekOut { get { return _WeekOut; } set { _WeekOut = value;
+                _YearWeekOut = value.Equals("") ? "" : _YearWeekOut.Remove(5, 2).Insert(5, value.Length == 1 ? value.Insert(0, "0") : value);
+            } }
+        public string YearIn { get { return _YearIn; } set { _YearIn = value;
+                _YearWeekIn = value.Equals("") ? "" : _YearWeekIn.Remove(0, 4).Insert(0, value);
+            } }
+        public string YearOut { get { return _YearOut; } set { _YearOut = value;
+                
+                _YearWeekOut = value.Equals("") ?
+                    "" : 
+                    _YearWeekOut.Remove(0, 4).Insert(0, value);
+            } }
+        public string YearWeekIn { get { return _YearWeekIn; } set { _YearWeekIn = value; } }
+        public string YearWeekOut { get { return _YearWeekOut; } set { _YearWeekOut = value; } }
+
         public string SLO { get; set; }
         public string ResolutionDuration { get; set; }
         public string SLA { get; set; }

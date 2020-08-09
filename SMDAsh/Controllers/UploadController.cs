@@ -68,8 +68,8 @@ namespace SMDAsh.Controllers
                     List<Tickets> tickets = new List<Tickets>();
                     //list to save the first row of data sheet as keys
                     List<string> keys = new List<string>();
-                    //var lastRow = 
-                    foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("all", sourcetool)])
+                    var lastColumn = ws.Dimension.End.Column;
+                    foreach (var firstRowCell in ws.Cells[1, 1, 1, lastColumn])
                     {
                         //Get names from first row
                         if (!string.IsNullOrEmpty(firstRowCell.Text))
@@ -77,20 +77,28 @@ namespace SMDAsh.Controllers
                             keys.Add(firstRowCell.Text);
 
                         }
+                        else { break; }
                     }
                     var startRow = 2;
-                    var endRow = sf.AllDataLastRow;
+                    var endRow = ws.Dimension.End.Row;
                     //Get row details
                     for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                     {
                         var wsRow = ws.Cells[rowNum, 1, rowNum, keys.Count];
                         Dictionary<string, string> ligne = new Dictionary<string, string>();
                         int j = 0;
-                        var endCell = getLastData("all", sourcetool);
+                        var endCell = keys.Count;
+                        if (string.IsNullOrEmpty(ws.Cells[rowNum, 1].Text))
+                        {
+                            break;
+
+                        }
                         for (int cellNum = 1; cellNum <= endCell; cellNum++)
                         {
+                            
                             var cell = ws.Cells[rowNum, cellNum];
                             string currentcellvalue = cell.Text;
+                            
                             ligne.Add(keys[j++], currentcellvalue);
                         }
 
@@ -116,7 +124,8 @@ namespace SMDAsh.Controllers
                         List<SlaTickets> slaTickets = new List<SlaTickets>();
                         //list to save the first row of data sheet as keys
                         List<string> slakeys = new List<string>();
-                        foreach (var firstRowCell in ws.Cells[1, 1, 1, getLastData("sla",sourcetool)])
+                        var endCell = ws.Dimension.End.Column;
+                        foreach (var firstRowCell in ws.Cells[1, 1, 1, endCell])
                         {
                             //Get names from first row
                             if (!string.IsNullOrEmpty(firstRowCell.Text))
@@ -124,16 +133,23 @@ namespace SMDAsh.Controllers
                                 slakeys.Add(firstRowCell.Text);
 
                             }
+                            else { 
+                                break; }
                         }
                          startRow = 2;
-                        endRow = sf.SlaDataLastRow;
+                        endRow = ws.Dimension.End.Row;
+                        endCell = slakeys.Count;
                         //Get row details
                         for (int rowNum = startRow; rowNum <= endRow; rowNum++)
                         {
                             var wsRow = ws.Cells[rowNum, 1, rowNum, slakeys.Count];
                             Dictionary<string, string> ligne = new Dictionary<string, string>();
                             int j = 0;
-                            var endCell = getLastData("sla", sourcetool);
+                            if (string.IsNullOrEmpty(ws.Cells[rowNum, 1].Text))
+                            {
+                                break;
+
+                            }
                             for (int cellNum = 1; cellNum <= endCell; cellNum++)
                             {
                                 var cell = ws.Cells[rowNum, cellNum];
@@ -181,6 +197,11 @@ namespace SMDAsh.Controllers
                         {
                             SourceTool = sourcetool,
                             Day = extractedDate,
+                            Year = Int32.Parse( DateTime.Parse(extractedDate).ToString("yyyy")),
+                            Week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+                        DateTime.Parse(extractedDate),
+                        CalendarWeekRule.FirstDay,
+                        DayOfWeek.Monday),
                             In = queryIn.First().count,
                             Out = queryOut.First().count,
                             backlog = queryB.First().count
@@ -207,7 +228,7 @@ namespace SMDAsh.Controllers
         {
             if (sourcetool.Equals("digiself",StringComparison.OrdinalIgnoreCase))
             {
-                System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
+                //System.Diagnostics.Debug.WriteLine(ligne["Parent"]);
                 var newSla = new SlaTickets()
                 {
                     SlaID = ligne["ID"],
@@ -226,7 +247,7 @@ namespace SMDAsh.Controllers
                     DsAge = Double.Parse(ligne["Durée écoulée (Ouvrée)"], NumberStyles.Number)
 
                 };
-                System.Diagnostics.Debug.WriteLine(newSla.ToString());
+                //System.Diagnostics.Debug.WriteLine(newSla.ToString());
                 return newSla;
 
                 

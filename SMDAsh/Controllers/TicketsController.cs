@@ -28,8 +28,8 @@ namespace SMDAsh.Controllers
             _context = context;
         }
 
-        [HttpGet("[action]/{Category}/{Year}/{Month}"), AutoQueryable]
-        public ActionResult<IQueryable> GetBacklog(string Category, string Year, string Month, bool ByDay = false)
+        [HttpGet("[action]/{SourceTool}/{Category}/{Year}/{Month}"), AutoQueryable]
+        public ActionResult<IQueryable> GetBacklog(string SourceTool, string Category, string Year, string Month, bool ByDay = false)
 
         {
 
@@ -53,8 +53,20 @@ namespace SMDAsh.Controllers
 
 
             var month = Month.Length == 2 ? Month : Month.Equals("all") ? Month : Month.Insert(0, "0");
+
+            if (SourceTool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
+            {
+                var queryBacklog = (from b in _context.Backlogs
+                                    where b.SourceTool == SourceTool
+                                    && b.Year.ToString().Contains((Year.Equals("all") ? "" : Year))
+                                    select b).ToList().Where(b=> DateTime.Parse(b.Day).ToString("MM")
+                                    .Contains(month.Equals("all") ? "" : month));
+                return Ok(queryBacklog.AsQueryable());
+            }
+
             var queryIn = (from t in _context.Tickets
-                           where t.Category.Contains((Category.Equals("all") ? "" : Category))
+                           where t.SourceTool==SourceTool &&
+                           t.Category.Contains((Category.Equals("all") ? "" : Category))
                            && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
                            select t)
                            .ToList()
@@ -67,8 +79,9 @@ namespace SMDAsh.Controllers
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
 
-            var queryOut = (from t in _context.Tickets
-                            where t.Category.Contains((Category.Equals("all") ? "" : Category))
+            var queryOut = (from t in _context.Tickets 
+                            where t.SourceTool == SourceTool &&
+                            t.Category.Contains((Category.Equals("all") ? "" : Category))
                             && t.YearOut.Contains((Year.Equals("all") ? "" : Year))
                             && !t.YearOut.Equals(string.Empty)
                             select t)
