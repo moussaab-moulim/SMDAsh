@@ -10,19 +10,7 @@ export default function SheetSettings(props) {
   const selectSlaSheet = (n) => {
     props.selectDataSheets.selectSlaSheet(n);
   };
-  const selectLastColumnData = (n) => {
-    props.selectDataSheets.selectLastColumnData(n);
-  };
-  const selectLastColumnSla = (n) => {
-    props.selectDataSheets.selectLastColumnSla(n);
-  };
-  const selectLastRowData = (n) => {
-    props.selectDataSheets.selectLastRowData(n);
-  };
-  const selectLastRowSla = (n) => {
-    props.selectDataSheets.selectLastRowSla(n);
-    console.log(n);
-  };
+
   return (
     <Box
       position='relative'

@@ -34,6 +34,7 @@ namespace SMDAsh.Controllers
         [HttpGet("[action]")]
         public ActionResult<IQueryable> GetServices()
         {
+            
             var query = (from t in _context.Tickets 
                          select new { t.AssignedToService })
                          .ToList().Distinct()

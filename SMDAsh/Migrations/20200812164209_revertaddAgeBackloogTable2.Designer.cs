@@ -3,48 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200812164209_revertaddAgeBackloogTable2")]
+    partial class revertaddAgeBackloogTable2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("SMDAsh.Models.Charts.BacklogByAge", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Cat0To5")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cat12To20")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cat20More")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cat6To12")
-                        .HasColumnType("int");
-
-                    b.Property<string>("date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BacklogByAge");
-                });
 
             modelBuilder.Entity("SMDAsh.Models.Charts.Backlogs", b =>
                 {
@@ -119,6 +94,9 @@ namespace SMDAsh.Migrations
                     b.Property<string>("ParentTicketId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ParentTicketId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Priority")
                         .HasColumnType("nvarchar(max)");
 
@@ -144,6 +122,8 @@ namespace SMDAsh.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentTicketId1");
 
                     b.HasIndex("SlaID", "SourceTool")
                         .IsUnique()
@@ -297,6 +277,13 @@ namespace SMDAsh.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SMDAsh.Models.SlaTickets", b =>
+                {
+                    b.HasOne("SMDAsh.Models.Tickets", "ParentTicket")
+                        .WithMany("SlaTickets")
+                        .HasForeignKey("ParentTicketId1");
                 });
 #pragma warning restore 612, 618
         }

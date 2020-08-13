@@ -33,11 +33,6 @@ namespace SMDAsh.Controllers
 
         {
 
-            //System.Diagnostics.Debug.WriteLine();
-            //var cmdText = "GetBacklogByCat @Cat";
-            //var param = new SqlParameter("@Cat", Category);
-            //IQueryable<Backlogs> back = _context.Backlogs.FromSqlRaw(cmdText, param).ToList<Backlogs>().AsQueryable();
-
             List<string> allCategory = CategoryParams.GetAll();
 
             //bad request error;
@@ -70,12 +65,8 @@ namespace SMDAsh.Controllers
                            && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
                            select t)
                            .ToList()
-                           .Where(
-                                t => DateTime.Parse(t.DateSent)
-                                .ToString("MM")
-                                .Contains((month.Equals("all") ? "" : month)))
-                            .OrderBy(t => DateTime.Parse(t.DateSent))
-                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedInDay).ToString("dd/MM/yyyy") : t.YearWeekIn)
+                            .OrderBy(t => t.YearWeekIn)
+                            .GroupBy(t => t.YearWeekIn)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
 
@@ -86,33 +77,11 @@ namespace SMDAsh.Controllers
                             && !t.YearOut.Equals(string.Empty)
                             select t)
                             .ToList()
-                            .Select(t => new
-                            {
-                                t.Category,
-                                t.DateSent,
-                                t.DsFormattedOutDay,
-                                t.YearWeekOut,
-                            })
-                            .Where(
-                                t => DateTime.Parse(t.DsFormattedOutDay)
-                                .ToString("MM")
-                                .Contains((month.Equals("all") ? "" : month)))
-                            .OrderBy(t => DateTime.Parse(t.DsFormattedOutDay))
-                            .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedOutDay).ToString("dd/MM/yyyy") : t.YearWeekOut)
+                            .OrderBy(t => t.YearWeekOut)
+                            .GroupBy(t =>  t.YearWeekOut)
                             .ToDictionary(g => g.Key, g => new { first = g.First(), count = g.Count() });
 
-            var queryB = (from t in _context.Tickets
-                          where t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING")
-                          && t.YearIn.Contains((Year.Equals("all") ? "" : Year))
-                          select t)
-                               .ToList()
-                               .Where(
-                                    t => DateTime.Parse(t.DateSent)
-                                    .ToString("MM")
-                                    .Contains((month.Equals("all") ? "" : month)))
-                                .OrderBy(t => DateTime.Parse(t.DsFormattedInDay))
-                                .GroupBy(t => (ByDay) ? DateTime.Parse(t.DsFormattedInDay).ToString("dd/MM/yyyy") : t.YearWeekIn)
-                                .ToDictionary(g => g.Key, g => g.Count());
+           
 
 
             List<Backlogs> back = new List<Backlogs>();
@@ -128,8 +97,7 @@ namespace SMDAsh.Controllers
                 int week = Int16.Parse(item.Value.first.WeekIn);
                 int bIn = item.Value.count;
                 int bOut = (queryOut.Keys.Contains((ByDay) ? day : yearWeek)) ? queryOut[ByDay ? day : yearWeek].count : 0;
-                int bck = ByDay ? (queryB.Keys.Contains(day) ? queryB[day] : 0) : 0;
-                bBacklog = (i == 0) ? bIn - bOut + bck : bBacklog + bIn - bOut;
+                bBacklog = (i == 0) ? bIn - bOut  : bBacklog + bIn - bOut;
                 Backlogs b = new Backlogs()
                 {
                     SourceTool = sourceTool,
@@ -523,46 +491,13 @@ namespace SMDAsh.Controllers
         [HttpGet("[action]")]
         public ActionResult<IQueryable> BacklogByAge()
         {
-            var query = (from t in _context.Tickets
-                         where t.Sharepoint == false && (t.DsFormattedStatus == "IN PROGRESS" || t.DsFormattedStatus == "PENDING")
+            var query = (from t in _context.BacklogByAge
                          select t)
-                         .ToList()
-            .GroupBy(t => t.DsFormattedInDay).Select(g => new { g.Key, Age = g.GroupBy(t => t.DsAge).Select(t => new { t.Key, count = t.Count() }) }).OrderBy(t => DateTime.Parse(t.Key));
-            var result = new List<BacklogByAge>();
-            var ageCategory = new List<ageStats>();
-            ageCategory.Add(new ageStats() { ageCategory = "5 days or less", count = 0 });
-            ageCategory.Add(new ageStats() { ageCategory = "6 to 12 days", count = 0 });
-            ageCategory.Add(new ageStats() { ageCategory = "12 to 20 days", count = 0 });
-            ageCategory.Add(new ageStats() { ageCategory = "more than 20 days", count = 0 });
-            foreach (var q in query)
-            {
-                if (!result.Exists(t => t.date.Equals(q.Key)))
-                {
-                    result.Add(new BacklogByAge { date = q.Key, ageCategory = new List<ageStats>(ageCategory) });
+                         .ToList();
 
-                }
-
-                foreach (var age in q.Age)
-                {
-                    if (age.Key <= 5)
-                    {
-                        result.Find(t => t.date.Equals(q.Key)).ageCategory[0].count += age.count;
-                    }
-                    else if (age.Key <= 12)
-                    {
-                        result.Find(t => t.date.Equals(q.Key)).ageCategory[1].count += age.count;
-                    }
-                    else if (age.Key <= 20)
-                    {
-                        result.Find(t => t.date.Equals(q.Key)).ageCategory[2].count += age.count;
-                    }
-                    else
-                    {
-                        result.Find(t => t.date.Equals(q.Key)).ageCategory[3].count += age.count;
-                    }
-                }
-            }
-            return Ok(result.AsQueryable());
+            
+            
+            return Ok(query.AsQueryable());
         }
 
         [HttpGet("[action]/{Sharepoint}/{Team}")]
