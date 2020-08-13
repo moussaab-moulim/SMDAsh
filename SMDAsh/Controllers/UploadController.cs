@@ -146,11 +146,7 @@ namespace SMDAsh.Controllers
                     {
                         
 
-                        var queryOldBacklog = (from t in _context.Backlogs select t).ToList();
-                        if (queryOldBacklog.Count>0 && DateTime.Compare(DateTime.Parse(queryOldBacklog.Last().Day), DateTime.Parse(extractedDate)) < 0)
-                        {
-                            return BadRequest(new { message="you cannot upload a file with older data" });
-                        }
+                 
                         ws = excelPack.Workbook.Worksheets[slaDataSheet - 1];
                         // list to save the data of excel as tickets
                         List<SlaTickets> slaTickets = new List<SlaTickets>();
