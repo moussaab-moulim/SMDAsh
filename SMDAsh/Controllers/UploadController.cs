@@ -13,6 +13,7 @@ using SMDAsh.Models;
 using Microsoft.EntityFrameworkCore;
 using SMDAsh.Models.Charts;
 using System.Linq;
+using Microsoft.Data.SqlClient;
 
 namespace SMDAsh.Controllers
 {
@@ -46,7 +47,23 @@ namespace SMDAsh.Controllers
             if (excelFile.Length <= 0)
                 return BadRequest("FileNotFound");
             string fileExtension = Path.GetExtension(excelFile.FileName);
+            var extractedName = excelFile.FileName.Replace(fileExtension, "");
+            var extractedDate = "";
 
+
+
+
+            if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
+            {
+                var dateRaw = extractedName.Split("-");
+                extractedDate = dateRaw[4] + "/" + dateRaw[3] + "/" + dateRaw[2];
+            }
+            else
+            {
+                var dateRaw = extractedName.Split("_");
+                extractedDate = dateRaw[2].Substring(0,4) + "/" + dateRaw[2].Substring(4,2) + "/" + dateRaw[2].Substring(6,2);
+            }
+            
 
             int count = 0;
 
@@ -103,8 +120,8 @@ namespace SMDAsh.Controllers
                         }
 
 
-                        tickets.Add(createNewTicket(ligne, sourcetool));
-                        count++;
+                        tickets.Add(createNewTicket(ligne, sourcetool,extractedDate));
+                        created++;
 
 
                     }
@@ -113,12 +130,27 @@ namespace SMDAsh.Controllers
 
 
                     // IMPORT TO DATABASE
-                   var upsertData = _context.Tickets.UpsertRange(tickets).On(t=>new { t.TicketID,t.SourceTool });
-                     created = upsertData.Run();
-                    //_context.AddRange(tickets);
+                    ///var upsertData = _context.Tickets.UpsertRange(tickets).On(t=>new { t.TicketID,t.SourceTool });
+                    //created = upsertData.Run();
+                    var deleteTickets = (from t in _context.Tickets where t.SourceTool == sourcetool select t);
+                    _context.Tickets.RemoveRange(deleteTickets);
+                    var deleteSlaTickets = (from t in _context.SlaTickets where t.SourceTool == sourcetool select t);
+                    _context.SlaTickets.RemoveRange(deleteSlaTickets);
+                    //_context.Database.ExecuteSqlCommand("DELETE from Tickets where SourceTool = '@st'", new SqlParameter("st", sourcetool));
+                    //_context.Database.ExecuteSqlCommand("DELETE from SlaTickets where SourceTool = '@st'", new SqlParameter("st", sourcetool));
 
+                    _context.SaveChanges();
+                    _context.AddRange(tickets);
+                    created = _context.SaveChanges();
                     if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase))
                     {
+                        
+
+                        var queryOldBacklog = (from t in _context.Backlogs select t).ToList();
+                        if (queryOldBacklog.Count>0 && DateTime.Compare(DateTime.Parse(queryOldBacklog.Last().Day), DateTime.Parse(extractedDate)) < 0)
+                        {
+                            return BadRequest(new { message="you cannot upload a file with older data" });
+                        }
                         ws = excelPack.Workbook.Worksheets[slaDataSheet - 1];
                         // list to save the data of excel as tickets
                         List<SlaTickets> slaTickets = new List<SlaTickets>();
@@ -159,70 +191,95 @@ namespace SMDAsh.Controllers
 
 
                             slaTickets.Add(createSlaTicket(ligne, sourcetool));
-                            count++;
+                            slaCreated++;
 
 
                         }
                         
-                        //_context.AddRange(slaTickets);
-                        var upsertSla = _context.SlaTickets.UpsertRange(slaTickets).On(t => new { t.SlaID, t.SourceTool });
-                        slaCreated = upsertSla.Run();
-
+                        _context.AddRange(slaTickets);
+                        //var upsertSla = _context.SlaTickets.UpsertRange(slaTickets).On(t => new { t.SlaID, t.SourceTool });
+                        //slaCreated = upsertSla.Run();
+                        _context.SaveChanges();
 
                         //Calcualte Backlog
 
-                        var extractedName = excelFile.FileName.Replace(fileExtension, "").Split("-");
-                        var extractedDate = extractedName[4] + "/" + extractedName[3] + "/" + extractedName[2];
+                        CalculateBacklog(extractedDate, sourcetool);
 
-                        var queryBacklog = (from t in _context.Tickets
-                                            where t.SourceTool == "digiself" &&
-                                            t.Sharepoint == false
-                                            select t).ToList();
-                        var queryOut = queryBacklog.Where(t => t.DsFormattedOutDay == extractedDate)
-                            .GroupBy(t => t.SourceTool)
-                           .Select(g => new { day = extractedDate, count = g.Count() });
+                        CalculateAgeBacklog(extractedDate, sourcetool);
 
-
-                        var queryIn = queryBacklog.Where(t => t.DateSent == extractedDate)
-                            .GroupBy(t => t.SourceTool)
-                           .Select(g => new { day = extractedDate, count = g.Count() });
-
-                        var queryB = queryBacklog
-                            .Where(t => t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING"))
-                            .GroupBy(t => t.SourceTool)
-                           .Select(g => new { day = extractedDate, count = g.Count() });
-
-
-                        var tableBacklog = new Backlogs()
-                        {
-                            SourceTool = sourcetool,
-                            Day = extractedDate,
-                            Year = Int32.Parse( DateTime.Parse(extractedDate).ToString("yyyy")),
-                            Week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                        DateTime.Parse(extractedDate),
-                        CalendarWeekRule.FirstDay,
-                        DayOfWeek.Monday),
-                            In = queryIn.First().count,
-                            Out = queryOut.First().count,
-                            backlog = queryB.First().count
-                        };
-                        var upsertBacklog = _context.Backlogs.Upsert(tableBacklog).On(t => new { t.SourceTool, t.Day });
-
-                        upsertBacklog.Run();
+                        
 
                     }
 
                      
                     
                     //int created = _context.SaveChanges();
-                    return Created("File imported successfully", new { name = filename, SourceTool = sourcetool,
+                    return Created("File imported successfully", new { message = "File imported successfully", name = filename, SourceTool = sourcetool,
                         RowsInsertedOrUpdated = created, SlaInsertedOrUpdated=slaCreated });
                 }
 
             }
         }
 
-        
+        private void CalculateAgeBacklog(string extractedDate,string sourceTool)
+        {
+            var query = (from t in _context.Tickets
+                         where
+                         t.SourceTool == sourceTool &&
+                         t.Sharepoint == false && (t.DsFormattedStatus == "IN PROGRESS" || t.DsFormattedStatus == "PENDING")
+                         select t)
+                         .ToList();
+            var BacklogAge = new BacklogByAge()
+            {
+                date = extractedDate,
+                Cat0To5 = query.Where(t => t.DsAge < 6).Count(),
+                Cat6To12 = query.Where(t => t.DsAge >= 6 && t.DsAge < 13).Count(),
+                Cat12To20 = query.Where(t => t.DsAge >= 13 && t.DsAge < 21).Count(),
+                Cat20More = query.Where(t => t.DsAge >= 21).Count()
+            };
+
+            _context.BacklogByAge.Upsert(BacklogAge).On(t => t.date).Run();
+
+        }
+
+        private void CalculateBacklog(string extractedDate, string sourcetool)
+        {
+            var queryBacklog = (from t in _context.Tickets
+                                where t.SourceTool == "digiself" &&
+                                t.Sharepoint == false
+                                select t).ToList();
+            var queryOut = queryBacklog.Where(t => t.DsFormattedOutDay == extractedDate)
+                .GroupBy(t => t.SourceTool)
+               .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+            var queryIn = queryBacklog.Where(t => t.DateSent == extractedDate)
+                .GroupBy(t => t.SourceTool)
+               .Select(g => new { day = extractedDate, count = g.Count() });
+
+            var queryB = queryBacklog
+                .Where(t => t.DsFormattedStatus.Contains("IN PROGRESS") || t.DsFormattedStatus.Contains("PENDING"))
+                .GroupBy(t => t.SourceTool)
+               .Select(g => new { day = extractedDate, count = g.Count() });
+
+
+            var tableBacklog = new Backlogs()
+            {
+                SourceTool = sourcetool,
+                Day = extractedDate,
+                Year = Int32.Parse(DateTime.Parse(extractedDate).ToString("yyyy")),
+                Week = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
+            DateTime.Parse(extractedDate),
+            CalendarWeekRule.FirstDay,
+            DayOfWeek.Monday),
+                In = queryIn.First().count,
+                Out = queryOut.First().count,
+                backlog = queryB.First().count
+            };
+            var upsertBacklog = _context.Backlogs.Upsert(tableBacklog).On(t => new { t.SourceTool, t.Day });
+
+            upsertBacklog.Run();
+        }
 
         private SlaTickets createSlaTicket(Dictionary<string, string> ligne, string sourcetool)
         {
@@ -256,21 +313,9 @@ namespace SMDAsh.Controllers
             return null;
         }
 
-        private int getLastData(string v, string sourcetool)
-        {
-            if (sourcetool.Equals("mantis", StringComparison.OrdinalIgnoreCase))
-            {
-                return 45;
-            }else if (sourcetool.Equals("sm9", StringComparison.OrdinalIgnoreCase))
-            {
-                return 29;
-            }else if (sourcetool.Equals("digiself", StringComparison.OrdinalIgnoreCase)){
-                return v.Equals("sla")?14:28;
-            }
-            return -1;
-        }
+        
 
-        private Tickets createNewTicket(Dictionary<string, string> ligne, string sourcetool)
+        private Tickets createNewTicket(Dictionary<string, string> ligne, string sourcetool, string extractedDate)
         {
             if (sourcetool.ToLower().Equals("mantis"))
             {
@@ -360,8 +405,8 @@ namespace SMDAsh.Controllers
                 var dsFormattedOut = (integrateColumn(ligne["SLA.Titre"], "Category").Equals(CategoryParams.SR)&& !dateClosed.Equals(string.Empty)?
                     dateClosed:dateResolved);
                 var dsAge = (dateResolved.Equals(string.Empty)) ?
-                    (DateTime.Today - DateTime.Parse(dsFormattedIn)).TotalDays:
-                    (DateTime.Parse(dsFormattedOut) - DateTime.Parse(dsFormattedIn)).TotalDays;
+                    CaluclateDays(DateTime.Parse(dsFormattedIn), DateTime.Parse(extractedDate)):
+                    CaluclateDays(DateTime.Parse(dsFormattedIn), DateTime.Parse(dsFormattedOut));
                 var isSharepoint = (ligne["Catégorie.Parent de 2e niveau"].Equals("Sharepoint", StringComparison.OrdinalIgnoreCase)) ?
                     true :
                     (ligne["Service.Libellé d'affichage"].Equals("Sharepoint", StringComparison.OrdinalIgnoreCase) ? true :
@@ -475,5 +520,52 @@ namespace SMDAsh.Controllers
             return finalVal;
         }
 
-       }
+
+        private int CaluclateDays(DateTime firstDay, DateTime lastDay, params DateTime[] bankHolidays)
+        {
+            firstDay = firstDay.Date;
+            lastDay = lastDay.Date;
+            //if (firstDay > lastDay)
+                //throw new ArgumentException("Incorrect last day " + lastDay + " first day" + firstDay);
+
+            TimeSpan span = lastDay - firstDay;
+            int businessDays = span.Days;
+            int fullWeekCount = businessDays / 7;
+            // find out if there are weekends during the time exceedng the full weeks
+            if (businessDays > fullWeekCount * 7)
+            {
+                // we are here to find out if there is a 1-day or 2-days weekend
+                // in the time interval remaining after subtracting the complete weeks
+                int firstDayOfWeek = firstDay.DayOfWeek == DayOfWeek.Sunday
+        ? 7 : (int)firstDay.DayOfWeek;
+                int lastDayOfWeek = lastDay.DayOfWeek == DayOfWeek.Sunday
+                    ? 7 : (int)lastDay.DayOfWeek;
+                if (lastDayOfWeek < firstDayOfWeek)
+                    lastDayOfWeek += 7;
+                if (firstDayOfWeek <= 6)
+                {
+                    if (lastDayOfWeek >= 7)// Both Saturday and Sunday are in the remaining time interval
+                        businessDays -= 2;
+                    else if (lastDayOfWeek >= 6)// Only Saturday is in the remaining time interval
+                        businessDays -= 1;
+                }
+                else if (firstDayOfWeek <= 7 && lastDayOfWeek >= 7)// Only Sunday is in the remaining time interval
+                    businessDays -= 1;
+            }
+
+            // subtract the weekends during the full weeks in the interval
+            businessDays -= fullWeekCount + fullWeekCount;
+
+            // subtract the number of bank holidays during the time interval
+            foreach (DateTime bankHoliday in bankHolidays)
+            {
+                DateTime bh = bankHoliday.Date;
+                if (firstDay <= bh && bh <= lastDay)
+                    --businessDays;
+            }
+
+            return businessDays;
+        }
+
+    }
 }

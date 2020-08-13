@@ -13,7 +13,5 @@ namespace SMDAsh.Models
 
         public int AllDataSheet { get; set; } = 1;
         public int SlaDataSheet { get; set; } = 1;
-        public int AllDataLastRow { get; set; } = 1;
-        public int SlaDataLastRow { get; set; } = 1;
     }
 }

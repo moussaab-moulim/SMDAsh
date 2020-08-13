@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMDAsh.Models;
 
 namespace SMDAsh.Migrations
 {
     [DbContext(typeof(SmDashboardContext))]
-    partial class SmDashboardContextModelSnapshot : ModelSnapshot
+    [Migration("20200813182253_backolgByage")]
+    partial class backolgByage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

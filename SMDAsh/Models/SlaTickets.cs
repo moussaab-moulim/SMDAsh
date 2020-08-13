@@ -26,6 +26,5 @@ namespace SMDAsh.Models
         public bool Sharepoint { get; set; }
         public string CreatedBy { get; set; }
         public double DsAge { get; set; }
-        public virtual Tickets ParentTicket { get; set; }
     }
 }

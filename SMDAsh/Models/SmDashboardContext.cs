@@ -19,6 +19,7 @@ namespace SMDAsh.Models
         public virtual DbSet<Tickets> Tickets { get; set; }
         public virtual DbSet<SlaTickets> SlaTickets { get; set; }
         public virtual DbSet<Backlogs> Backlogs { get; set; }
+        public virtual DbSet<BacklogByAge> BacklogByAge { get; set; }
         public DbSet<Users.User> Users { get; set; }
 
 
@@ -32,9 +33,7 @@ namespace SMDAsh.Models
                 .HasIndex(t => new { t.SlaID, t.SourceTool })
                 .IsUnique()
                 .HasName("Index_by_SlaId_Source_tool");
-            modelBuilder.Entity<Tickets>()
-            .HasMany(s => s.SlaTickets)
-            .WithOne(t => t.ParentTicket);
+            
             
         }
     }
