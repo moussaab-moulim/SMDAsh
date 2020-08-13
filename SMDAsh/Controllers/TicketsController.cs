@@ -55,7 +55,7 @@ namespace SMDAsh.Controllers
                                     where b.SourceTool == SourceTool
                                     && b.Year.ToString().Contains((Year.Equals("all") ? "" : Year))
                                     select b).ToList().Where(b=> DateTime.Parse(b.Day).ToString("MM")
-                                    .Contains(month.Equals("all") ? "" : month)).OrderBy(t=> DateTime.Parse(t.Days));
+                                    .Contains(month.Equals("all") ? "" : month)).OrderBy(t=> DateTime.Parse(t.Day));
                 return Ok(queryBacklog.AsQueryable());
             }
 
