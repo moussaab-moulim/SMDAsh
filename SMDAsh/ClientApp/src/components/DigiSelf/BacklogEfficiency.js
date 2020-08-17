@@ -188,6 +188,15 @@ const BacklogEfficiencyDigiSelf = () => {
     const newChartData = {
       datasets: [
         {
+          label: 'Backlog',
+          data: newChartArrays.backlog,
+          order: 1,
+          type: 'line',
+          fill: false,
+          backgroundColor: COLOR_BLUE,
+          borderColor: COLOR_BLUE,
+        },
+        {
           label: 'Incoming',
           data: newChartArrays.in,
           backgroundColor: COLOR_TEAL,
@@ -197,15 +206,7 @@ const BacklogEfficiencyDigiSelf = () => {
           data: newChartArrays.out,
           backgroundColor: COLOR_ORANGE,
         },
-        {
-          label: 'Backlog',
-          data: newChartArrays.backlog,
-          order: 1,
-          type: 'line',
-          fill: false,
-          backgroundColor: COLOR_BLUE,
-          borderColor: COLOR_BLUE,
-        },
+       
       ],
       labels: newChartArrays.day,
     };

@@ -182,17 +182,17 @@ const BacklogEvolutionByAge = () => {
 
     for (let i = 0; i < datatable.length; i++) {
       newChartArrays.date.push(datatable[i].date);
-      newChartArrays.days12to20.push(datatable[i].ageCategory[0].count);
-      newChartArrays.days5orLess.push(datatable[i].ageCategory[1].count);
-      newChartArrays.days6to12.push(datatable[i].ageCategory[2].count);
-      newChartArrays.morethen20days.push(datatable[i].ageCategory[3].count);
+      newChartArrays.days12to20.push(datatable[i].cat12To20);
+      newChartArrays.days5orLess.push(datatable[i].cat0To5);
+      newChartArrays.days6to12.push(datatable[i].cat6To12);
+      newChartArrays.morethen20days.push(datatable[i].cat20More);
 
       datatableToShow.push({
        "date": datatable[i].date,
-       "days12to20": datatable[i].ageCategory[0].count,
-       "days5orLess": datatable[i].ageCategory[1].count,
-       "days6to12": datatable[i].ageCategory[2].count,
-       "morethen20days": datatable[i].ageCategory[3].count,
+       "days12to20": datatable[i].cat12To20,
+       "days5orLess": datatable[i].cat0To5,
+       "days6to12": datatable[i].cat6To12,
+       "morethen20days": datatable[i].cat20More,
       });
     }
     const newChartData = {

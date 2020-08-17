@@ -182,11 +182,11 @@ export const APIS = {
    
 
     // DigiSelf Backlog
-    getBacklogDigiSelfOneWeek: '/api/GetBacklog/all/all/all?ByDay=true&take=5',
-    getBacklogDigiSelfOneMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=20',
-    getBacklogDigiSelfThreeMonth: '/api/GetBacklog/all/all/all?ByDay=true&take=60',
-    getBacklogDigiSelfOneYear: '/api/GetBacklog/all/all/all?ByDay=true&take=240',
-    getBacklogDigiSelfAll: '/api/GetBacklog/all/all/all',
+    getBacklogDigiSelfOneWeek: '/api/GetBacklog/digiself/all/all/all?ByDay=true&take=5',
+    getBacklogDigiSelfOneMonth: '/api/GetBacklog/digiself/all/all/all?ByDay=true&take=20',
+    getBacklogDigiSelfThreeMonth: '/api/GetBacklog/digiself/all/all/all?ByDay=true&take=60',
+    getBacklogDigiSelfOneYear: '/api/GetBacklog/digiself/all/all/all?ByDay=true&take=240',
+    getBacklogDigiSelfAll: '/api/GetBacklog/digiself/all/all/all',
 
     // DigiSelf Backlog Evolution
     getBacklogDigiSelfByAgeOneWeek: '/api/BacklogByAge?take=5',

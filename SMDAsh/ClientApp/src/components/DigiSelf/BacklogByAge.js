@@ -159,21 +159,28 @@ export default function BacklogByAge() {
         let dataTable = [];
         let total = 0;
 
-        const labels = [];
+        const labels = ["5 days or less", "6 to 12 days", "12 to 20 days", "20 and more"];
         const counts = [];
 
         const backgroundColor = [];
 
-        const data = chartBacklogByAgeState.dataTable.slice(-1)[0].ageCategory;
+        const data = chartBacklogByAgeState.dataTable.slice(-1)[0];
+        console.log(data);
 
-        for (let i = 0; i < data.length; i++) {
 
-            labels.push(data[i].ageCategory)
-            counts.push(data[i].count)
-            dataTable.push(data[i])
 
-            backgroundColor.push(dynamicColors());
-        }
+        counts.push(data.cat0To5)
+        counts.push(data.cat6To12)
+        counts.push(data.cat12To20)
+        counts.push(data.cat20More)
+        dataTable.push({ageCategory: "5 days or less", count: data.cat0To5})
+        dataTable.push({ageCategory: "6 to 12 days", count: data.cat6To12})
+        dataTable.push({ageCategory: "12 to 20 days", count: data.cat12To20})
+        dataTable.push({ageCategory: "20 and more", count: data.cat20More})
+    
+
+        backgroundColor.push(dynamicColors());
+
 
         for (let i = 0; i < dataTable.length; i++) {
             total += dataTable[i].count;
@@ -199,129 +206,129 @@ export default function BacklogByAge() {
 
     return (
         <div>
-                    <GridContainer>
-                        <Grid item xs={12} sm={12} md={4} >
-                            <Card className={classes.card}>
+            <GridContainer>
+                <Grid item xs={12} sm={12} md={4} >
+                    <Card className={classes.card}>
 
-                                {chartData.loading ? <SpinnerChart /> : null}
-                                <CardBody>
-                                    <Grid item
-                                        xs={12}
-                                        sm={12}
-                                        md={12}
-                                        container
-                                        direction='row'
-                                        justify='space-between'
-                                        alignItems='center'
-                                    >
+                        {chartData.loading ? <SpinnerChart /> : null}
+                        <CardBody>
+                            <Grid item
+                                xs={12}
+                                sm={12}
+                                md={12}
+                                container
+                                direction='row'
+                                justify='space-between'
+                                alignItems='center'
+                            >
 
-                                        <Button
-                                            variant='contained'
-                                            className={classes.buttonTealColor + ' ' + classes.btn}
-                                        >
-                                            <TableChartIcon className={classes.buttonicon} />
+                                <Button
+                                    variant='contained'
+                                    className={classes.buttonTealColor + ' ' + classes.btn}
+                                >
+                                    <TableChartIcon className={classes.buttonicon} />
                                  Table PNG
                                 </Button>
 
-                                    </Grid>
+                            </Grid>
 
-                                    <TableContainer component={Paper} >
-                                        <Table className={classes.table} aria-label="simple table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Age Category</TableCell>
-                                                    <TableCell >Count Of ID</TableCell>
+                            <TableContainer component={Paper} >
+                                <Table className={classes.table} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Age Category</TableCell>
+                                            <TableCell >Count Of ID</TableCell>
+
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+
+                                        {
+                                            chartTable.map((row) => (
+
+                                                <TableRow className={classes.paddingTable}>
+
+                                                    <TableCell align="left">{row.ageCategory}</TableCell>
+                                                    <TableCell align="left">{row.count}</TableCell>
 
                                                 </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-
-                                                {
-                                                    chartTable.map((row) => (
-
-                                                        <TableRow className={classes.paddingTable}>
-
-                                                            <TableCell align="left">{row.ageCategory}</TableCell>
-                                                            <TableCell align="left">{row.count}</TableCell>
-
-                                                        </TableRow>
-                                                    ))
-                                                }
+                                            ))
+                                        }
 
 
-                                                <TableRow >
-                                                    <TableCell align="left"><b>Total :</b></TableCell>
-                                                    <TableCell style={{
-                                                        color: '#008080'
+                                        <TableRow >
+                                            <TableCell align="left"><b>Total :</b></TableCell>
+                                            <TableCell style={{
+                                                color: '#008080'
 
-                                                    }} align="left"><b>{total}</b></TableCell>
-                                                </TableRow>
+                                            }} align="left"><b>{total}</b></TableCell>
+                                        </TableRow>
 
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
 
-                                </CardBody>
+                        </CardBody>
 
-                            </Card>
+                    </Card>
 
-                        </Grid>
+                </Grid>
 
-                        <Grid item xs={12} sm={12} md={8} >
-                            <Card className={classes.card}>
-                                {chartData.loading ? <SpinnerChart /> : null}
-                                <CardBody>
-                                    <Grid
+                <Grid item xs={12} sm={12} md={8} >
+                    <Card className={classes.card}>
+                        {chartData.loading ? <SpinnerChart /> : null}
+                        <CardBody>
+                            <Grid
 
-                                        container
-                                        direction='row'
-                                        justify='flex-end'
-                                        alignItems='left'
-                                    >
-                                        <Button
-                                            variant='contained'
-                                            className={classes.buttonTealColor + ' ' + classes.btn}
-                                        >
-                                            <GetAppIcon className={classes.buttonicon} />
+                                container
+                                direction='row'
+                                justify='flex-end'
+                                alignItems='left'
+                            >
+                                <Button
+                                    variant='contained'
+                                    className={classes.buttonTealColor + ' ' + classes.btn}
+                                >
+                                    <GetAppIcon className={classes.buttonicon} />
                 Chart PNG
               </Button>
-                                    </Grid>
+                            </Grid>
 
-                                    <Pie data={chartData} options={{
-                                        plugins: {
-                                            labels: {
-                                                render: 'value',
-                                                fontSize: 13,
+                            <Pie data={chartData} options={{
+                                plugins: {
+                                    labels: {
+                                        render: 'value',
+                                        fontSize: 13,
 
-                                                fontColor: '#000',
-                                                fontFamily: '"Lucida Console", Monaco, monospace'
-                                            },
-                                        },
-                                        title: {
-                                            display: true,
-                                            text: 'Backlog By Age',
-                                            fontSize: 20,
-                                        },
-                                        responsive: true,
+                                        fontColor: '#000',
+                                        fontFamily: '"Lucida Console", Monaco, monospace'
+                                    },
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Backlog By Age',
+                                    fontSize: 20,
+                                },
+                                responsive: true,
 
-                                        legend: {
-                                            display: true,
-                                            position: 'top',
-                                            labels: {
-                                                fontSize: 12,
-                                                usePointStyle: true
-                                            },
-                                        },
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        fontSize: 12,
+                                        usePointStyle: true
+                                    },
+                                },
 
-                                    }} />
+                            }} />
 
-                                </CardBody>
+                        </CardBody>
 
-                            </Card>
+                    </Card>
 
-                        </Grid>
+                </Grid>
 
-                    </GridContainer>
+            </GridContainer>
 
         </div >
     );
