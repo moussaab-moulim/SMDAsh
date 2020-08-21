@@ -174,11 +174,11 @@ export const COLOR_RED = '#d44320';
 
 export const APIS = {
     // Anomalie Backlog
-    getBacklogAnomalyOneMonth: '/api/GetBacklog/anomalie/all/all?take=4',
-    getBacklogAnomalyThreeMonth: '/api/GetBacklog/anomalie/all/all?take=13',
-    getBacklogAnomalySixMonth: '/api/GetBacklog/anomalie/all/all?take=26',
-    getBacklogAnomalyOneYear: '/api/GetBacklog/anomalie/all/all?take=52',
-    getBacklogAnomalyAll: '/api/GetBacklog/anomalie/all/all',
+    getBacklogAnomalyOneMonth: '/api/GetBacklog/mantis/anomalie/all/all?take=4',
+    getBacklogAnomalyThreeMonth: '/api/GetBacklog/mantis/anomalie/all/all?take=13',
+    getBacklogAnomalySixMonth: '/api/GetBacklog/mantis/anomalie/all/all?take=26',
+    getBacklogAnomalyOneYear: '/api/GetBacklog/mantis/anomalie/all/all?take=52',
+    getBacklogAnomalyAll: '/api/GetBacklog/mantis/anomalie/all/all',
    
 
     // DigiSelf Backlog
@@ -210,19 +210,19 @@ export const APIS = {
    
 
     // SR Backlog
-    getBacklogSrOneMonth: '/api/GetBacklog/sr/all/all?take=4',
-    getBacklogSrThreeMonth: '/api/GetBacklog/sr/all/all?take=13',
-    getBacklogSrSixMonth: '/api/GetBacklog/sr/all/all?take=26',
-    getBacklogSrOneYear: '/api/GetBacklog/sr/all/all?take=52',
-    getBacklogSrAll: '/api/GetBacklog/sr/all/all',
+    getBacklogSrOneMonth: '/api/GetBacklog/mantis/sr/all/all?take=4',
+    getBacklogSrThreeMonth: '/api/GetBacklog/mantis/sr/all/all?take=13',
+    getBacklogSrSixMonth: '/api/GetBacklog/mantis/sr/all/all?take=26',
+    getBacklogSrOneYear: '/api/GetBacklog/mantis/sr/all/all?take=52',
+    getBacklogSrAll: '/api/GetBacklog/mantis/sr/all/all',
     
 
     // Evolution Backlog
-    getBacklogEvolutionOneMonth: '/api/GetBacklog/evolution/all/all?take=4',
-    getBacklogEvolutionThreeMonth: '/api/GetBacklog/evolution/all/all?take=13',
-    getBacklogEvolutionSixMonth: '/api/GetBacklog/evolution/all/all?take=26',
-    getBacklogEvolutionOneYear: '/api/GetBacklog/evolution/all/all?take=52',
-    getBacklogEvolutionAll: '/api/GetBacklog/evolution/all/all',
+    getBacklogEvolutionOneMonth: '/api/GetBacklog/mantis/evolution/all/all?take=4',
+    getBacklogEvolutionThreeMonth: '/api/GetBacklog/mantis/evolution/all/all?take=13',
+    getBacklogEvolutionSixMonth: '/api/GetBacklog/mantis/evolution/all/all?take=26',
+    getBacklogEvolutionOneYear: '/api/GetBacklog/mantis/evolution/all/all?take=52',
+    getBacklogEvolutionAll: '/api/GetBacklog/mantis/evolution/all/all',
 
     // BacklogByOwner
     getBacklogByOwner:'/api/BacklogByOwner',
@@ -241,7 +241,7 @@ export const APIS = {
         getYearsOut: '/api/Filters/GetYears/Out',
 
         /* Get Weeks */
-        getWeeks: '/api/Filters/GetWeeks/all',
+        getWeeks: '/api/Filters/GetWeeks',
         getWeeksIn: '/api/Filters/GetWeeks/in',
         getWeeksOut: '/api/Filters/GetWeeks/out',
 
